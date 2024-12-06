@@ -1,25 +1,13 @@
+import Dashboard from "./components/Dashboard/Dashboard"
+import Topbar from "./components/Topbar/Topbar"
 
 
 function App() {
 
   return (
     <>
-     <h1>Project Management</h1>
-      <h1>Project Management- rakesh code</h1>
-      <h1>Project Management- rakesh code</h1>
-      <h1>Project Management- rakesh code</h1>
-
-      <h1>Project Management- rakesh code</h1>
-      
-     <h1>Project Management-puja</h1>
-     <h1>Project Management-puja</h1>
-     <h1>Project Management-puja</h1>
-     <h1>Project Management-puja</h1>
-     <h2>Project Management-pujahjjhhj</h2>
-     <h2>Project Management-pujahjjhhj</h2>
-     <h2>Project Management-pujahjjhhj</h2>
-     
-
+     <Topbar/>
+     <Dashboard/>
       
     </>
   )
