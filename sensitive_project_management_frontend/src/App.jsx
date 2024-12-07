@@ -5,6 +5,7 @@ import Topbar from "./components/Topbar/Topbar";
 import Test from "./components/Test";
 import LoginPage from "./components/Login/Login";
 import SignUp from "./assets/SignUp";
+import TaskList from "./components/Task/Task"; // Make sure to import your TaskList component
 
 function App() {
   return (
@@ -14,10 +15,9 @@ function App() {
         {/* Define your routes here */}
         <Route path="/" element={<Dashboard />} />
         <Route path="/user" element={<Test />} />
-        <Route path="/login" element={<LoginPage/>} />
-
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUp />} />
-
+        <Route path="/task" element={<TaskList />} /> {/* Route for Task Management Page */}
         {/* Add additional routes for other components */}
       </Routes>
     </Router>
