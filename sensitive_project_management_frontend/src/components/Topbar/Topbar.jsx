@@ -1,5 +1,6 @@
-import React from 'react'
-import logo from "../../assets/logo.webp"
+import React from 'react';
+import { Link } from 'react-router-dom';
+import logo from "../../assets/logo.webp";
 
 export default function Topbar() {
   return (
@@ -15,12 +16,12 @@ export default function Topbar() {
 
       {/* Menu Section */}
       <div className="flex justify-center items-center space-x-6 md:space-x-8 lg:space-x-12">
-        <a href="#leave" className="font-bold text-white hover:text-gray-200 transition-colors">User</a>
-        <a href="#employee" className="font-bold text-white hover:text-gray-200 transition-colors">Employee</a>
-        <a href="#attendance" className="font-bold text-white hover:text-gray-200 transition-colors">Attendance</a>
-        <a href="#client" className="font-bold text-white hover:text-gray-200 transition-colors">Client</a>
-        <a href="#task" className="font-bold text-white hover:text-gray-200 transition-colors">Task</a>
-        <a href="#leave" className="font-bold text-white hover:text-gray-200 transition-colors">Leave</a>
+        <Link to="/user" className="font-bold text-white hover:text-gray-200 transition-colors">User</Link>
+        <Link to="/employee" className="font-bold text-white hover:text-gray-200 transition-colors">Employee</Link>
+        <Link to="/attendance" className="font-bold text-white hover:text-gray-200 transition-colors">Attendance</Link>
+        <Link to="/client" className="font-bold text-white hover:text-gray-200 transition-colors">Client</Link>
+        <Link to="/task" className="font-bold text-white hover:text-gray-200 transition-colors">Task</Link>
+        <Link to="/leave" className="font-bold text-white hover:text-gray-200 transition-colors">Leave</Link>
       </div>
 
       {/* Logout Button Section */}
@@ -30,5 +31,5 @@ export default function Topbar() {
         </button>
       </div>
     </div>
-  )
+  );
 }
