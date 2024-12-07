@@ -1,17 +1,21 @@
-import Dashboard from "./components/Dashboard/Dashboard"
-import LoginPage from "./components/Login/Login"
-import Topbar from "./components/Topbar/Topbar"
-
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Dashboard from "./components/Dashboard/Dashboard";
+import Topbar from "./components/Topbar/Topbar";
+import Test from "./components/Test";
 
 function App() {
-
   return (
-    <>
-     <Topbar/>
-     <Dashboard/>
-    <LoginPage/>      
-    </>
-  )
+    <Router>
+      <Topbar />
+      <Routes>
+        {/* Define your routes here */}
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/user" element={<Test />} />
+        {/* Add additional routes for other components */}
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
