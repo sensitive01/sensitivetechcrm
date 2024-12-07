@@ -6,6 +6,7 @@ import EmployeeTable from "./components/Employee/EmployeeTable";
 import Employee from "./components/Employee/Employee";
 import LoginPage from "./components/Login/Login";
 import SignUp from "./assets/SignUp";
+import TaskList from "./components/Task/Task"; // Make sure to import your TaskList component
 
 function App() {
   return (
@@ -18,8 +19,10 @@ function App() {
         <Route path="/employee-form" element={<Employee />} />
         <Route path="/login" element={<LoginPage/>} />
 
+        <Route path="/user" element={<Test />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUp />} />
-
+        <Route path="/task" element={<TaskList />} /> {/* Route for Task Management Page */}
         {/* Add additional routes for other components */}
       </Routes>
     </Router>
