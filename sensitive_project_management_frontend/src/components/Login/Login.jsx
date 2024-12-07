@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import logo from "../../assets/logo.webp";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -13,6 +15,7 @@ const LoginPage = () => {
     e.preventDefault();
     console.log("Login Data:", formData);
     // Add your login logic here
+    navigate("/dashboard"); // Redirect to the dashboard after login
   };
 
   return (

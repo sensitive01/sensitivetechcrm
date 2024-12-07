@@ -4,25 +4,32 @@ import Dashboard from "./components/Dashboard/Dashboard";
 import Topbar from "./components/Topbar/Topbar";
 import EmployeeTable from "./components/Employee/EmployeeTable";
 import Employee from "./components/Employee/Employee";
-import Test from "./components/Test";
 import LoginPage from "./components/Login/Login";
 import SignUp from "./assets/SignUp";
 
 function App() {
   return (
     <Router>
-      <Topbar />
       <Routes>
-        {/* Define your routes here */}
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/employee-table" element={<EmployeeTable />} />
-        <Route path="/employee-form" element={<Employee />} />
-        <Route path="/user" element={<Test />} />
-        <Route path="/login" element={<LoginPage/>} />
+        {/* Login Route - No Topbar */}
+        <Route path="/" element={<LoginPage />} />
 
-        <Route path="/signup" element={<SignUp />} />
-
-        {/* Add additional routes for other components */}
+        {/* Admin Layout - With Topbar */}
+        <Route
+          path="/*"
+          element={
+            <div className="app">
+              <Topbar />
+              <div className="main-content">
+                <Routes>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/employee-table" element={<EmployeeTable />} />
+                  <Route path="/employee-form" element={<Employee />} />
+                </Routes>
+              </div>
+            </div>
+          }
+        />
       </Routes>
     </Router>
   );
