@@ -20,6 +20,7 @@ export default function Topbar() {
         <Link to="/employee" className="font-bold text-white hover:text-gray-200 transition-colors">Employee</Link>
         <Link to="/attendance" className="font-bold text-white hover:text-gray-200 transition-colors">Attendance</Link>
         <Link to="/client" className="font-bold text-white hover:text-gray-200 transition-colors">Client</Link>
+        <Link to="/project" className="font-bold text-white hover:text-gray-200 transition-colors">Project</Link>
         <Link to="/task" className="font-bold text-white hover:text-gray-200 transition-colors">Task</Link>
         <Link to="/leave" className="font-bold text-white hover:text-gray-200 transition-colors">Leave</Link>
       </div>

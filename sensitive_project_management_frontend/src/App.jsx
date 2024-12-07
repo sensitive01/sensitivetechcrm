@@ -4,8 +4,10 @@ import Dashboard from "./components/Dashboard/Dashboard";
 import Topbar from "./components/Topbar/Topbar";
 import Test from "./components/Test";
 import LoginPage from "./components/Login/Login";
-import SignUp from "./assets/SignUp";
-import TaskList from "./components/Task/Task"; // Make sure to import your TaskList component
+import TaskList from "./components/Project/Project"; 
+import TaskBoard from "./components/Project/Project";
+import ProjectManager from "./components/Project/Project";
+import TaskManagementForm from "./components/Task/Task";
 
 function App() {
   return (
@@ -16,9 +18,9 @@ function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/user" element={<Test />} />
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/task" element={<TaskList />} /> {/* Route for Task Management Page */}
-        {/* Add additional routes for other components */}
+        <Route path="/project" element={<ProjectManager />} />
+        <Route path="/task" element={<TaskManagementForm />} />
+        {/* <Route path="/task" element={<TaskBoard  />} />  */}
       </Routes>
     </Router>
   );
