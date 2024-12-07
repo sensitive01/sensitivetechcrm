@@ -1,15 +1,21 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import logo from "../../assets/logo.webp";
 import { FaUser } from 'react-icons/fa'; // Import user icon from react-icons
 
 export default function Topbar() {
+  const navigate = useNavigate(); // Initialize useNavigate
+
+  const handleLogout = () => {
+    // Perform any logout logic here (e.g., clearing tokens, user data)
+    navigate('/'); // Redirect to the login page
+  };
+
   return (
     <div className="fixed top-0 left-0 right-0 z-50 grid grid-cols-1 md:grid-cols-3 items-center bg-blue-600 text-white py-2 px-4 sm:px-6 shadow-md">
       {/* Logo Section */}
       <div className="flex justify-center md:justify-start items-center mb-4 md:mb-0">
-        {/* Link wrapped around the logo */}
-        <Link to="/">
+        <Link to="/dashboard">
           <img 
             src={logo} 
             alt="Logo" 
@@ -21,10 +27,10 @@ export default function Topbar() {
       {/* Menu Section */}
       <div className="flex justify-center items-center space-x-6 md:space-x-8 lg:space-x-12">
         <Link to="/employee-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Employee</Link>
-        <Link to="/attendance" className="font-bold text-white hover:text-gray-200 text-xl  transition-colors">Attendance</Link>
-        <Link to="/client" className="font-bold text-white hover:text-gray-200 text-xl  transition-colors">Client</Link>
-        <Link to="/task" className="font-bold text-white hover:text-gray-200 text-xl  transition-colors">Task</Link>
-        <Link to="/leave" className="font-bold text-white hover:text-gray-200 text-xl  transition-colors">Leave</Link>
+        <Link to="/attendance" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Attendance</Link>
+        <Link to="/client" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Client</Link>
+        <Link to="/task" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Task</Link>
+        <Link to="/leave" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Leave</Link>
       </div>
 
       {/* Right Section: Search Bar, Logout Button, and User Icon */}
@@ -37,7 +43,10 @@ export default function Topbar() {
         />
         
         {/* Logout Button */}
-        <button className="bg-white text-blue-600 font-bold py-3 px-8 rounded hover:bg-gray-100 transition-colors">
+        <button 
+          onClick={handleLogout} 
+          className="bg-white text-blue-600 font-bold py-3 px-8 rounded hover:bg-gray-100 transition-colors"
+        >
           Logout
         </button>
 

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function Employee() {
+function  Employee() {
     const [employee, setEmployee] = useState({
         fullName: "",
         email: "",
@@ -146,7 +146,7 @@ function Employee() {
                                 name="emergencyContactName"
                                 value={employee.emergencyContactName}
                                 onChange={handleChange}
-                                className="border-2 border-blue-300 p-2 w-full rounded"
+                                className="border-2 border-blue-00 p-2 w-full rounded"
                             />
                         </div>
                     </div>
