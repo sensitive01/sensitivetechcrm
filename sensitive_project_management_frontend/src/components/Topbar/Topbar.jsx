@@ -1,14 +1,26 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate
 import logo from "../../assets/logo.webp";
 import { FaUser } from 'react-icons/fa'; // Import user icon from react-icons
+import ProfileModal from '../Profile/Profile'; // Import ProfileModal
 
 export default function Topbar() {
+  const [showProfile, setShowProfile] = useState(false); // State to toggle profile modal
   const navigate = useNavigate(); // Initialize useNavigate
+
+  const userProfile = {
+    name: "John Doe",
+    email: "john.doe@example.com",
+    position: "Software Developer"
+  };
 
   const handleLogout = () => {
     // Perform any logout logic here (e.g., clearing tokens, user data)
     navigate('/'); // Redirect to the login page
+  };
+
+  const toggleProfile = () => {
+    setShowProfile(prevState => !prevState); // Toggle profile visibility
   };
 
   return (
@@ -26,16 +38,12 @@ export default function Topbar() {
 
       {/* Menu Section */}
       <div className="flex justify-center items-center space-x-6 md:space-x-8 lg:space-x-12">
-
-
         <Link to="/employee-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Employee</Link>
         <Link to="/attendance" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Attendance</Link>
         <Link to="/client" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Client</Link>
         <Link to="/task" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Task</Link>
-        <Link to="/project" className="font-bold text-white hover:text-gray-200 transition-colors">Project</Link>
+        <Link to="/project" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Project</Link>
         <Link to="/leave" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Leave</Link>
-
-
       </div>
 
       {/* Right Section: Search Bar, Logout Button, and User Icon */}
@@ -56,8 +64,19 @@ export default function Topbar() {
         </button>
 
         {/* User Icon */}
-        <FaUser className="text-white text-2xl cursor-pointer hover:text-gray-200" />
+        <FaUser 
+          className="text-white text-2xl cursor-pointer hover:text-gray-200" 
+          onClick={toggleProfile} 
+        />
       </div>
+
+      {/* Profile Modal */}
+      {showProfile && (
+        <ProfileModal 
+          userProfile={userProfile} 
+          onClose={toggleProfile} 
+        />
+      )}
     </div>
   );
 }

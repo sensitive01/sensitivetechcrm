@@ -7,7 +7,9 @@ import Employee from "./components/Employee/Employee";
 import LoginPage from "./components/Login/Login";
 import SignUp from "./assets/SignUp";
 import TaskList from "./components/Task/Task";
+import TaskForm from "./components/Task/TaskForm";
 import ProjectManager from "./components/Project/Project";
+import ProjectForm from "./components/Project/ProjectForm";
 
 // Layout Component for Admin Pages
 const AdminLayout = ({ children }) => (
@@ -36,7 +38,9 @@ function App() {
                 <Route path="/employee-table" element={<EmployeeTable />} />
                 <Route path="/employee-form" element={<Employee />} />
                 <Route path="/task" element={<TaskList />} />
+                <Route path="/task-form" element={<TaskForm />} />
                 <Route path="/project" element={<ProjectManager/>} />
+                <Route path="/add-project" element={<ProjectForm/>} />
 
               </Routes>
             </AdminLayout>

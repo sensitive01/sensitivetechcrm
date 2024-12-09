@@ -1,9 +1,7 @@
-
-
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const ProjectManager = () => {
-  // Default data for projects
   const [projects, setProjects] = useState([
     {
       id: 1,
@@ -28,148 +26,56 @@ const ProjectManager = () => {
     },
   ]);
 
-  const [newProject, setNewProject] = useState({
-    title: "",
-    description: "",
-    days: "",
-    assignedTo: "",
-  });
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
-
-  // List of assignable users (could come from an API or state)
-  const assignableUsers = ["John Doe", "Jane Smith", "Team Alpha", "Team Beta"];
-
-  // Add a new project
-  const addProject = () => {
-    if (
-      newProject.title &&
-      newProject.description &&
-      newProject.days &&
-      newProject.assignedTo
-    ) {
-      setProjects([...projects, { ...newProject, id: Date.now() }]); // Add project with unique ID
-      setNewProject({ title: "", description: "", days: "", assignedTo: "" }); // Reset input fields
-      setIsModalOpen(false); // Close modal
-    } else {
-      alert("Please fill out all fields before adding a project!");
-    }
-  };
+  // State to manage modal visibility and selected project
+  const [selectedProject, setSelectedProject] = useState(null);
 
   // Remove a project
   const removeProject = (id) => {
     setProjects(projects.filter((project) => project.id !== id));
   };
 
+  // Open the modal with project details
+  const openProjectDetails = (project) => {
+    setSelectedProject(project);
+  };
+
+  // Close the modal
+  const closeModal = () => {
+    setSelectedProject(null);
+  };
+
   return (
-    <div className="bg-gray-100 p-6 min-h-screen">
-      <h1 className="text-2xl font-bold mb-6">Project Manager</h1>
+    <div className="bg-gray-50 p-6 min-h-screen mt-20">
+      <h1 className="text-3xl font-bold text-gray-800 mb-6">Project Manager</h1>
 
       {/* Add Project Button */}
-      <button
-        onClick={() => setIsModalOpen(true)}
-        className="bg-blue-500 text-white px-4 py-2 rounded"
-      >
+      <Link to="/add-project" className="bg-blue-500 text-white px-6 py-3 rounded-lg text-lg hover:bg-blue-600 transition duration-200">
         Add Project
-      </button>
-
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-            <h2 className="text-lg font-semibold mb-4">Add New Project</h2>
-            <div className="space-y-4">
-              {/* Project Title */}
-              <input
-                type="text"
-                placeholder="Project Title"
-                value={newProject.title}
-                onChange={(e) =>
-                  setNewProject({ ...newProject, title: e.target.value })
-                }
-                className="border p-2 rounded w-full"
-              />
-
-              {/* Project Description */}
-              <input
-                type="text"
-                placeholder="Project Description"
-                value={newProject.description}
-                onChange={(e) =>
-                  setNewProject({ ...newProject, description: e.target.value })
-                }
-                className="border p-2 rounded w-full"
-              />
-
-              {/* Days to Complete */}
-              <input
-                type="number"
-                placeholder="Days to Complete"
-                value={newProject.days}
-                onChange={(e) =>
-                  setNewProject({ ...newProject, days: e.target.value })
-                }
-                className="border p-2 rounded w-full"
-              />
-
-              {/* Assign To Dropdown */}
-              <select
-                value={newProject.assignedTo}
-                onChange={(e) =>
-                  setNewProject({ ...newProject, assignedTo: e.target.value })
-                }
-                className="border p-2 rounded w-full"
-              >
-                <option value="">Assign To</option>
-                {assignableUsers.map((user, index) => (
-                  <option key={index} value={user}>
-                    {user}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Modal Buttons */}
-            <div className="mt-4 flex justify-end space-x-2">
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="bg-gray-400 text-white px-4 py-2 rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={addProject}
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-              >
-                Add Project
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      </Link>
 
       {/* Display Projects */}
-      <div className="mt-6">
-        <h2 className="text-lg font-semibold mb-4">Projects</h2>
+      <div className="mt-8">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Projects</h2>
         {projects.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {projects.map((project) => (
               <div
                 key={project.id}
-                className="bg-white shadow-md rounded-lg p-4 border border-gray-200"
+                className="bg-white shadow-lg rounded-lg p-6 border border-gray-200 cursor-pointer transition duration-300 hover:shadow-xl hover:scale-105"
+                onClick={() => openProjectDetails(project)}
               >
-                <h3 className="text-lg font-semibold">{project.title}</h3>
-                <p className="text-sm text-gray-500 mb-2">
-                  {project.description}
-                </p>
-                <div className="text-sm text-gray-400 mb-2">
-                  <span>📅 {project.days} Days</span>
-                </div>
-                <div className="text-sm text-gray-400">
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">{project.title}</h3>
+                <p className="text-sm text-gray-600 mb-4">{project.description}</p>
+                <div className="text-sm text-gray-500 mb-3">
+                  <span className="mr-4">📅 {project.days} Days</span>
                   <span>👤 Assigned To: {project.assignedTo}</span>
                 </div>
                 <button
-                  onClick={() => removeProject(project.id)}
-                  className="bg-red-500 text-white px-2 py-1 rounded mt-2"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent closing modal when removing
+                    removeProject(project.id);
+                  }}
+                  className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-600 transition duration-200"
                 >
                   Remove
                 </button>
@@ -177,11 +83,33 @@ const ProjectManager = () => {
             ))}
           </div>
         ) : (
-          <p className="text-gray-500">
+          <p className="text-gray-500 text-lg">
             No projects added yet. Click "Add Project" to get started.
           </p>
         )}
       </div>
+
+      {/* Modal for Project Details */}
+      {selectedProject && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg max-w-lg w-full">
+            <h2 className="text-2xl font-semibold text-gray-800">{selectedProject.title}</h2>
+            <p className="text-sm text-gray-600 mt-4">{selectedProject.description}</p>
+            <div className="mt-4">
+              <p className="text-sm text-gray-500">📅 {selectedProject.days} Days</p>
+              <p className="text-sm text-gray-500">👤 Assigned To: {selectedProject.assignedTo}</p>
+            </div>
+            <div className="mt-6 flex justify-end space-x-4">
+              <button
+                onClick={closeModal}
+                className="bg-gray-400 text-white px-6 py-3 rounded-lg text-sm hover:bg-gray-500 transition duration-200"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
