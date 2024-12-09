@@ -7,6 +7,7 @@ import Employee from "./components/Employee/Employee";
 import LoginPage from "./components/Login/Login";
 import SignUp from "./assets/SignUp";
 import TaskList from "./components/Task/Task";
+<<<<<<< HEAD
 import ClientTable from "./components/Client/ClientTable";
 import Client from "./components/Client/Client";
 import AttendanceTable from "./components/AttendanceTable/AttendanceTable";
@@ -14,6 +15,9 @@ import EmployeeAttendance from "./components/AttendanceTable/EmployeeAttendance"
 import Leave from "./components/Leave/Leave";
 import LeaveTable from "./components/Leave/LeaveTable";
 
+=======
+import ProjectManager from "./components/Project/Project";
+>>>>>>> e139716cba39215f2eb80da352cc36aaa4c80ed4
 
 // Layout Component for Admin Pages
 const AdminLayout = ({ children }) => (
