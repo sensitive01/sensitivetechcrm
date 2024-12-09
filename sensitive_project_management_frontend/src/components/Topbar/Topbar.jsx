@@ -26,21 +26,16 @@ export default function Topbar() {
 
       {/* Menu Section */}
       <div className="flex justify-center items-center space-x-6 md:space-x-8 lg:space-x-12">
-<<<<<<< HEAD
-        <Link to="/user" className="font-bold text-white hover:text-gray-200 transition-colors">User</Link>
-        <Link to="/employee" className="font-bold text-white hover:text-gray-200 transition-colors">Employee</Link>
-        <Link to="/attendance" className="font-bold text-white hover:text-gray-200 transition-colors">Attendance</Link>
-        <Link to="/client" className="font-bold text-white hover:text-gray-200 transition-colors">Client</Link>
-        <Link to="/project" className="font-bold text-white hover:text-gray-200 transition-colors">Project</Link>
-        <Link to="/task" className="font-bold text-white hover:text-gray-200 transition-colors">Task</Link>
-        <Link to="/leave" className="font-bold text-white hover:text-gray-200 transition-colors">Leave</Link>
-=======
+
+
         <Link to="/employee-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Employee</Link>
         <Link to="/attendance" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Attendance</Link>
         <Link to="/client" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Client</Link>
         <Link to="/task" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Task</Link>
+        <Link to="/project" className="font-bold text-white hover:text-gray-200 transition-colors">Project</Link>
         <Link to="/leave" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Leave</Link>
->>>>>>> 35fed340dd325c8b98dde83f50c7971b2ed111cf
+
+
       </div>
 
       {/* Right Section: Search Bar, Logout Button, and User Icon */}
