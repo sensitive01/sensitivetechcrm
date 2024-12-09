@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 
-function  Employee() {
+function Employee() {
     const [employee, setEmployee] = useState({
+        employeeId: "",
         fullName: "",
         email: "",
         phone: "",
         department: "",
         position: "",
         joiningDate: "",
-        salary: "",
         address: "",
         emergencyContactName: "",
         status: "Active",
@@ -16,6 +16,7 @@ function  Employee() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+        console.log(`name:${name},value:${value}`)
         setEmployee((prev) => ({ ...prev, [name]: value }));
     };
 
@@ -30,18 +31,32 @@ function  Employee() {
             <h2 className="text-4xl font-bold mb-20 text-center mt-20">Employee Form</h2>
             <form onSubmit={handleSubmit} className="grid grid-cols-3 gap-6">
                 {/* First Column */}
-                <div className="border-2 border-blue-500 p-6 rounded-lg">
+                <div className="border border-blue-500 p-6 rounded-lg">
                     <div className="space-y-8 pb-4">
-                        <div>
-                            <label className="block text-sm font-medium pb-4">Full Name:</label>
-                            <input
-                                type="text"
-                                name="fullName"
-                                value={employee.fullName}
-                                onChange={handleChange}
-                                required
-                                className="border-2 border-blue-300 p-2 w-full rounded"
-                            />
+                        {/* Full Name and Employee ID Row */}
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium pb-4">Full Name:</label>
+                                <input
+                                    type="text"
+                                    name="fullName"
+                                    value={employee.fullName}
+                                    onChange={handleChange}
+                                    required
+                                    className="border border-blue-300 p-2 w-full rounded"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium pb-4">Employee ID:</label>
+                                <input
+                                    type="text"
+                                    name="employeeId"
+                                    value={employee.employeeId}
+                                    onChange={handleChange}
+                                    required
+                                    className="border border-blue-300 p-2 w-full rounded"
+                                />
+                            </div>
                         </div>
                         <div>
                             <label className="block text-sm font-medium pb-4">Email:</label>
@@ -51,7 +66,7 @@ function  Employee() {
                                 value={employee.email}
                                 onChange={handleChange}
                                 required
-                                className="border-2 border-blue-300 p-2 w-full rounded"
+                                className="border border-blue-300 p-2 w-full rounded"
                             />
                         </div>
                         <div>
@@ -62,14 +77,14 @@ function  Employee() {
                                 value={employee.phone}
                                 onChange={handleChange}
                                 required
-                                className="border-2 border-blue-300 p-2 w-full rounded"
+                                className="border border-blue-300 p-2 w-full rounded"
                             />
                         </div>
                     </div>
                 </div>
 
                 {/* Second Column */}
-                <div className="border-2 border-blue-500 p-6 rounded-lg">
+                <div className="border border-blue-500 p-6 rounded-lg">
                     <div className="space-y-8 pb-4">
                         <div>
                             <label className="block text-sm font-medium pb-4">Department:</label>
@@ -78,7 +93,7 @@ function  Employee() {
                                 value={employee.department}
                                 onChange={handleChange}
                                 required
-                                className="border-2 border-blue-300 p-2 w-full rounded"
+                                className="border border-blue-300 p-2 w-full rounded"
                             >
                                 <option value="">Select Department</option>
                                 <option value="HR">HR</option>
@@ -95,7 +110,7 @@ function  Employee() {
                                 value={employee.position}
                                 onChange={handleChange}
                                 required
-                                className="border-2 border-blue-300 p-2 w-full rounded"
+                                className="border border-blue-300 p-2 w-full rounded"
                             />
                         </div>
                         <div>
@@ -106,24 +121,24 @@ function  Employee() {
                                 value={employee.joiningDate}
                                 onChange={handleChange}
                                 required
-                                className="border-2 border-blue-300 p-2 w-full rounded"
+                                className="border border-blue-300 p-2 w-full rounded"
                             />
                         </div>
                     </div>
                 </div>
 
                 {/* Third Column */}
-                <div className="border-2 border-blue-500 p-6 rounded-lg ">
+                <div className="border border-blue-500 p-6 rounded-lg ">
                     <div className="space-y-8 pb-4">
                         <div>
-                            <label className="block text-sm font-medium pb-4">Salary:</label>
+                            <label className="block text-sm font-medium pb-4">Address:</label>
                             <input
-                                type="number"
-                                name="salary"
-                                value={employee.salary}
+                                type="text"
+                                name="address"
+                                value={employee.address}
                                 onChange={handleChange}
                                 required
-                                className="border-2 border-blue-300 p-2 w-full rounded"
+                                className="border border-blue-300 p-2 w-full rounded"
                             />
                         </div>
                         <div>
@@ -132,7 +147,7 @@ function  Employee() {
                                 name="status"
                                 value={employee.status}
                                 onChange={handleChange}
-                                className="border-2 border-blue-300 p-2 w-full rounded"
+                                className="border border-blue-300 p-2 w-full rounded"
                             >
                                 <option value="Active">Active</option>
                                 <option value="On Leave">On Leave</option>
@@ -146,7 +161,7 @@ function  Employee() {
                                 name="emergencyContactName"
                                 value={employee.emergencyContactName}
                                 onChange={handleChange}
-                                className="border-2 border-blue-00 p-2 w-full rounded"
+                                className="border border-blue-300 p-2 w-full rounded"
                             />
                         </div>
                     </div>
@@ -156,7 +171,7 @@ function  Employee() {
                 <div className="col-span-3 flex justify-center mt-6">
                     <button
                         type="submit"
-                        className="bg-[#2563eb] text-white border-2 border-black px-8 py-2 rounded-md hover:bg-blue-600"
+                        className="bg-[#2563eb] text-white border border-black px-8 py-2 rounded-md hover:bg-blue-600"
                     >
                         Submit
                     </button>

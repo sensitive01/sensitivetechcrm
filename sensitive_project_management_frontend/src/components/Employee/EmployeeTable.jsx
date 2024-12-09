@@ -8,6 +8,7 @@ const EmployeeTable = () => {
     {
       id: 1,
       fullName: "Jeyaram",
+      employeeid: "Emp123",
       email: "jeyram@gmail.com",
       phone: "+91 7974532890",
       department: "IT",
@@ -23,6 +24,7 @@ const EmployeeTable = () => {
     {
       id: 2,
       fullName: "Adiraj",
+      employeeid: "Emp543",
       email: "adiraj@gmail.com",
       phone: "+91 7878234567",
       department: "IT",
@@ -38,6 +40,7 @@ const EmployeeTable = () => {
     {
       id: 3,
       fullName: "AswinRaj",
+      employeeid: "Emp456",
       email: "aswinraj@gmail.com",
       phone: "+91 8325678901",
       department: "IT",
@@ -53,6 +56,7 @@ const EmployeeTable = () => {
     {
         id: 4,
         fullName: "Puja",
+        employeeid: "Emp897",
         email: "puja@gmail.com",
         phone: "+91 9558976025",
         department: "IT",
@@ -68,6 +72,7 @@ const EmployeeTable = () => {
       {
         id: 5,
         fullName: "Rakesh",
+        employeeid: "Emp089",
         email: "rakesh@gmail.com",
         phone: "+91 7823451289",
         department: "IT",
@@ -117,6 +122,7 @@ const EmployeeTable = () => {
               <th className="p-6 text-left">S.No</th>
               <th className="p-6 text-left">Image</th>
               <th className="p-6 text-left">Name</th>
+              <th className="p-6 text-left">EmployeeID</th>
               <th className="p-6 text-left">Department</th>
               <th className="p-6 text-left">Position</th>
               <th className="p-6 text-left">Email</th>
@@ -141,6 +147,7 @@ const EmployeeTable = () => {
                   />
                 </td>
                 <td className="p-6">{employee.fullName}</td>
+                <td className="p-6">{employee.employeeid}</td>
                 <td className="p-6">{employee.department}</td>
                 <td className="p-6 whitespace-nowrap">{employee.position}</td>
                 <td className="p-3">{employee.email}</td>
