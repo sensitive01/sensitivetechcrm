@@ -26,6 +26,7 @@ export default function Topbar() {
 
       {/* Menu Section */}
       <div className="flex justify-center items-center space-x-6 md:space-x-8 lg:space-x-12">
+<<<<<<< HEAD
 
 
         <Link to="/employee-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Employee</Link>
@@ -36,6 +37,13 @@ export default function Topbar() {
         <Link to="/leave" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Leave</Link>
 
 
+=======
+        <Link to="/employee-table" className="font-bold text-white hover:text-gray-200 text-2xs transition-colors">Employee</Link>
+        <Link to="/attendance-table" className="font-bold text-white hover:text-gray-200 text-2xs transition-colors">Attendance</Link>
+        <Link to="/client-table" className="font-bold text-white hover:text-gray-200 text-2xs transition-colors">Client</Link>
+        <Link to="/task" className="font-bold text-white hover:text-gray-200 text-2xs transition-colors">Task</Link>
+        <Link to="/leave-table" className="font-bold text-white hover:text-gray-200 text-2xs transition-colors">Leave</Link>
+>>>>>>> puja_code
       </div>
 
       {/* Right Section: Search Bar, Logout Button, and User Icon */}
