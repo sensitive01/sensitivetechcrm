@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function Dashboard() {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-10 px-28">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-32 px-28">
       {/* Total Employee */}
       <div className="bg-white rounded-xl shadow-2xl p-8">
         <div className="flex items-center justify-between">
