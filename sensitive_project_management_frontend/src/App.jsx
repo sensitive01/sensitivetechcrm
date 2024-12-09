@@ -7,11 +7,7 @@ import Employee from "./components/Employee/Employee";
 import LoginPage from "./components/Login/Login";
 import SignUp from "./assets/SignUp";
 import TaskList from "./components/Task/Task";
-<<<<<<< HEAD
 import ProjectManager from "./components/Project/Project";
-=======
-<<<<<<< HEAD
->>>>>>> puja_code
 import ClientTable from "./components/Client/ClientTable";
 import Client from "./components/Client/Client";
 import AttendanceTable from "./components/AttendanceTable/AttendanceTable";
@@ -52,17 +48,15 @@ function App() {
                 <Route path="/employee-table" element={<EmployeeTable />} />
                 <Route path="/employee-form" element={<Employee />} />
                 <Route path="/task" element={<TaskList />} />
-                <Route path="/project" element={<ProjectManager/>} />
-                <Route path="/add-project" element={<ProjectForm/>} />
-
-=======
->>>>>>> puja_code
-                <Route path="/client-table" element={<ClientTable/>} />
-                <Route path="/client-form" element={<Client/>}/>
-                <Route path="/attendance-table" element={<AttendanceTable/>} />
-                < Route path="/attendance-form" element={<EmployeeAttendance/>} />
-                <Route path="/leave" element={<Leave/>} />
-                <Route path="/leave-table" element={<LeaveTable/>} />
+                <Route path="/project" element={<ProjectManager />} />
+                <Route path="/add-project" element={<ProjectForm />} />
+                <Route path="/client-table" element={<ClientTable />} />
+                <Route path="/client-form" element={<Client />} />
+                <Route path="/attendance-table" element={<AttendanceTable />} />
+                <Route path="/attendance-form" element={<EmployeeAttendance />} />
+                <Route path="/leave" element={<Leave />} />
+                <Route path="/leave-table" element={<LeaveTable />} />
+                <Route path="/task-form" element={<TaskForm />} /> {/* Added TaskForm route */}
               </Routes>
             </AdminLayout>
           }
