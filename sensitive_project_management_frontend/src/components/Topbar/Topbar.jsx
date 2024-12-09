@@ -27,6 +27,15 @@ export default function Topbar() {
       {/* Menu Section */}
       <div className="flex justify-center items-center space-x-6 md:space-x-8 lg:space-x-12">
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        <Link to="/employee-table" className="font-bold text-white hover:text-gray-200 text-2xs transition-colors">Employee</Link>
+        <Link to="/attendance-table" className="font-bold text-white hover:text-gray-200 text-2xs transition-colors">Attendance</Link>
+        <Link to="/client-table" className="font-bold text-white hover:text-gray-200 text-2xs transition-colors">Client</Link>
+        <Link to="/task" className="font-bold text-white hover:text-gray-200 text-2xs transition-colors">Task</Link>
+        <Link to="/leave-table" className="font-bold text-white hover:text-gray-200 text-2xs transition-colors">Leave</Link>
+=======
+>>>>>>> puja_code
 
 
         <Link to="/employee-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Employee</Link>
@@ -37,12 +46,16 @@ export default function Topbar() {
         <Link to="/leave" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Leave</Link>
 
 
+<<<<<<< HEAD
 =======
         <Link to="/employee-table" className="font-bold text-white hover:text-gray-200 text-2xs transition-colors">Employee</Link>
         <Link to="/attendance-table" className="font-bold text-white hover:text-gray-200 text-2xs transition-colors">Attendance</Link>
         <Link to="/client-table" className="font-bold text-white hover:text-gray-200 text-2xs transition-colors">Client</Link>
         <Link to="/task" className="font-bold text-white hover:text-gray-200 text-2xs transition-colors">Task</Link>
         <Link to="/leave-table" className="font-bold text-white hover:text-gray-200 text-2xs transition-colors">Leave</Link>
+>>>>>>> puja_code
+=======
+>>>>>>> e139716cba39215f2eb80da352cc36aaa4c80ed4
 >>>>>>> puja_code
       </div>
 
