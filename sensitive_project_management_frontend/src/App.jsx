@@ -8,6 +8,14 @@ import LoginPage from "./components/Login/Login";
 import SignUp from "./assets/SignUp";
 import TaskList from "./components/Task/Task";
 import ProjectManager from "./components/Project/Project";
+import ClientTable from "./components/Client/ClientTable";
+import Client from "./components/Client/Client";
+import AttendanceTable from "./components/AttendanceTable/AttendanceTable";
+import EmployeeAttendance from "./components/AttendanceTable/EmployeeAttendance";
+import Leave from "./components/Leave/Leave";
+import LeaveTable from "./components/Leave/LeaveTable";
+import TaskForm from "./components/Task/TaskForm"; // Added TaskForm import
+import ProjectForm from "./components/Project/ProjectForm";
 
 // Layout Component for Admin Pages
 const AdminLayout = ({ children }) => (
@@ -36,12 +44,15 @@ function App() {
                 <Route path="/employee-table" element={<EmployeeTable />} />
                 <Route path="/employee-form" element={<Employee />} />
                 <Route path="/task" element={<TaskList />} />
-                <Route path="/client-table" element={<ClientTable/>} />
-                <Route path="/client-form" element={<Client/>}/>
-                <Route path="/attendance-table" element={<AttendanceTable/>} />
-                < Route path="/attendance-form" element={<EmployeeAttendance/>} />
-                <Route path="/leave" element={<Leave/>} />
-                <Route path="/leave-table" element={<LeaveTable/>} />
+                <Route path="/project" element={<ProjectManager />} />
+                <Route path="/add-project" element={<ProjectForm />} />
+                <Route path="/client-table" element={<ClientTable />} />
+                <Route path="/client-form" element={<Client />} />
+                <Route path="/attendance-table" element={<AttendanceTable />} />
+                <Route path="/attendance-form" element={<EmployeeAttendance />} />
+                <Route path="/leave" element={<Leave />} />
+                <Route path="/leave-table" element={<LeaveTable />} />
+                <Route path="/task-form" element={<TaskForm />} /> {/* Added TaskForm route */}
               </Routes>
             </AdminLayout>
           }
