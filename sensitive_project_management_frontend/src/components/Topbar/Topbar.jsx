@@ -43,7 +43,7 @@ export default function Topbar() {
         <Link to="/client-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Client</Link>
         <Link to="/task" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Task</Link>
         <Link to="/project" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Project</Link>
-        <Link to="/leave-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Leaves</Link>
+        <Link to="/leave-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Leave</Link>
 
       </div>
 
