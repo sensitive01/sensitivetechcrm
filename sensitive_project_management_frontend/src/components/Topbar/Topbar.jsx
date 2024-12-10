@@ -45,6 +45,8 @@ export default function Topbar() {
         <Link to="/project" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Project</Link>
         <Link to="/leave-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Leave</Link>
 
+        <Link to="/leave-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Leaves</Link>
+
       </div>
 
       {/* Right Section: Search Bar, Logout Button, and User Icon */}
