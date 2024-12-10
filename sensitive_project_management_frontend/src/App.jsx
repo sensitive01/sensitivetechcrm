@@ -16,6 +16,7 @@ import Leave from "./components/Leave/Leave";
 import LeaveTable from "./components/Leave/LeaveTable";
 import TaskForm from "./components/Task/TaskForm"; // Added TaskForm import
 import ProjectForm from "./components/Project/ProjectForm";
+import ClientEdit from "./components/Client/ClientEdit";
 
 // Layout Component for Admin Pages
 const AdminLayout = ({ children }) => (
@@ -47,6 +48,7 @@ function App() {
                 <Route path="/project" element={<ProjectManager />} />
                 <Route path="/add-project" element={<ProjectForm />} />
                 <Route path="/client-table" element={<ClientTable />} />
+                <Route path="/client-edit" element={<ClientEdit />} />
                 <Route path="/client-form" element={<Client />} />
                 <Route path="/attendance-table" element={<AttendanceTable />} />
                 <Route path="/attendance-form" element={<EmployeeAttendance />} />

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-function Client() {
+function ClientEdit() {
   const [client, setClient] = useState({
     organization: "",
     contactPerson: "",
@@ -314,4 +314,4 @@ function Client() {
   );
 }
 
-export default Client;
+export default ClientEdit;
