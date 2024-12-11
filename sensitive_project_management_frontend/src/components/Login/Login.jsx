@@ -14,8 +14,7 @@ const LoginPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Login Data:", formData);
-    // Add your login logic here
-    navigate("/dashboard"); // Redirect to the dashboard after login
+    navigate("/dashboard"); 
   };
 
   return (

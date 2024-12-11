@@ -58,7 +58,7 @@ const ProjectForm = ({ setProjects }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-50 p-6 flex justify-center items-center mt-16">
-      <div className="bg-white p-8 rounded-lg shadow-xl max-w-4xl w-full">
+      <div className="bg-white p-8 rounded-lg shadow-xl max-w-6xl w-full">
         <h1 className="text-3xl font-semibold text-gray-800 mb-6">
           Add New Project
         </h1>
@@ -69,7 +69,7 @@ const ProjectForm = ({ setProjects }) => {
             <h2 className="text-2xl font-semibold text-gray-700 mb-4">
               Project Details
             </h2>
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-3 gap-6">
               {[
                 { label: "Project Name", field: "projectName", type: "text" },
                 { label: "Type", field: "type", type: "text" },
@@ -83,7 +83,7 @@ const ProjectForm = ({ setProjects }) => {
                 { label: "Duration (in days)", field: "duration", type: "number" },
                 { label: "Dependencies", field: "dependencies", type: "textarea" },
               ].map(({ label, field, type }) => (
-                <div key={field} className={type === "textarea" ? "col-span-2" : ""}>
+                <div key={field} className={type === "textarea" ? "col-span-3" : ""}>
                   <label className="block text-gray-600 mb-1 font-medium">
                     {label}
                   </label>
@@ -112,10 +112,13 @@ const ProjectForm = ({ setProjects }) => {
               ))}
             </div>
           </section>
-          
+
+          {/* Section 2: Financial Details */}
           <section>
-            
-            <div className="grid grid-cols-2 gap-6">
+            <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+              Financial Details
+            </h2>
+            <div className="grid grid-cols-3 gap-6">
               {[
                 { label: "Quoted Value", field: "quotedValue", type: "number" },
                 { label: "Approved Value", field: "approvedValue", type: "number" },
@@ -123,7 +126,7 @@ const ProjectForm = ({ setProjects }) => {
                 { label: "Tax Terms", field: "taxTerms", type: "textarea" },
                 { label: "Payment Terms", field: "paymentTerms", type: "textarea" },
               ].map(({ label, field, type }) => (
-                <div key={field} className={type === "textarea" ? "col-span-2" : ""}>
+                <div key={field} className={type === "textarea" ? "col-span-3" : ""}>
                   <label className="block text-gray-600 mb-1 font-medium">
                     {label}
                   </label>
@@ -150,13 +153,18 @@ const ProjectForm = ({ setProjects }) => {
                   )}
                 </div>
               ))}
+            </div>
+          </section>
 
-              {/* File Uploads */}
-              {[
-                { label: "Project Document", field: "projectDocument" },
+          {/* Section 3: Additional Details */}
+          <section>
+            <h2 className="text-2xl font-semibold text-gray-700 mb-4">
+              Additional Details
+            </h2>
+            <div className="grid grid-cols-3 gap-6">
+              {[{ label: "Project Document", field: "projectDocument" },
                 { label: "NDA Document", field: "nda" },
-                { label: "MSA Document", field: "msa" },
-              ].map(({ label, field }) => (
+                { label: "MSA Document", field: "msa" }].map(({ label, field }) => (
                 <div key={field}>
                   <label className="block text-gray-600 mb-1 font-medium">
                     {label}
@@ -168,12 +176,8 @@ const ProjectForm = ({ setProjects }) => {
                   />
                 </div>
               ))}
-
-              {/* Assign To */}
               <div>
-                <label className="block text-gray-600 mb-1 font-medium">
-                  Assign To
-                </label>
+                <label className="block text-gray-600 mb-1 font-medium">Assign To</label>
                 <select
                   value={newProject.assignedTo}
                   onChange={(e) =>
@@ -183,18 +187,12 @@ const ProjectForm = ({ setProjects }) => {
                 >
                   <option value="">Select an assignee</option>
                   {assignableUsers.map((user, index) => (
-                    <option key={index} value={user}>
-                      {user}
-                    </option>
+                    <option key={index} value={user}>{user}</option>
                   ))}
                 </select>
               </div>
-
-              {/* Status */}
               <div>
-                <label className="block text-gray-600 mb-1 font-medium">
-                  Status
-                </label>
+                <label className="block text-gray-600 mb-1 font-medium">Status</label>
                 <select
                   value={newProject.status}
                   onChange={(e) =>
@@ -204,18 +202,12 @@ const ProjectForm = ({ setProjects }) => {
                 >
                   <option value="">Select a status</option>
                   {statuses.map((status, index) => (
-                    <option key={index} value={status}>
-                      {status}
-                    </option>
+                    <option key={index} value={status}>{status}</option>
                   ))}
                 </select>
               </div>
-
-              {/* Created Date */}
               <div>
-                <label className="block text-gray-600 mb-1 font-medium">
-                  Created Date
-                </label>
+                <label className="block text-gray-600 mb-1 font-medium">Created Date</label>
                 <input
                   type="date"
                   value={newProject.createdDate}

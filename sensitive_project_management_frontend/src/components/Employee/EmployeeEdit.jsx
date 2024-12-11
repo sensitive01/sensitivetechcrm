@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const EmployeeForm = () => {
+const EmployeeEdit = () => {
   const [formData, setFormData] = useState({
     empId: '',
     name: '',
@@ -45,6 +45,8 @@ const EmployeeForm = () => {
     password: '',
     status: 'Active'
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -72,6 +74,27 @@ const EmployeeForm = () => {
       }
     }));
   };
+
+  useEffect(() => {
+    // Fetch employee data from an API
+    const fetchEmployees = async () => {
+      try {
+        setLoading(true); // Show loader
+        const response = await axios.get(
+          `http://localhost:5000/getemployeebyid/${id}`
+        ); // Replace with your API endpoint
+        console.log(response)
+        setFormData(response.data); 
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false); // Stop loader
+      }
+    };
+
+    fetchEmployees();
+  }, []);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent page reload on form submission
@@ -532,4 +555,4 @@ const EmployeeForm = () => {
   );
 };
 
-export default EmployeeForm;
+export default EmployeeEdit;
