@@ -4,12 +4,13 @@ const clientModel = require("../models/Clientmodel");
 // Create a new client
 exports.createClient = async (req, res) => {
   try {
+    console.log("CREATE",req.body)
     const client = new clientModel(req.body);
     await client.save();
     res.status(201).json({ message: 'Client created successfully', client });
   } catch (error) {
     console.error('Error creating client:', error);
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: error.message });   
   }
 };
 
@@ -17,6 +18,7 @@ exports.createClient = async (req, res) => {
 exports.getAllClients = async (req, res) => {
   try {
     const clients = await clientModel.find();
+    console.log("get all",clients)
     res.status(200).json(clients);
   } catch (error) {
     console.error('Error fetching clients:', error);
@@ -27,7 +29,9 @@ exports.getAllClients = async (req, res) => {
 // Get a client by ID
 exports.getClientById = async (req, res) => {
   try {
+    console.log("welcome toedit",req.params.id)
     const client = await clientModel.findById(req.params.id);
+    console.log(client)
     if (!client) {
       return res.status(404).json({ message: 'Client not found' });
     }

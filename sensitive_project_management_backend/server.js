@@ -6,6 +6,8 @@ const cors = require('cors')
 
 
 const clientRoutes = require('./routes/clientRoutes')
+const leaveRoutes = require('./routes/leaveRoutes')
+const attendanceRoutes = require('./routes/attendanceRoutes')
 
 
 dotenv.config();
@@ -17,7 +19,10 @@ db();
 app.use(bodyparser.json());
 app.use(cors());
 
+app.use('/', attendanceRoutes);
 app.use('/clients', clientRoutes);
+app.use('/leaves', leaveRoutes);
+app.use('/attendance', attendanceRoutes);
 
 
 
