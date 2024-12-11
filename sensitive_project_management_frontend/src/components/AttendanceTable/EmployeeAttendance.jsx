@@ -2,7 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Camera } from 'lucide-react';
 
 const EmployeeAttendance = () => {
+  // State to hold the captured photo
   const [photo, setPhoto] = useState(null);
+  
+  // State to hold attendance details
   const [attendanceDetails, setAttendanceDetails] = useState({
     employeeId: "",
     employeeName: "",
@@ -14,26 +17,38 @@ const EmployeeAttendance = () => {
     remarks: "",
   });
 
-  const [submittedData, setSubmittedData] = useState(null); // State to hold the submitted data
+  // State to hold submitted data
+  const [submittedData, setSubmittedData] = useState(null);
 
+  // State to manage camera status
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [isInitializingCamera, setIsInitializingCamera] = useState(false);
+
+  // Reference to the video and canvas elements
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const [isCameraActive, setIsCameraActive] = useState(false);
+
+  // State to hold the camera stream
   const [cameraStream, setCameraStream] = useState(null);
 
-  // Function to stop camera stream
+  /**
+   * Function to stop the camera stream
+   */
   const stopCamera = () => {
     if (cameraStream) {
       cameraStream.getTracks().forEach(track => track.stop());
       setCameraStream(null);
       setIsCameraActive(false);
+      console.log("Camera stopped");
     }
   };
 
-  // Initialize camera
+  /**
+   * Function to initialize the camera
+   */
   const initializeCamera = async () => {
-    // Stop any existing stream first
-    stopCamera();
+    setIsInitializingCamera(true); // Show loading indicator
+    stopCamera(); // Ensure no existing stream is active
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -41,57 +56,78 @@ const EmployeeAttendance = () => {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
-      
+
       setCameraStream(stream);
       setIsCameraActive(true);
+      console.log("Camera initialized");
     } catch (error) {
       console.error("Error accessing camera:", error);
       setIsCameraActive(false);
+      alert("Unable to access camera. Please check your permissions.");
+    } finally {
+      setIsInitializingCamera(false); // Hide loading indicator
     }
   };
 
-  // Handle page visibility changes
+  /**
+   * Effect to handle camera initialization and page visibility changes
+   */
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        // Page is not visible, stop camera
+        // If the page is not visible, stop the camera
         stopCamera();
       } else {
-        // Page becomes visible, reinitialize camera
-        initializeCamera();
+        // If the page becomes visible and no photo is displayed, reinitialize the camera
+        if (!photo && !submittedData) {
+          initializeCamera();
+        }
       }
     };
 
-    // Add event listener for page visibility
+    // Add event listener for page visibility changes
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Initial camera setup
+    // Initialize camera on component mount
     initializeCamera();
 
-    // Cleanup
+    // Cleanup on component unmount
     return () => {
-      // Remove event listener
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      
-      // Stop camera when component unmounts
       stopCamera();
     };
-  }, []);
+  }, [photo, submittedData]); // Dependencies include photo and submittedData
 
+  /**
+   * Function to capture a photo from the video stream
+   */
   const capturePhoto = () => {
-    const context = canvasRef.current.getContext('2d');
-    context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
-    setPhoto(canvasRef.current.toDataURL('image/jpeg'));
-    
-    // Stop camera after capturing
-    stopCamera();
+    if (videoRef.current && canvasRef.current) {
+      const context = canvasRef.current.getContext('2d');
+      // Draw the current frame from the video onto the canvas
+      context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
+      // Convert the canvas image to a data URL
+      const dataURL = canvasRef.current.toDataURL('image/jpeg');
+      setPhoto(dataURL);
+      console.log("Photo captured");
+
+      // Stop camera after capturing
+      stopCamera();
+    }
   };
 
+  /**
+   * Function to recapture a photo
+   */
   const recapturePhoto = () => {
-    setPhoto(null);
-    initializeCamera();
+    setPhoto(null); // Clear the current photo
+    initializeCamera(); // Reinitialize the camera
+    console.log("Recapturing photo");
   };
 
+  /**
+   * Function to handle form submission
+   */
   const handleSubmit = () => {
     if (!photo) {
       alert("Please capture a photo before submitting.");
@@ -143,7 +179,9 @@ const EmployeeAttendance = () => {
 
       {!submittedData && (
         <div>
+          {/* Buttons for capturing or recapturing photo */}
           <div className="flex justify-center mb-6 space-x-4">
+            {/* Show "Capture Photo" button if no photo is captured and camera is active */}
             {!photo && isCameraActive && (
               <button
                 onClick={capturePhoto}
@@ -154,6 +192,7 @@ const EmployeeAttendance = () => {
               </button>
             )}
 
+            {/* Show "Recapture" button if a photo is captured */}
             {photo && (
               <button
                 onClick={recapturePhoto}
@@ -165,7 +204,8 @@ const EmployeeAttendance = () => {
             )}
           </div>
 
-          {!photo && isCameraActive && (
+          {/* Video element for live camera feed */}
+          {!photo && isCameraActive && !isInitializingCamera && (
             <div className="flex justify-center">
               <video 
                 ref={videoRef} 
@@ -177,6 +217,14 @@ const EmployeeAttendance = () => {
             </div>
           )}
 
+          {/* Loading indicator when initializing camera */}
+          {isInitializingCamera && (
+            <div className="flex justify-center text-gray-500">
+              Initializing camera...
+            </div>
+          )}
+
+          {/* Hidden canvas for capturing photo */}
           <canvas 
             ref={canvasRef} 
             width="300" 
@@ -184,6 +232,7 @@ const EmployeeAttendance = () => {
             className="hidden"
           ></canvas>
 
+          {/* Display the captured photo */}
           {photo && (
             <div className="flex justify-center mt-6">
               <img 
@@ -194,7 +243,7 @@ const EmployeeAttendance = () => {
             </div>
           )}
 
-          {/* Submit Button */}
+          {/* Submit button after capturing a photo */}
           {photo && (
             <div className="flex justify-center mt-6">
               <button
