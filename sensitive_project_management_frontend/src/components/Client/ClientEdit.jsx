@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useParams } from "react-router-dom";
 
 function ClientEdit() {
+  const { id } = useParams(); // Assume ID is passed in the URL as /client-edit/:id
+  console.log(id)
   const [client, setClient] = useState({
     organization: "",
     contactPerson: "",
@@ -29,6 +32,27 @@ function ClientEdit() {
     status: "",
   });
 
+  // Fetch user details when the component mounts or the ID changes.
+  useEffect(() => {
+    if (!id) return; // Skip if ID is not provided.
+
+    const fetchClientDetails = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/clients/get/${id}`);
+        console.log(response)
+        if (response.status === 200) {
+          setClient(response.data); // Update the state with fetched data.
+        } else {
+          console.error("Failed to fetch client details:", response.status);
+        }
+      } catch (error) {
+        console.error("Error fetching client details:", error);
+      }
+    };
+
+    fetchClientDetails();
+  }, [id]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name.includes("officeLocation") || name.includes("registeredAddress")) {
@@ -47,14 +71,15 @@ function ClientEdit() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
-      const response = await axios.post('http://localhost:3000/clients/create', client);
-      console.log('Response Status:', response.status); // Log the response status
-      console.log('Response Data:', response.data);     // Log the response data
-  
-      if (response.status === 201) {
-        alert('Client data submitted successfully!');
+      const response = id
+        ? await axios.put(`http://localhost:3000/clients/update/${id}`, client) // Update client
+        : await axios.post(`http://localhost:3000/clients/create`, client); // Create client
+        
+
+      if (response.status === 200 || response.status === 201) {
+        alert("Client data submitted successfully!");
         setClient({
           organization: "",
           contactPerson: "",
@@ -80,17 +105,16 @@ function ClientEdit() {
             landmark: "",
           },
           status: "",
-        }); // Reset form after submission
-      } else {
-        console.error('Unexpected response status:', response.status);
-        alert('There was an issue with the submission.');
-      }
-    } catch (error) {
-      console.error('Error submitting data:', error); // Log the error
-      alert('There was an error submitting the data');
+        });
+        } else {
+      alert(`Error: ${response.statusText}`);
     }
+  } catch (error) {
+    console.error("Error submitting data:", error);
+    alert(`Submission failed: ${error.message}`);
+  }
   };
-  
+
   return (
     <div className="container mx-auto p-6 mt-12">
       <h2 className="text-4xl font-bold mb-10 text-center mt-20">Client Form</h2>
@@ -187,7 +211,7 @@ function ClientEdit() {
               <input
                 type="text"
                 name="officeLocation.addressLine"
-                value={client.officeLocation.addressLine}
+                value={client?.officeLocation?.addressLine}
                 onChange={handleChange}
                 required
                 className="border border-blue-300 p-2 mb-2 w-full rounded"
@@ -196,7 +220,7 @@ function ClientEdit() {
               <input
                 type="text"
                 name="officeLocation.area"
-                value={client.officeLocation.area}
+                value={client?.officeLocation?.area}
                 onChange={handleChange}
                 required
                 className="border border-blue-300 p-2 mb-2 w-full rounded"

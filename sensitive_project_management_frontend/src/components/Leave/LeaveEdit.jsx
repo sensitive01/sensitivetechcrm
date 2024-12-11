@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";  // Import axios for HTTP requests
+import { useParams } from "react-router-dom";
 
-function Leave() {
+function LeaveEdit() {
   const [leave, setLeave] = useState({
     employee: "",
     leaveCategory: "",  
@@ -16,6 +17,28 @@ function Leave() {
     startTime: "",
     endTime: "",
   });
+
+  const { id } = useParams();  // Get the ID from URL
+  console.log(id)
+  useEffect(() => {
+    if (!id) return; // Skip if ID is not provided.
+
+    const fetchLeaveDetails = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/leaves/get/${id}`);
+        console.log(response);
+        if (response.status === 200) {
+          setLeave(response.data); // Update the state with fetched data.
+        } else {
+          console.error("Failed to fetch leave details:", response.status);
+        }
+      } catch (error) {
+        console.error("Error fetching leave details:", error);
+      }
+    };
+
+    fetchLeaveDetails();
+  }, [id]);
 
   const employees = [
     { id: 1, name: "John Doe" },
@@ -32,16 +55,14 @@ function Leave() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const response = await axios.post("http://localhost:3000/leaves/create", leave, {
-        headers: {
-          "Content-Type": "application/json",  // Set the content type header
-        },
-      });
 
-      if (response.status === 201) {
+    try {
+      const response = id
+        ? await axios.put(`http://localhost:3000/leaves/update/${id}`, leave) // Update leave
+        : await axios.post(`http://localhost:3000/leaves/create`, leave); // Create leave
+
+      if (response.status === 200 || response.status === 201) {
         alert("Leave data submitted successfully!");
-        // Optionally, reset the form after successful submission
         setLeave({
           employee: "",
           leaveCategory: "",
@@ -56,10 +77,12 @@ function Leave() {
           startTime: "",
           endTime: "",
         });
+      } else {
+        alert(`Error: ${response.statusText}`);
       }
     } catch (error) {
       console.error("Error submitting data:", error);
-      alert("There was an error submitting the data.");
+      alert(`Submission failed: ${error.message}`);
     }
   };
 
@@ -264,4 +287,4 @@ function Leave() {
   );
 }
 
-export default Leave;
+export default LeaveEdit;

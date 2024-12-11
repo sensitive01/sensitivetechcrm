@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { FaPlus } from 'react-icons/fa';
 import axios from 'axios';
@@ -44,7 +44,7 @@ const ClientTable = () => {
   };
 
 
-  
+
 
   // Edit client function (redirect to the client edit form)
   const handleEdit = (clientId) => {
@@ -113,7 +113,14 @@ const ClientTable = () => {
                   {client.registeredAddress.addressLine}, {client.registeredAddress.area}, {client.registeredAddress.city}, {client.registeredAddress.state} - {client.registeredAddress.pincode} ({client.registeredAddress.landmark})
                 </td>
                 <td className="p-6">{client.status}</td>
-                <td className="p-6">{client.createdAt}</td>
+                <td className="p-6 p-6 whitespace-nowrap">
+                  {new Intl.DateTimeFormat('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: '2-digit',
+                  }).format(new Date(client.createdAt))}{" "}
+                  {new Date(client.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </td>
                 <td className="p-3">
                   <div className="flex justify-center space-x-2">
                     <button

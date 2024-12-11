@@ -11,9 +11,13 @@ const LoginPage = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Login Data:", formData);
+    const response = await axios.post('http://localhost:3000/employee-login',formData)
+    console.log(response)
+    
+
     // Add your login logic here
     navigate("/dashboard"); // Redirect to the dashboard after login
   };

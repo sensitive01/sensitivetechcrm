@@ -1,11 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera } from 'lucide-react';
+import { Camera, LogOut } from 'lucide-react';
 
 const EmployeeAttendance = () => {
-  // State to hold the captured photo
-  const [photo, setPhoto] = useState(null);
-  
-  // State to hold attendance details
+  const [photo, setPhoto] = useState(null); // Captured photo
   const [attendanceDetails, setAttendanceDetails] = useState({
     employeeId: "",
     employeeName: "",
@@ -13,148 +10,79 @@ const EmployeeAttendance = () => {
     status: "",
     logintime: "",
     logouttime: "",
-    projectName: "",
-    remarks: "",
-  });
-
-  // State to hold submitted data
-  const [submittedData, setSubmittedData] = useState(null);
-
-  // State to manage camera status
+  }); // Form data
+  const [submittedData, setSubmittedData] = useState(null); // Submitted data
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [isInitializingCamera, setIsInitializingCamera] = useState(false);
-
-  // Reference to the video and canvas elements
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-
-  // State to hold the camera stream
   const [cameraStream, setCameraStream] = useState(null);
 
-  /**
-   * Function to stop the camera stream
-   */
+  // Function to stop the camera
   const stopCamera = () => {
     if (cameraStream) {
       cameraStream.getTracks().forEach(track => track.stop());
       setCameraStream(null);
       setIsCameraActive(false);
-      console.log("Camera stopped");
     }
   };
 
-  /**
-   * Function to initialize the camera
-   */
+  // Function to initialize the camera
   const initializeCamera = async () => {
-    setIsInitializingCamera(true); // Show loading indicator
-    stopCamera(); // Ensure no existing stream is active
-
+    setIsInitializingCamera(true);
+    stopCamera();
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
-
       setCameraStream(stream);
       setIsCameraActive(true);
-      console.log("Camera initialized");
     } catch (error) {
-      console.error("Error accessing camera:", error);
-      setIsCameraActive(false);
-      alert("Unable to access camera. Please check your permissions.");
+      alert("Unable to access the camera. Please check permissions.");
     } finally {
-      setIsInitializingCamera(false); // Hide loading indicator
+      setIsInitializingCamera(false);
     }
   };
 
-  /**
-   * Effect to handle camera initialization and page visibility changes
-   */
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        // If the page is not visible, stop the camera
         stopCamera();
-      } else {
-        // If the page becomes visible and no photo is displayed, reinitialize the camera
-        if (!photo && !submittedData) {
-          initializeCamera();
-        }
+      } else if (!photo && !submittedData) {
+        initializeCamera();
       }
     };
 
-    // Add event listener for page visibility changes
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    // Initialize camera on component mount
+    document.addEventListener("visibilitychange", handleVisibilityChange);
     initializeCamera();
 
-    // Cleanup on component unmount
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
       stopCamera();
     };
-  }, [photo, submittedData]); // Dependencies include photo and submittedData
+  }, [photo, submittedData]);
 
-  /**
-   * Function to capture a photo from the video stream
-   */
+  // Function to capture a photo
   const capturePhoto = () => {
     if (videoRef.current && canvasRef.current) {
-      const context = canvasRef.current.getContext('2d');
-      // Draw the current frame from the video onto the canvas
+      const context = canvasRef.current.getContext("2d");
       context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
-      // Convert the canvas image to a data URL
-      const dataURL = canvasRef.current.toDataURL('image/jpeg');
+      const dataURL = canvasRef.current.toDataURL("image/jpeg");
       setPhoto(dataURL);
-      console.log("Photo captured");
-
-      // Stop camera after capturing
       stopCamera();
     }
   };
 
-  /**
-   * Function to recapture a photo
-   */
+  // Function to recapture the photo
   const recapturePhoto = () => {
-    setPhoto(null); // Clear the current photo
-    initializeCamera(); // Reinitialize the camera
-    console.log("Recapturing photo");
+    setPhoto(null);
+    initializeCamera();
   };
 
-  /**
-   * Function to handle form submission
-   */
-  const handleSubmit = () => {
-    if (!photo) {
-      alert("Please capture a photo before submitting.");
-      return;
-    }
-
-    const currentDate = new Date();
-    const formattedDate = currentDate.toLocaleString(); // Get current date and time as a string
-
-    // Prepare the submission data
-    const submissionData = {
-      photo,
-      employeeId: attendanceDetails.employeeId,
-      employeeName: attendanceDetails.employeeName,
-      date: attendanceDetails.date,
-      status: attendanceDetails.status,
-      logintime: attendanceDetails.logintime,
-      logouttime: attendanceDetails.logouttime,
-      projectName: attendanceDetails.projectName,
-      remarks: attendanceDetails.remarks,
-      submissionDateTime: formattedDate, // Add current date and time to submission
-    };
-
-    // Set the submitted data to display
-    setSubmittedData(submissionData);
-
-    // Clear the form data (reset the state)
+  // Function to handle logout
+  const handleLogout = () => {
+    // Reset all state to initial values
     setPhoto(null);
     setAttendanceDetails({
       employeeId: "",
@@ -163,14 +91,60 @@ const EmployeeAttendance = () => {
       status: "",
       logintime: "",
       logouttime: "",
-      projectName: "",
-      remarks: "",
     });
-
-    // Stop camera after submission
+    setSubmittedData(null);
     stopCamera();
+    // You might want to add additional logout logic here, 
+    // such as clearing authentication tokens or redirecting
+  };
 
-    alert(`Attendance details submitted successfully!\nDate and Time: ${formattedDate}`);
+  // Function to submit the attendance details
+  const handleSubmit = async () => {
+    if (!photo) {
+      alert("Please capture a photo before submitting.");
+      return;
+    }
+
+    const currentDate = new Date();
+    const formattedDate = currentDate.toLocaleString();
+
+    const submissionData = {
+      photo,
+      employeeId: attendanceDetails.employeeId,
+      employeeName: attendanceDetails.employeeName,
+      date: attendanceDetails.date,
+      status: attendanceDetails.status,
+      logintime: attendanceDetails.logintime,
+      logouttime: attendanceDetails.logouttime,
+      submissionDateTime: formattedDate,
+    };
+
+    try {
+      const response = await fetch("http://localhost:3000/attendance/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(submissionData),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        alert("Attendance submitted successfully!");
+        setSubmittedData(result.attendance);
+        setAttendanceDetails({
+          employeeId: "",
+          employeeName: "",
+          date: "",
+          status: "",
+          logintime: "",
+          logouttime: "",
+        });
+        setPhoto(null);
+      } else {
+        alert("Failed to submit attendance.");
+      }
+    } catch (error) {
+      alert("Error submitting attendance. Please try again.");
+    }
   };
 
   return (
@@ -179,9 +153,7 @@ const EmployeeAttendance = () => {
 
       {!submittedData && (
         <div>
-          {/* Buttons for capturing or recapturing photo */}
           <div className="flex justify-center mb-6 space-x-4">
-            {/* Show "Capture Photo" button if no photo is captured and camera is active */}
             {!photo && isCameraActive && (
               <button
                 onClick={capturePhoto}
@@ -191,8 +163,6 @@ const EmployeeAttendance = () => {
                 Capture Photo
               </button>
             )}
-
-            {/* Show "Recapture" button if a photo is captured */}
             {photo && (
               <button
                 onClick={recapturePhoto}
@@ -202,54 +172,32 @@ const EmployeeAttendance = () => {
                 Recapture
               </button>
             )}
+            {isCameraActive && (
+              <button
+                onClick={handleLogout}
+                className="bg-red-500 text-white p-4 rounded-full flex items-center justify-center"
+              >
+                <LogOut className="mr-2" size={20} />
+                Logout
+              </button>
+            )}
           </div>
 
-          {/* Video element for live camera feed */}
           {!photo && isCameraActive && !isInitializingCamera && (
             <div className="flex justify-center">
-              <video 
-                ref={videoRef} 
-                autoPlay 
-                width="300" 
-                height="200" 
-                className="border rounded-md"
-              ></video>
+              <video ref={videoRef} autoPlay className="fullscreen-video"></video>
             </div>
           )}
-
-          {/* Loading indicator when initializing camera */}
-          {isInitializingCamera && (
-            <div className="flex justify-center text-gray-500">
-              Initializing camera...
-            </div>
-          )}
-
-          {/* Hidden canvas for capturing photo */}
-          <canvas 
-            ref={canvasRef} 
-            width="300" 
-            height="200" 
-            className="hidden"
-          ></canvas>
-
-          {/* Display the captured photo */}
+          {isInitializingCamera && <div className="text-center">Initializing camera...</div>}
+          <canvas ref={canvasRef} width="300" height="200" className="hidden"></canvas>
           {photo && (
             <div className="flex justify-center mt-6">
-              <img 
-                src={photo} 
-                alt="Captured" 
-                className="w-64 h-64 rounded-full object-cover shadow-lg" 
-              />
+              <img src={photo} alt="Captured" className="w-64 h-64 rounded-full object-cover shadow-lg" />
             </div>
           )}
-
-          {/* Submit button after capturing a photo */}
           {photo && (
             <div className="flex justify-center mt-6">
-              <button
-                onClick={handleSubmit}
-                className="bg-green-500 text-white p-4 rounded-md"
-              >
+              <button onClick={handleSubmit} className="bg-green-500 text-white p-4 rounded-md">
                 Submit Details
               </button>
             </div>
@@ -257,27 +205,23 @@ const EmployeeAttendance = () => {
         </div>
       )}
 
-      {/* Display the submitted data */}
       {submittedData && (
         <div className="mt-6 p-6 border rounded-md">
           <h3 className="text-2xl font-semibold">Submitted Attendance Details</h3>
           <div className="flex justify-center mt-6">
-            <img 
-              src={submittedData.photo} 
-              alt="Captured" 
-              className="w-64 h-64 rounded-full object-cover shadow-lg" 
+            <img
+              src={submittedData.photo}
+              alt="Captured"
+              className="w-64 h-64 rounded-full object-cover shadow-lg"
             />
           </div>
-          <ul className="list-none mt-4">
+          <ul className="mt-4">
             <li><strong>Employee ID:</strong> {submittedData.employeeId}</li>
             <li><strong>Name:</strong> {submittedData.employeeName}</li>
             <li><strong>Date:</strong> {submittedData.date}</li>
             <li><strong>Status:</strong> {submittedData.status}</li>
-            <li><strong>Check-In Time:</strong> {submittedData.logintime}</li>
-            <li><strong>Check-Out Time:</strong> {submittedData.logouttime}</li>
-            <li><strong>Project Name:</strong> {submittedData.projectName}</li>
-            <li><strong>Remarks:</strong> {submittedData.remarks}</li>
-            <li><strong>Submission Date and Time:</strong> {submittedData.submissionDateTime}</li>
+            <li><strong>Login Time:</strong> {submittedData.submissionDateTime}</li>
+            <li><strong>Logout Time:</strong> {submittedData.logouttime}</li>
           </ul>
         </div>
       )}
