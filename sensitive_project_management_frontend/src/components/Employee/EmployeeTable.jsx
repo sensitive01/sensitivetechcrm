@@ -1,59 +1,61 @@
-import React, { useState } from 'react';
-import { Eye, Edit, Trash2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { FaPlus } from 'react-icons/fa';
+import React, { useState, useEffect } from "react";
+import { Eye, Edit, Trash2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { FaPlus } from "react-icons/fa";
+import axios from "axios";
 
 const EmployeeTable = () => {
-  const [employees, setEmployees] = useState([
-    {
-      id: 1,
-      empId: "EMP001",
-      fullName: "Rakesh N",
-      designation: "Frontend Developer",
-      department: "IT",
-      dob: "2001-01-16",
-      doj: "2024-10-14",
-      status: "Active",
-      createdDate: "2024-10-14",
-      imageUrl: "/src/assets/arjun.jpg"
-    },
-    {
-      id: 2,
-      empId: "EMP002",
-      fullName: "AswiniRaj",
-      designation: "Full stack developer",
-      department: "IT",
-      dob: "1985-09-20",
-      doj: "2018-09-01",
-      status: "Active",
-      createdDate: "2018-08-20",
-      imageUrl: "/src/assets/priya.jpg"
-    },
-    {
-      id: 3,
-      empId: "EMP003",
-      fullName: "Jeyaram",
-      designation: "Fultter devp",
-      department: "IT",
-      dob: "1992-07-15",
-      doj: "2019-07-10",
-      status: "On Leave",
-      createdDate: "2019-06-30",
-      imageUrl: "/src/assets/vikram.jpg"
-    },
-    {
-      id: 4,
-      empId: "EMP004",
-      fullName: "Puja Samantaray",
-      designation: "Full stack developer",
-      department: "IT",
-      dob: "1995-11-25",
-      doj: "2022-03-05",
-      status: "Active",
-      createdDate: "2022-02-28",
-      imageUrl: "/src/assets/kavya.jpg"
-    },
-  ]);
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [employeeToDelete, setEmployeeToDelete] = useState(null); // Track the employee to be deleted
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch employee data from an API
+    const fetchEmployees = async () => {
+      try {
+        setLoading(true); // Show loader
+        const response = await axios.get(
+          "http://localhost:5000/getallemployees"
+        ); // Replace with your API endpoint
+        console.log(response)
+        setEmployees(response.data); // Assuming data is an array of employees
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false); // Stop loader
+      }
+    };
+
+    fetchEmployees();
+  }, []);
+
+  // Delete the employee whenever employeeToDelete is set
+  const handleEmployeeDelete = async (id) => {
+    console.log("employee id", id);
+
+    try {
+      await axios.delete(`http://localhost:5000/deleteemployee/${id}`);
+      setEmployees((prevEmployees) =>
+        prevEmployees.filter((employee) => employee._id !== id)
+      );
+      alert("Employee deleted successfully!");
+    } catch (err) {
+      console.error("Error deleting employee:", err.message);
+      alert("Failed to delete employee. Please try again.");
+    } finally {
+      setEmployeeToDelete(null);
+    }
+  };
+
+  const handleEmployeeEdit = (id) => {
+    console.log('Edit client with ID:', id);
+    navigate(`/employee-edit/${id}`); // Adjust navigation route
+  };
+
+
+
 
   const renderStatusBadge = (status) => {
     const statusColors = {
@@ -64,16 +66,29 @@ const EmployeeTable = () => {
 
     return (
       <span
-        className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[status] || "bg-gray-100"}`}
+        className={`px-3 py-1 rounded-full text-xs font-medium ${
+          statusColors[status] || "bg-gray-100"
+        }`}
       >
         {status}
       </span>
     );
   };
 
+  if (loading) {
+    return <div className="text-center mt-20">Loading employee data...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center mt-20 text-red-500">Error: {error}</div>;
+  }
+
   return (
     <div className="container mx-auto p-6">
-      <h2 className="text-4xl font-bold mb-10 text-center mt-20">Employee Details</h2>
+      <h2 className="text-4xl font-bold mb-10 text-center mt-20">
+        Employee Details
+      </h2>
+      
 
       {/* Add Employee Button */}
       <div className="flex justify-end mb-6">
@@ -90,32 +105,50 @@ const EmployeeTable = () => {
         <table className="w-full table-auto">
           <thead className="bg-blue-50 border-b">
             <tr>
-              <th className="p-4 text-left font-semibold text-gray-600">S.No</th>
-              <th className="p-4 text-left font-semibold text-gray-600">Profile Picture</th>
-              <th className="p-4 text-left font-semibold text-gray-600">Emp ID</th>
-              <th className="p-4 text-left font-semibold text-gray-600">Name</th>
-              <th className="p-4 text-left font-semibold text-gray-600">Designation</th>
-              <th className="p-4 text-left font-semibold text-gray-600">Department</th>
+              <th className="p-4 text-left font-semibold text-gray-600">
+                S.No
+              </th>
+              <th className="p-4 text-left font-semibold text-gray-600">
+                Profile Picture
+              </th>
+              <th className="p-4 text-left font-semibold text-gray-600">
+                Emp ID
+              </th>
+              <th className="p-4 text-left font-semibold text-gray-600">
+                Name
+              </th>
+              <th className="p-4 text-left font-semibold text-gray-600">
+                Designation
+              </th>
+              <th className="p-4 text-left font-semibold text-gray-600">
+                Department
+              </th>
               <th className="p-4 text-left font-semibold text-gray-600">DOB</th>
               <th className="p-4 text-left font-semibold text-gray-600">DOJ</th>
-              <th className="p-4 text-left font-semibold text-gray-600">Status</th>
-              <th className="p-4 text-left font-semibold text-gray-600">Created Date</th>
-              <th className="p-4 text-center font-semibold text-gray-600">Actions</th>
+              <th className="p-4 text-left font-semibold text-gray-600">
+                Status
+              </th>
+              <th className="p-4 text-left font-semibold text-gray-600">
+                Created Date
+              </th>
+              <th className="p-4 text-center font-semibold text-gray-600">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
             {employees.map((employee, index) => (
-              <tr key={employee.id} className="border-b hover:bg-gray-50">
+              <tr key={employee._id} className="border-b hover:bg-gray-50">
                 <td className="p-4">{index + 1}</td>
                 <td className="p-4">
                   <img
                     src={employee.imageUrl}
-                    alt={employee.fullName}
+                    alt={employee.name}
                     className="w-16 h-16 rounded-full object-cover"
                   />
                 </td>
                 <td className="p-4">{employee.empId}</td>
-                <td className="p-4">{employee.fullName}</td>
+                <td className="p-4">{employee.name}</td>
                 <td className="p-4">{employee.designation}</td>
                 <td className="p-4">{employee.department}</td>
                 <td className="p-4">{employee.dob}</td>
@@ -131,12 +164,14 @@ const EmployeeTable = () => {
                       <Eye size={20} />
                     </button>
                     <button
+                      onClick={() => handleEmployeeEdit(employee._id)}
                       className="text-green-500 hover:bg-green-100 p-2 rounded-full transition-colors"
                       title="Edit Employee"
                     >
                       <Edit size={20} />
                     </button>
                     <button
+                      onClick={() => handleEmployeeDelete(employee._id)} // Set the employee to be deleted
                       className="text-red-500 hover:bg-red-100 p-2 rounded-full transition-colors"
                       title="Delete Employee"
                     >
@@ -152,5 +187,4 @@ const EmployeeTable = () => {
     </div>
   );
 };
-
 export default EmployeeTable;

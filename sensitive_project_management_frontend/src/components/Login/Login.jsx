@@ -20,6 +20,7 @@ const LoginPage = () => {
 
     // Add your login logic here
     navigate("/dashboard"); // Redirect to the dashboard after login
+    navigate("/dashboard"); 
   };
 
   return (

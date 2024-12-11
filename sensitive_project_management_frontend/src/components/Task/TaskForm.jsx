@@ -12,7 +12,7 @@ function TaskForm() {
     attachments: null,
   });
 
-  // Sample data for Projects and Employees
+  // Manually inserted data for Projects and Employees
   const projects = [
     { id: "1", name: "ParkMyWheels" },
     { id: "2", name: "Capilary" },
@@ -34,13 +34,45 @@ function TaskForm() {
     setTask((prev) => ({ ...prev, attachments: e.target.files }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({
-      ...task,
-      timeline: task.timeline.split(",").map((t) => t.trim()),
+
+    // Prepare the form data
+    const formData = new FormData();
+
+    // Append all form fields
+    Object.keys(task).forEach((key) => {
+      if (key === "attachments" && task[key]) {
+        // For attachments, append all files
+        Array.from(task[key]).forEach((file) => {
+          formData.append("attachments", file);
+        });
+      } else {
+        formData.append(key, task[key]);
+      }
     });
-    // Add backend integration here
+
+    try {
+      // Send POST request to backend
+      const response = await fetch("http://localhost:5000/createtask", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        // Handle success (e.g., show a success message)
+        console.log("Task created:", result);
+        alert("Task created successfully!");
+      } else {
+        // Handle error (e.g., show an error message)
+        console.error("Error:", result);
+        alert("Failed to create task.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while creating the task.");
+    }
   };
 
   return (
