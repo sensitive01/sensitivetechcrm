@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.webp";
+import axios from "axios";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -13,15 +14,38 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login Data:", formData);
-    const response = await axios.post('http://localhost:3000/employee-login',formData)
-    console.log(response)
-    
-
-    // Add your login logic here
-    navigate("/dashboard"); // Redirect to the dashboard after login
-    navigate("/dashboard"); 
+    try {
+      console.log("Login Data:", formData);
+  
+      // Determine whether this is an employee or admin login
+      const endpoint = formData.username.includes("admin") 
+        ? "http://localhost:3000/admin-login/adminlogin"  // Admin login
+        : "http://localhost:3000/employee-login/login"; // Employee login
+  
+      const response = await axios.post(endpoint, formData);
+  
+      console.log(response);
+  
+      if (response.status === 200) {
+        const { _id, role } = response.data.employee || response.data.admin; // Adapt based on response structure
+        localStorage.setItem("empId", _id);
+        localStorage.setItem("role", role); // Save role to localStorage
+  
+        // Navigate based on role
+        if (role === "employee") {
+          navigate("/attendance-form");
+        } else if (role === "admin") {
+          navigate("/dashboard"); // Admin should be navigated to dashboard
+        } else {
+          navigate("/attendance-form"); // Default navigation
+        }
+      }
+    } catch (error) {
+      console.error("Login Error:", error);
+      alert("Invalid username or password. Please try again.");
+    }
   };
+  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -87,3 +111,5 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
+

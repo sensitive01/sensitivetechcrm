@@ -81,7 +81,7 @@ const EmployeeEdit = () => {
       try {
         setLoading(true); // Show loader
         const response = await axios.get(
-          `http://localhost:5000/getemployeebyid/${id}`
+          `http://localhost:3000/getemployeebyid/${id}`
         ); // Replace with your API endpoint
         console.log(response)
         setFormData(response.data); 
@@ -102,7 +102,7 @@ const EmployeeEdit = () => {
     console.log(formData);
     try {
       const response = await axios.post(
-        "http://localhost:5000/createemployee",
+        "http://localhost:3000/createemployee",
         formData
       );
       console.log("Response:", response.data);
