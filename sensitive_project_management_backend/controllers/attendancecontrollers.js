@@ -1,9 +1,14 @@
 const attendanceModel = require("../models/attendanceModel");
+const employeeSchema = require("../models/employeeSchema");
 
 exports.createAttendance = async (req, res) => {
   try {
     console.log("CREATE Attendance", req.body);
+    const empdata = await employeeSchema.findOne({ _id: req.body.employeeId }, { name: 1, empId: 1 })
     const attendance = new attendanceModel(req.body);
+    attendance.employeeName = empdata.name
+    attendance.employeeId = empdata._id
+
     await attendance.save();
     res.status(201).json({ message: "Attendance record created successfully", attendance });
   } catch (error) {
@@ -15,7 +20,18 @@ exports.createAttendance = async (req, res) => {
 // Get all attendance records
 exports.getAllAttendance = async (req, res) => {
   try {
-    const attendanceRecords = await attendanceModel.find();
+    const { id } = req.params
+    console.log(id)
+    const empdata = await employeeSchema.findOne({ _id: id }, { role: 1 })
+    console.log("empdata puja", empdata)
+    let attendanceRecords
+
+    if (id == "675c0f589c0c7ac25d72bd8c") {
+      attendanceRecords = await attendanceModel.find();
+    }
+    else {
+      attendanceRecords = await attendanceModel.find({ employeeId: id });
+    }
     console.log("GET all attendance records", attendanceRecords);
     res.status(200).json(attendanceRecords);
   } catch (error) {
@@ -37,8 +53,8 @@ exports.logoutAttendance = async (req, res) => {
 
     // Find and update the attendance record with the given ID
     const updatedAttendance = await attendanceModel.findByIdAndUpdate(
-      id, 
-      { logouttime: logouttime }, 
+      id,
+      { logouttime: logouttime },
       { new: true } // Return the updated document
     );
 

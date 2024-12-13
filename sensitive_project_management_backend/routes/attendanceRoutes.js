@@ -8,7 +8,7 @@ const router = express.Router();
 
 // Routes
 router.post('/create',createAttendance);
-router.get('/attendance-all',getAllAttendance);
+router.get('/attendance-all/:id',getAllAttendance);
 router.put('/logout/:id',logoutAttendance)
 
 module.exports = router;
