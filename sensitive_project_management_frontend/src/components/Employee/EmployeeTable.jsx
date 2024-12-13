@@ -167,7 +167,7 @@ const EmployeeTable = () => {
     const exportData = employees.map((employee, index) => ({
       "S.No": index + 1,
       "Emp ID": employee.empId,
-      "Name": employee.name,
+      "Name": employee.contactPerson,
       "Designation": employee.designation,
       "Department": employee.department,
       "DOB": employee.dob,

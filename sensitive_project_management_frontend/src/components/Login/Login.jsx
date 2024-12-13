@@ -18,11 +18,15 @@ const LoginPage = () => {
       console.log("Login Data:", formData);
   
       // Determine whether this is an employee or admin login
-      const endpoint = formData.username.includes("admin") 
-        ? "http://localhost:3000/admin-login/adminlogin"  // Admin login
-        : "http://localhost:3000/employee-login/login"; // Employee login
+      // const endpoint = formData.username.includes("admin") 
+      //   ? "http://localhost:3000/admin-login/adminlogin"  
+      //   : "http://localhost:3000/employee-login/login";
+
+
+
+      
   
-      const response = await axios.post(endpoint, formData);
+      const response = await axios.post("http://localhost:3000/employee-login/login", formData);
   
       console.log(response);
   
@@ -34,7 +38,7 @@ const LoginPage = () => {
         // Navigate based on role
         if (role === "employee") {
           navigate("/attendance-form");
-        } else if (role === "admin") {
+        } else if (role === "Superadmin") {
           navigate("/dashboard"); // Admin should be navigated to dashboard
         } else {
           navigate("/attendance-form"); // Default navigation

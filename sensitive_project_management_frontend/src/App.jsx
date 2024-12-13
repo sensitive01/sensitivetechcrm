@@ -103,7 +103,8 @@ const AdminLayout = ({ children }) => (
 );
 
 function App() {
-  const role = localStorage.getItem("role"); // Get role from localStorage
+  const role = localStorage.getItem("role"); 
+  console.log(role)
 
   return (
     <Router>

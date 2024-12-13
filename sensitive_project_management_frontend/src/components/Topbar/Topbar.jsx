@@ -141,7 +141,7 @@ export default function Topbar() {
         <Link to="/project" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Project</Link>
 
         {/* Admin specific links */}
-        {role === "admin" && (
+        {role === "Superadmin" && (
           <>
             <Link to="/employee-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Employee</Link>
             <Link to="/client-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Client</Link>
