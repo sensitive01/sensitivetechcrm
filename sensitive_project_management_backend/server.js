@@ -6,18 +6,20 @@ const cors = require('cors');
 const adminRoute =require('./routes/adminRoute')
 const projectRouter = require('./routes/projectRoute')
 const taskRouter = require('./routes/taskRoute')
+const verificationRoutes = require("./routes/verificationRoutes")
 // const EmployeeRoutes = require("./routes/EmployeeRoutes");
 
 
 const clientRoutes = require('./routes/clientRoutes')
 const leaveRoutes = require('./routes/leaveRoutes')
 const attendanceRoutes = require('./routes/attendanceRoutes')
+const superadminRouter = require('./routes/superadminRoutes');
 
 
 dotenv.config();
 
 const app = express();
-const PORT = 5000;
+const PORT = 3000;
 
 // Middleware
 app.use(express.json());
@@ -37,7 +39,9 @@ db(); // MongoDB connection setup
 app.use('/', adminRoute);
 app.use('/project', projectRouter)
 app.use('/task', taskRouter)
-// app.use('/employees',adminRoute);
+app.use('/employee-login',verificationRoutes);
+app.use('/super-admin', superadminRouter)
+app.use('/admin-login',verificationRoutes);
 
 
 // Start server
