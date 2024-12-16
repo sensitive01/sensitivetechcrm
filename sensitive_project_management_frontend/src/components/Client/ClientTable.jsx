@@ -18,7 +18,10 @@ const ClientTable = () => {
     const fetchClients = async () => {
       try {
         const response = await axios.get('http://localhost:3000/clients/get-all');
+        console.log(response);
         setClients(response.data);
+
+        
       } catch (err) {
         setError('Failed to load client data');
       } finally {
@@ -34,6 +37,8 @@ const ClientTable = () => {
     if (window.confirm('Are you sure you want to delete this client?')) {
       try {
         const response = await axios.delete(`http://localhost:3000/clients/delete/${clientId}`);
+   
+        
         if (response.status === 200) {
           setClients(clients.filter((client) => client._id !== clientId));
         }

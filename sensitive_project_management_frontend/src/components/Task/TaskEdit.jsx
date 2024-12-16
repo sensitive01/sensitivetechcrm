@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 
-function TaskForm() {
+function TaskEdit() {
+  const { taskId } = useParams(); // Get task ID from URL params
   const [task, setTask] = useState({
     project: "",
     task: "",
@@ -25,6 +27,38 @@ function TaskForm() {
     { id: "103", name: "Jeyaram" },
   ];
 
+  // Fetch the task data using useEffect
+  useEffect(() => {
+    const fetchTaskData = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/task/gettask/${taskId}`);
+        const data = await response.json();
+
+        if (response.ok) {
+          setTask({
+            project: data.project,
+            task: data.task,
+            empId: data.empId,
+            description: data.description,
+            timeline: data.timeline,
+            status: data.status,
+            date: data.date,
+            attachments: data.attachments || null,
+          });
+        } else {
+          alert("Failed to fetch task data.");
+        }
+      } catch (error) {
+        console.error("Error fetching task data:", error);
+        alert("An error occurred while fetching task data.");
+      }
+    };
+
+    if (taskId) {
+      fetchTaskData();
+    }
+  }, [taskId]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setTask((prev) => ({ ...prev, [name]: value }));
@@ -34,46 +68,46 @@ function TaskForm() {
     setTask((prev) => ({ ...prev, attachments: e.target.files }));
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  // Prepare the form data
-  const formData = new FormData();
+    // Prepare the form data
+    const formData = new FormData();
 
-  // Append all form fields
-  Object.keys(task).forEach((key) => {
-    if (key === "attachments" && task[key]) {
-      // For attachments, append all files
-      Array.from(task[key]).forEach((file) => {
-        formData.append("attachments", file);
-      });
-    } else {
-      formData.append(key, task[key]);
-    }
-  });
-
-  try {
-    // Send POST request to backend
-    const response = await fetch("http://localhost:3000/task/createtask", {
-      method: "POST",
-      body: formData,
+    // Append all form fields
+    Object.keys(task).forEach((key) => {
+      if (key === "attachments" && task[key]) {
+        // For attachments, append all files
+        Array.from(task[key]).forEach((file) => {
+          formData.append("attachments", file);
+        });
+      } else {
+        formData.append(key, task[key]);
+      }
     });
 
-    const result = await response.json();
-    if (response.ok) {
-      // Handle success (e.g., show a success message)
-      console.log("Task created:", result);
-      alert("Task created successfully!");
-    } else {
-      // Handle error (e.g., show an error message)
-      console.error("Error:", result);
-      alert("Failed to create task.");
+    try {
+      // Send POST request to backend
+      const response = await fetch("http://localhost:3000/task/updatetask", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        // Handle success (e.g., show a success message)
+        console.log("Task updated:", result);
+        alert("Task updated successfully!");
+      } else {
+        // Handle error (e.g., show an error message)
+        console.error("Error:", result);
+        alert("Failed to update task.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred while updating the task.");
     }
-  } catch (error) {
-    console.error("Error:", error);
-    alert("An error occurred while creating the task.");
-  }
-};
+  };
 
   return (
     <div className="container mx-auto p-8 mt-20">
@@ -219,4 +253,4 @@ const handleSubmit = async (e) => {
   );
 }
 
-export default TaskForm;
+export default TaskEdit;
