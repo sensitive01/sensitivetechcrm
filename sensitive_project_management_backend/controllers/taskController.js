@@ -46,7 +46,6 @@ const createTask = async (req, res) => {
     }
 };
 
-
 // Get all tasks
 const getAllTasks = async (req, res) => {
   try {
@@ -66,11 +65,9 @@ const getAllTasks = async (req, res) => {
 // Get task by ID
 const getTaskById = async (req, res) => {
   const { id } = req.params;
-  console.log(id )
 
   try {
     const task = await Task.findById(id); // Find a task by its ID
-    console.log(task)
     if (!task) {
       return res.status(404).json({
         message: "Task not found",
@@ -82,7 +79,6 @@ const getTaskById = async (req, res) => {
       task,
     });
   } catch (error) {
-    console.log("err",error)
     return res.status(500).json({
       message: "Error retrieving task",
       error: error.message,
@@ -121,6 +117,36 @@ const updateTask = async (req, res) => {
   }
 };
 
+// Update the status of a task by ID
+const updateTaskStatus = async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  try {
+    const updatedTask = await Task.findByIdAndUpdate(
+      id,
+      { status }, // Only update the status field
+      { new: true } // Return the updated task
+    );
+
+    if (!updatedTask) {
+      return res.status(404).json({
+        message: "Task not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Task status updated successfully",
+      task: updatedTask,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Error updating task status",
+      error: error.message,
+    });
+  }
+};
+
 // Delete a task by ID
 const deleteTask = async (req, res) => {
   const { id } = req.params;
@@ -150,5 +176,6 @@ module.exports = {
   getAllTasks,
   getTaskById,
   updateTask,
+  updateTaskStatus,  // Export the new updateTaskStatus function
   deleteTask,
 };

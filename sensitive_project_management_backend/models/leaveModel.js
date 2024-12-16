@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-// Define the schema for the leave model
+
 const leaveSchema = new mongoose.Schema({
   employee: { type: String },
   leaveCategory: { type: String },  // Tracks if the user selects Leave or Permission

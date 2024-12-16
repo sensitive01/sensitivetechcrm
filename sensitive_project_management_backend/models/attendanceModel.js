@@ -6,7 +6,8 @@ const attendanceSchema = new mongoose.Schema({
   employeeName: { type: String },             
   date: { type: Date },                      
   status: { type: String },                    
-  logintime: { type: String },                
+  logintime: { type: String },
+                  
   logouttime: { type: String },                
 }, { timestamps: true });                     
 

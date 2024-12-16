@@ -8,15 +8,14 @@ const {
   updateClientStatus,
 } = require('../controllers/clientController');
 
-const router = express.Router(); // Use Router() for modular routing
+const router = express.Router(); 
 
-// Define routes for client operations
-router.post('/create', createClient); // Create a new client
-router.get('/get-all', getAllClients); // Get all clients
-router.get('/get/:id', getClientById); // Get a client by ID
-router.put('/update/:id', updateClientById); // Update a client by ID
-router.delete('/delete/:id', deleteClientById); // Delete a client by ID
-router.put('/update-status/:id',updateClientStatus); // Define the route for updating employee status
+router.post('/create', createClient);
+router.get('/get-all', getAllClients); 
+router.get('/get/:id', getClientById); 
+router.put('/update/:id', updateClientById);
+router.delete('/delete/:id', deleteClientById); 
+router.put('/update-status/:id',updateClientStatus); 
 
 
 module.exports = router;
