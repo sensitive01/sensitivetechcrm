@@ -19,11 +19,12 @@ const AttendanceTable = () => {
         const fetchAttendance = async () => {
             try {
                 const response = await fetch(`http://localhost:3000/attendance/attendance-all/${employeeId}`);
+                console.log(response)
                 if (!response.ok) {
                     throw new Error("Failed to fetch attendance data.");
                 }
                 const data = await response.json();
-
+                console.log(data)
                 data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 setAttendanceRecords(data);
             } catch (err) {
@@ -85,7 +86,7 @@ const AttendanceTable = () => {
     const exportToExcel = () => {
         const exportData = attendanceRecords.map((record, index) => ({
             "S.No": index + 1,
-            "Employee ID": record.employeeId,
+            "Employee ID": record.empId,
             Name: record.employeeName,
             Status: record.createdAt ? "Present" : "Absent",
             Date: new Intl.DateTimeFormat("en-GB", {

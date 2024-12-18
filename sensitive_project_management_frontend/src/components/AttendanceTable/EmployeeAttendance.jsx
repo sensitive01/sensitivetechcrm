@@ -103,6 +103,7 @@ const EmployeeAttendance = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(submissionData),
       });
+      console.log(response)
 
       if (response.ok) {
         const result = await response.json();
