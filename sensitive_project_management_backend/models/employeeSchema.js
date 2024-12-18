@@ -37,6 +37,7 @@ const EmployeeSchema = new mongoose.Schema({
   addressProofFile: { type: String, },
   password: { type: String,  },
   status: { type: String, default: "Active" },
-});
+}, { timestamps: true });                     
+
 
 module.exports = mongoose.model("Employee", EmployeeSchema);
