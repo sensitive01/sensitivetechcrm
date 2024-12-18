@@ -13,7 +13,6 @@ const ClientTable = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch clients data from the API
   useEffect(() => {
     const fetchClients = async () => {
       try {
@@ -32,7 +31,6 @@ const ClientTable = () => {
     fetchClients();
   }, []);
 
-  // Delete client function
   const handleDelete = async (clientId) => {
     if (window.confirm('Are you sure you want to delete this client?')) {
       try {
