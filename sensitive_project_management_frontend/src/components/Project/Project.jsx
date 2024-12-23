@@ -1,348 +1,87 @@
-// // import React, { useState, useEffect } from "react";
-// // import { Link } from "react-router-dom";
-// // import axios from "axios";
+import React, { useEffect, useState, useMemo } from "react";
+import { Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-// // const ProjectManager = () => {
-// //   const [projects, setProjects] = useState([]);
-// //   const [loading, setLoading] = useState(false);
-// //   const [error, setError] = useState(null);
+const ProjectDetailsModal = ({ project, onClose,onEdit }) => {
+  const renderArrayData = (array, field) => {
+    if (!array || array.length === 0) return "N/A";
+    return array.map((item, index) => item[field]).filter(Boolean).join(", ");
+  };
 
-// //   useEffect(() => {
-// //     // const fetchProjects = async () => {
-// //     //   try {
-// //     //     const response = await fetch("http://localhost:3000/project/getallprojects");
-// //     //     const data = await response.json();
-// //     //     console.log("Fetched projects:", data); // Debugging log
-// //     //     setProjects(data);
-// //     //   } catch (err) {
-// //     //     console.error("Error fetching projects:", err);
-// //     //   }
-// //     // };
-// //     const fetchProjects = async () => {
-// //       try {
-// //         const response = await axios.get("http://localhost:3000/project/getallprojects");
-// //         console.log(response);
-// //         setProjects(response.data);
+  return (
+    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
+      <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Project Details</h2>
+        
+        <div className="space-y-4">
+          <section>
+            <h3 className="text-lg font-semibold mb-2">Project Information</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <p><strong>Project Name:</strong> {renderArrayData(project.projectDetails, 'projectName')}</p>
+              <p><strong>Tech Stack:</strong> {renderArrayData(project.projectDetails, 'techStack')}</p>
+              <p><strong>Type:</strong> {renderArrayData(project.projectDetails, 'type')}</p>
+              <p><strong>Category:</strong> {renderArrayData(project.projectDetails, 'category')}</p>
+              <p><strong>Domain:</strong> {renderArrayData(project.projectDetails, 'domain')}</p>
+              <p><strong>Requirements:</strong> {renderArrayData(project.projectDetails, 'requirements')}</p>
+            </div>
+          </section>
 
+          <section>
+            <h3 className="text-lg font-semibold mb-2">Financial Details</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <p><strong>Quoted Value:</strong> {renderArrayData(project.financialDetails, 'quotedValue')}</p>
+              <p><strong>Approved Value:</strong> {renderArrayData(project.financialDetails, 'approvedValue')}</p>
+              <p><strong>Payment Terms:</strong> {renderArrayData(project.financialDetails, 'paymentTerms')}</p>
+              <p><strong>Tax Terms:</strong> {renderArrayData(project.financialDetails, 'taxTerms')}</p>
+            </div>
+          </section>
 
-// //       } catch (err) {
-// //         setError('Failed to load Project data');
-// //       } finally {
-// //         setLoading(false);
-// //       }
-// //     };
+          <section>
+            <h3 className="text-lg font-semibold mb-2">Additional Information</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <p><strong>Assigned To:</strong> {renderArrayData(project.additionalDetails, 'assignedTo')}</p>
+              <p><strong>Status:</strong> {renderArrayData(project.additionalDetails, 'status')}</p>
+              <p><strong>NDA:</strong> {renderArrayData(project.additionalDetails, 'nda')}</p>
+              <p><strong>MSA:</strong> {renderArrayData(project.additionalDetails, 'msa')}</p>
+              <p><strong>Created Date:</strong> {
+                project.additionalDetails?.[0]?.createdDate
+                  ? new Date(project.additionalDetails[0].createdDate).toLocaleDateString()
+                  : "N/A"
+              }</p>
+            </div>
+          </section>
+        </div>
 
-// //     fetchProjects();
-// //   }, []);
-
-
-// //   // const removeProject = async (id) => {
-// //   //   console.log("Deleting project with ID:", id); // Debugging log
-// //   //   if (!id) {
-// //   //     alert("Invalid project ID");
-// //   //     return;
-// //   //   }
-
-// //   //   try {
-// //   //     const response = await fetch(`http://localhost:3000/project/deleteproject/${id}`, {
-// //   //       method: "DELETE",
-// //   //     });
-// //   //     if (response.ok) {
-// //   //       setProjects((prevProjects) => prevProjects.filter((project) => project._id !== id));
-// //   //     } else {
-// //   //       alert("Failed to delete project");
-// //   //     }
-// //   //   } catch (err) {
-// //   //     console.error("Error deleting project:", err);
-// //   //     alert("An error occurred while deleting the project");
-// //   //   }
-// //   // };
-
-
-// //   const removeProject = async (id) => {
-// //     if (window.confirm('Are you sure you want to delete this project?')) {
-// //       try {
-// //         const response = await axios.delete(`http://localhost:3000/project/deleteproject/${id}`);
-
-
-// //         if (response.status === 200) {
-// //           setProjects(projects.filter((project) => project._id !== id));
-// //         }
-// //       } catch (err) {
-// //         setError('Failed to delete client');
-// //       }
-// //     }
-// //   };
-
-
-// //   // Open the modal with project details
-// //   const [selectedProject, setSelectedProject] = useState(null);
-// //   const openProjectDetails = (project) => setSelectedProject(project);
-// //   const closeModal = () => setSelectedProject(null);
-
-// //   return (
-// //     <div className="bg-gray-50 p-6 min-h-screen mt-20">
-// //       <h1 className="text-3xl font-bold text-gray-800 mb-6">Project Manager</h1>
-
-// //       {/* Add Project Button */}
-// //       <Link
-// //         to="/add-project"
-// //         className="bg-blue-500 text-white px-6 py-3 rounded-lg text-lg hover:bg-blue-600 transition duration-200"
-// //       >
-// //         Add Project
-// //       </Link>
-
-// //       {/* Data Table */}
-// //       <div className="mt-8">
-// //         <h2 className="text-xl font-semibold text-gray-800 mb-4">Projects</h2>
-
-// //         {loading ? (
-// //           <p className="text-gray-500 text-lg">Loading projects...</p>
-// //         ) : error ? (
-// //           <p className="text-red-500 text-lg">Error: {error}</p>
-// //         ) : projects.length > 0 ? (
-// //           <div className="overflow-x-auto bg-white shadow-md rounded-lg">
-// //             <table className="table-auto w-full border-collapse border border-gray-300">
-// //               <thead className="bg-blue-500 text-white">
-// //                 <tr>
-// //                   <th className="px-4 py-2 border border-gray-300">Project Name</th>
-// //                   <th className="px-4 py-2 border border-gray-300">Tech Stack</th>
-// //                   <th className="px-4 py-2 border border-gray-300">Client Company</th>
-// //                   <th className="px-4 py-2 border border-gray-300">Assigned To</th>
-// //                   <th className="px-4 py-2 border border-gray-300">Duration</th>
-// //                   <th className="px-4 py-2 border border-gray-300">Tasks</th>
-// //                   <th className="px-4 py-2 border border-gray-300">Status</th>
-// //                   <th className="px-4 py-2 border border-gray-300">Created Date</th>
-// //                   <th className="px-4 py-2 border border-gray-300">Actions</th>
-// //                 </tr>
-// //               </thead>
-// //               <tbody>
-// //                 {projects.map((project) => (
-// //                   <tr key={project._id} className="hover:bg-gray-100">
-// //                     <td className="px-4 py-2 border border-gray-300">{project.projectName}</td>
-// //                     <td className="px-4 py-2 border border-gray-300">{project.techStack}</td>
-// //                     <td className="px-4 py-2 border border-gray-300">{project.clientCompany}</td>
-// //                     <td className="px-4 py-2 border border-gray-300">{project.assignedTo}</td>
-// //                     <td className="px-4 py-2 border border-gray-300">{project.duration}</td>
-// //                     <td className="px-4 py-2 border border-gray-300">{project.tasks}</td>
-// //                     <td className="px-4 py-2 border border-gray-300">{project.status}</td>
-// //                     <td className="px-4 py-2 border border-gray-300">{new Date(project.createdDate).toLocaleDateString()}</td>
-// //                     <td className="px-4 py-2 border border-gray-300 flex space-x-2">
-// //                       <button
-// //                         onClick={() => openProjectDetails(project)}
-// //                         className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition duration-200"
-// //                       >
-// //                         View
-// //                       </button>
-// //                       <button
-// //                         onClick={() => removeProject(project._id)}
-// //                         className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-600 transition duration-200"
-// //                       >
-// //                         Remove
-// //                       </button>
-// //                     </td>
-// //                   </tr>
-// //                 ))}
-// //               </tbody>
-
-// //             </table>
-// //           </div>
-// //         ) : (
-// //           <p className="text-gray-500 text-lg">
-// //             No projects added yet. Click "Add Project" to get started.
-// //           </p>
-// //         )}
-// //       </div>
-
-// //       {/* Modal for Project Details */}
-// //       {selectedProject && (
-// //         <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
-// //           <div className="bg-white p-8 rounded-lg max-w-lg w-full">
-// //             <h2 className="text-2xl font-semibold text-gray-800">{selectedProject.projectName}</h2>
-// //             <p className="text-sm text-gray-600 mt-4">{selectedProject.tasks}</p>
-// //             <div className="mt-4">
-// //               <p className="text-sm text-gray-500">Tech Stack: {selectedProject.techStack}</p>
-// //               <p className="text-sm text-gray-500">Client Company: {selectedProject.clientCompany}</p>
-// //               <p className="text-sm text-gray-500">Assigned To: {selectedProject.assignedTo}</p>
-// //               <p className="text-sm text-gray-500">Duration: {selectedProject.duration}</p>
-// //               <p className="text-sm text-gray-500">Status: {selectedProject.status}</p>
-// //               <p className="text-sm text-gray-500">Created Date: {selectedProject.createdDate}</p>
-// //             </div>
-// //             <div className="mt-6 flex justify-end space-x-4">
-// //               <button
-// //                 onClick={closeModal}
-// //                 className="bg-gray-400 text-white px-6 py-3 rounded-lg text-sm hover:bg-gray-500 transition duration-200"
-// //               >
-// //                 Close
-// //               </button>
-// //             </div>
-// //           </div>
-// //         </div>
-// //       )}
-// //     </div>
-// //   );
-// // };
-
-// // export default ProjectManager;
-
-
-// import React, { useState, useEffect } from "react";
-// import { Link } from "react-router-dom";
-// import axios from "axios";
-
-// const ProjectManager = () => {
-//   const [projects, setProjects] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-
-//   useEffect(() => {
-//     const fetchProjects = async () => {
-//       try {
-//         const response = await axios.get("http://localhost:3000/project/getallprojects");
-//         setProjects(response.data);
-//       } catch (err) {
-//         setError('Failed to load project data');
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchProjects();
-//   }, []);
-
-//   const removeProject = async (id) => {
-//     if (window.confirm('Are you sure you want to delete this project?')) {
-//       try {
-//         const response = await axios.delete(`http://localhost:3000/project/deleteproject/${id}`);
-//         if (response.status === 200) {
-//           setProjects(projects.filter((project) => project._id !== id));
-//         }
-//       } catch (err) {
-//         setError('Failed to delete project');
-//       }
-//     }
-//   };
-
-//   // Open the modal with project details
-//   const [selectedProject, setSelectedProject] = useState(null);
-//   const openProjectDetails = (project) => setSelectedProject(project);
-//   const closeModal = () => setSelectedProject(null);
-
-//   return (
-//     <div className="bg-gray-50 p-6 min-h-screen mt-20">
-//       <h1 className="text-3xl font-bold text-gray-800 mb-6">Project Manager</h1>
-
-//       {/* Add Project Button */}
-//       <Link
-//         to="/add-project"
-//         className="bg-blue-500 text-white px-6 py-3 rounded-lg text-lg hover:bg-blue-600 transition duration-200"
-//       >
-//         Add Project
-//       </Link>
-
-//       {/* Data Table */}
-//       <div className="mt-8">
-//         <h2 className="text-xl font-semibold text-gray-800 mb-4">Projects</h2>
-
-//         {loading ? (
-//           <p className="text-gray-500 text-lg">Loading projects...</p>
-//         ) : error ? (
-//           <p className="text-red-500 text-lg">Error: {error}</p>
-//         ) : projects.length > 0 ? (
-//           <div className="overflow-x-auto bg-white shadow-md rounded-lg">
-//             <table className="table-auto w-full border-collapse border border-gray-300">
-//               <thead className="bg-blue-500 text-white">
-//                 <tr>
-//                   <th className="px-4 py-2 border border-gray-300">Project Name</th>
-//                   <th className="px-4 py-2 border border-gray-300">Tech Stack</th>
-//                   <th className="px-4 py-2 border border-gray-300">Client Company</th>
-//                   <th className="px-4 py-2 border border-gray-300">Assigned To</th>
-//                   <th className="px-4 py-2 border border-gray-300">Duration</th>
-//                   <th className="px-4 py-2 border border-gray-300">Tasks</th>
-//                   <th className="px-4 py-2 border border-gray-300">Status</th>
-//                   <th className="px-4 py-2 border border-gray-300">Created Date</th>
-//                   <th className="px-4 py-2 border border-gray-300">Actions</th>
-//                 </tr>
-//               </thead>
-//               <tbody>
-//                 {projects.map((project) => (
-//                   <tr key={project._id} className="hover:bg-gray-100">
-//                     <td className="px-4 py-2 border border-gray-300">{project.projectName}</td>
-//                     <td className="px-4 py-2 border border-gray-300">{project.techStack}</td>
-//                     <td className="px-4 py-2 border border-gray-300">{project.clientCompany}</td>
-//                     <td className="px-4 py-2 border border-gray-300">{project.assignedTo}</td>
-//                     <td className="px-4 py-2 border border-gray-300">{project.duration}</td>
-//                     <td className="px-4 py-2 border border-gray-300">{project.tasks}</td>
-//                     <td className="px-4 py-2 border border-gray-300">{project.status}</td>
-//                     <td className="px-4 py-2 border border-gray-300">{new Date(project.createdDate).toLocaleDateString()}</td>
-//                     <td className="px-4 py-2 border border-gray-300 flex space-x-2">
-//                       <button
-//                         onClick={() => openProjectDetails(project)}
-//                         className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-600 transition duration-200"
-//                       >
-//                         View
-//                       </button>
-//                       <button
-//                         onClick={() => removeProject(project._id)}
-//                         className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-red-600 transition duration-200"
-//                       >
-//                         Remove
-//                       </button>
-//                     </td>
-//                   </tr>
-//                 ))}
-//               </tbody>
-//             </table>
-//           </div>
-//         ) : (
-//           <p className="text-gray-500 text-lg">
-//             No projects added yet. Click "Add Project" to get started.
-//           </p>
-//         )}
-//       </div>
-
-//       {/* Modal for Project Details */}
-//       {selectedProject && (
-//         <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
-//           <div className="bg-white p-8 rounded-lg max-w-lg w-full">
-//             <h2 className="text-2xl font-semibold text-gray-800">{selectedProject.projectName}</h2>
-//             <p className="text-sm text-gray-600 mt-4">{selectedProject.tasks}</p>
-//             <div className="mt-4">
-//               <p className="text-sm text-gray-500">Tech Stack: {selectedProject.techStack}</p>
-//               <p className="text-sm text-gray-500">Client Company: {selectedProject.clientCompany}</p>
-//               <p className="text-sm text-gray-500">Assigned To: {selectedProject.assignedTo}</p>
-//               <p className="text-sm text-gray-500">Duration: {selectedProject.duration}</p>
-//               <p className="text-sm text-gray-500">Status: {selectedProject.status}</p>
-//               <p className="text-sm text-gray-500">Created Date: {selectedProject.createdDate}</p>
-//             </div>
-//             <div className="mt-6 flex justify-end space-x-4">
-//               <button
-//                 onClick={closeModal}
-//                 className="bg-gray-400 text-white px-6 py-3 rounded-lg text-sm hover:bg-gray-500 transition duration-200"
-//               >
-//                 Close
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default ProjectManager;
-
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate from react-router-dom
+        <div className="mt-6 flex justify-end space-x-4">
+        <button
+            onClick={() => onEdit(project)}
+            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+          >
+            Edit
+          </button>
+          <button
+            onClick={onClose}
+            className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-700"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const ProjectManager = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedProject, setSelectedProject] = useState(null); // Store selected project for modal
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
-
-  const navigate = useNavigate(); // Initialize navigate
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+  const ITEMS_PER_PAGE = 5;
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -350,7 +89,7 @@ const ProjectManager = () => {
         const response = await fetch("http://localhost:3000/project/getallprojects");
         if (response.ok) {
           const data = await response.json();
-          setProjects(data); // Assuming API returns an array of projects
+          setProjects(data);
         } else {
           throw new Error("Failed to fetch projects");
         }
@@ -364,96 +103,256 @@ const ProjectManager = () => {
     fetchProjects();
   }, []);
 
-  const handleView = (project) => {
-    setSelectedProject(project); // Set selected project for modal
-    setIsModalOpen(true); // Open the modal
+  // Helper function to get the latest or most relevant value from an array of objects
+  const getLatestValue = (array, field) => {
+    if (!array || array.length === 0) return "N/A";
+    // Join all unique values
+    const uniqueValues = [...new Set(array.map(item => item[field]).filter(Boolean))];
+    return uniqueValues.join(", ") || "N/A";
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false); // Close the modal
-    setSelectedProject(null); // Clear selected project
+  const processedProjects = useMemo(() => {
+    return projects.map(project => ({
+      ...project,
+      displayData: {
+        projectName: getLatestValue(project.projectDetails, 'projectName'),
+        techStack: getLatestValue(project.projectDetails, 'techStack'),
+        companyName: getLatestValue(project.projectDetails, 'companyName'),
+        assignedTo: getLatestValue(project.additionalDetails, 'assignedTo'),
+        duration: getLatestValue(project.projectDetails, 'duration'),
+        task: getLatestValue(project.projectDetails, 'task'),
+        status: getLatestValue(project.additionalDetails, 'status'),
+        createdDate: project.additionalDetails?.[0]?.createdDate
+          ? new Date(project.additionalDetails[0].createdDate).toLocaleDateString()
+          : "N/A"
+      }
+    }));
+  }, [projects]);
+
+  const handleAddProject = () => {
+    window.location.href = '/add-project';
   };
 
   const handleDelete = async (projectId) => {
-    try {
-      const response = await fetch(`http://localhost:3000/project/deleteproject/${projectId}`, {
-        method: 'DELETE',
-      });
-      if (response.ok) {
-        // Remove the deleted project from the state
-        setProjects(projects.filter(project => project._id !== projectId));
-        alert("Project deleted successfully");
-      } else {
-        throw new Error("Failed to delete project");
+    if (window.confirm('Are you sure you want to delete this project?')) {
+      try {
+        const response = await fetch(`http://localhost:3000/project/deleteproject/${projectId}`, {
+          method: "DELETE",
+        });
+        if (response.ok) {
+          setProjects(projects.filter((project) => project._id !== projectId));
+          alert("Project deleted successfully");
+        } else {
+          throw new Error("Failed to delete project");
+        }
+      } catch (err) {
+        alert(err.message);
       }
-    } catch (err) {
-      alert(err.message);
     }
   };
 
-  const handleAddProject = () => {
-    navigate("/add-project"); // Navigate to the /add-project route
+  const handleExportData = () => {
+    const csvRows = [];
+    const headers = [
+      "Project Name",
+      "Tech Stack",
+      "Client Company",
+      "Assigned To",
+      "Duration",
+      "Tasks",
+      "Status",
+      "Created Date",
+    ];
+    csvRows.push(headers.join(","));
+
+    processedProjects.forEach((project) => {
+      const row = [
+        project.displayData.projectName,
+        project.displayData.techStack,
+        project.displayData.companyName,
+        project.displayData.assignedTo,
+        project.displayData.duration,
+        project.displayData.task,
+        project.displayData.status,
+        project.displayData.createdDate,
+      ];
+      csvRows.push(row.map((value) => `"${value}"`).join(","));
+    });
+
+    const csvContent = `data:text/csv;charset=utf-8,${csvRows.join("\n")}`;
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "projects.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
+
+  const handleView = (project) => {
+    setSelectedProject(project);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedProject(null);
+  };
+
+  const handleEdit = (project) => {
+    navigate(`/edit-project/${project._id}`);
+  };
+
+  const handleSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const filteredAndSortedProjects = useMemo(() => {
+    let filtered = [...processedProjects];
+    
+    if (searchTerm) {
+      filtered = filtered.filter((project) => {
+        const searchString = searchTerm.toLowerCase();
+        return (
+          project.displayData.projectName.toLowerCase().includes(searchString) ||
+          project.displayData.techStack.toLowerCase().includes(searchString) ||
+          project.displayData.companyName.toLowerCase().includes(searchString) ||
+          project.displayData.assignedTo.toLowerCase().includes(searchString)
+        );
+      });
+    }
+
+    if (sortConfig.key) {
+      filtered.sort((a, b) => {
+        const aValue = a.displayData[sortConfig.key] || '';
+        const bValue = b.displayData[sortConfig.key] || '';
+        
+        if (sortConfig.key === 'createdDate') {
+          return sortConfig.direction === 'asc' 
+            ? new Date(aValue) - new Date(bValue)
+            : new Date(bValue) - new Date(aValue);
+        }
+        
+        return sortConfig.direction === 'asc'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      });
+    }
+
+    return filtered;
+  }, [processedProjects, searchTerm, sortConfig]);
+
+  const paginatedProjects = useMemo(() => {
+    const startIndex = currentPage * ITEMS_PER_PAGE;
+    return filteredAndSortedProjects.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredAndSortedProjects, currentPage]);
+
+  const totalPages = Math.ceil(filteredAndSortedProjects.length / ITEMS_PER_PAGE);
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <h1 className="text-3xl font-semibold text-gray-800 mb-6 text-center mt-28">Project List</h1>
 
-      <div className="flex justify-end mb-4">
-        <button
-          onClick={handleAddProject}
-          className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700 flex items-center"
-        >
-          <span className="mr-2">+</span> Add Project
-        </button>
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center border border-blue-500 rounded w-64">
+          <span className="px-2 text-gray-500">
+            <Filter className="h-5 w-5" />
+          </span>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search projects..."
+            className="p-2 rounded w-full outline-none"
+          />
+        </div>
+        <div className="flex justify-end items-center space-x-4 mb-4">
+          <button
+            onClick={handleExportData}
+            className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-700 flex items-center"
+          >
+            Export Data
+          </button>
+          <button
+            onClick={handleAddProject}
+            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700 flex items-center"
+          >
+            <span className="mr-2">+</span> Add Project
+          </button>
+        </div>
       </div>
 
       {loading ? (
         <p className="text-gray-500 text-lg text-center">Loading projects...</p>
       ) : error ? (
         <p className="text-red-500 text-lg text-center">{error}</p>
-      ) : projects.length > 0 ? (
-        <div className="overflow-x-auto">
-          <table className="min-w-full border border-gray-300 bg-white rounded-lg">
+      ) : paginatedProjects.length > 0 ? (
+        <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+          <table className="w-full">
             <thead className="bg-gray-100">
               <tr>
-                <th className="px-4 py-2 border border-gray-300">Project Name</th>
-                <th className="px-4 py-2 border border-gray-300">Tech Stack</th>
-                <th className="px-4 py-2 border border-gray-300">Client Company</th>
-                <th className="px-4 py-2 border border-gray-300">Assigned To</th>
-                <th className="px-4 py-2 border border-gray-300">Duration</th>
+                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200" 
+                    onClick={() => handleSort('projectName')}>
+                  Project Name
+                </th>
+                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200" 
+                    onClick={() => handleSort('techStack')}>
+                  Tech Stack
+                </th>
+                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200" 
+                    onClick={() => handleSort('companyName')}>
+                  Client Company
+                </th>
+                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200" 
+                    onClick={() => handleSort('assignedTo')}>
+                  Assigned To
+                </th>
+                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200" 
+                    onClick={() => handleSort('duration')}>
+                  Duration
+                </th>
                 <th className="px-4 py-2 border border-gray-300">Tasks</th>
-                <th className="px-4 py-2 border border-gray-300">Status</th>
-                <th className="px-4 py-2 border border-gray-300">Created Date</th>
+                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200" 
+                    onClick={() => handleSort('status')}>
+                  Status
+                </th>
+                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200" 
+                    onClick={() => handleSort('createdDate')}>
+                  Created Date
+                </th>
                 <th className="px-4 py-2 border border-gray-300">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {projects.map((project) => (
+              {paginatedProjects.map((project) => (
                 <tr key={project._id} className="hover:bg-gray-100">
-                  <td className="px-4 py-2 border border-gray-300">{project.projectDetails[0]?.projectName}</td>
-                  <td className="px-4 py-2 border border-gray-300">{project.projectDetails[0]?.techStack}</td>
-                  <td className="px-4 py-2 border border-gray-300">{project.clientCompany}</td>
-                  <td className="px-4 py-2 border border-gray-300">{project.additionalDetails[0]?.assignedTo}</td>
-                  <td className="px-4 py-2 border border-gray-300">{project.projectDetails[0]?.duration}</td>
-                  <td className="px-4 py-2 border border-gray-300">{project.tasks}</td>
-                  <td className="px-4 py-2 border border-gray-300">{project.additionalDetails[0]?.status}</td>
+                  <td className="px-4 py-2 border border-gray-300">{project.displayData.projectName}</td>
+                  <td className="px-4 py-2 border border-gray-300">{project.displayData.techStack}</td>
+                  <td className="px-4 py-2 border border-gray-300">{project.displayData.companyName}</td>
+                  <td className="px-4 py-2 border border-gray-300">{project.displayData.assignedTo}</td>
+                  <td className="px-4 py-2 border border-gray-300">{project.displayData.duration}</td>
+                  <td className="px-4 py-2 border border-gray-300">{project.displayData.task}</td>
+                  <td className="px-4 py-2 border border-gray-300">{project.displayData.status}</td>
+                  <td className="px-4 py-2 border border-gray-300">{project.displayData.createdDate}</td>
                   <td className="px-4 py-2 border border-gray-300">
-                    {new Date(project.additionalDetails[0]?.createdDate).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    <button
-                      onClick={() => handleView(project)}
-                      className="text-blue-500 hover:text-blue-700 mr-2"
-                    >
-                      View
-                    </button>
-                    <button
-                      onClick={() => handleDelete(project._id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      Delete
-                    </button>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleView(project)}
+                        className="bg-blue-500 text-white py-1 px-2 rounded hover:bg-blue-700"
+                      >
+                        View
+                      </button>
+                      <button
+                        onClick={() => handleDelete(project._id)}
+                        className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-700"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -461,34 +360,33 @@ const ProjectManager = () => {
           </table>
         </div>
       ) : (
-        <p className="text-gray-500 text-lg text-center">No projects available.</p>
+        <p className="text-gray-500 text-lg text-center">No projects found.</p>
       )}
 
-      {/* Modal for Viewing Project */}
+      <div className="mt-4 flex justify-between items-center">
+        <button
+          disabled={currentPage === 0}
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
+          className={`px-4 py-2 rounded ${currentPage === 0 ? 'bg-gray-300' : 'bg-blue-500 text-white hover:bg-blue-700'}`}
+        >
+          <ChevronLeft className="h-5 w-5 inline" />
+          Previous
+        </button>
+        <p className="text-gray-700">
+          Page {currentPage + 1} of {totalPages}
+        </p>
+        <button
+          disabled={currentPage + 1 === totalPages}
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))}
+          className={`px-4 py-2 rounded ${currentPage + 1 === totalPages ? 'bg-gray-300' : 'bg-blue-500 text-white hover:bg-blue-700'}`}
+        >
+          Next
+          <ChevronRight className="h-5 w-5 inline" />
+        </button>
+      </div>
+
       {isModalOpen && selectedProject && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Project Details</h2>
-            <div>
-              <p><strong>Project Name:</strong> {selectedProject.projectDetails[0]?.projectName}</p>
-              <p><strong>Tech Stack:</strong> {selectedProject.projectDetails[0]?.techStack}</p>
-              <p><strong>Client Company:</strong> {selectedProject.clientCompany}</p>
-              <p><strong>Assigned To:</strong> {selectedProject.additionalDetails[0]?.assignedTo}</p>
-              <p><strong>Duration:</strong> {selectedProject.projectDetails[0]?.duration}</p>
-              <p><strong>Tasks:</strong> {selectedProject.tasks}</p>
-              <p><strong>Status:</strong> {selectedProject.additionalDetails[0]?.status}</p>
-              <p><strong>Created Date:</strong> {new Date(selectedProject.additionalDetails[0]?.createdDate).toLocaleDateString()}</p>
-            </div>
-            <div className="mt-4 flex justify-end">
-              <button
-                onClick={handleCloseModal}
-                className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-700"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
+        <ProjectDetailsModal project={selectedProject} onClose={handleCloseModal} onEdit={handleEdit} />
       )}
     </div>
   );

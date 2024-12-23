@@ -94,6 +94,7 @@ import LeaveEdit from "./components/Leave/LeaveEdit";
 import EmployeeEdit from "./components/Employee/EmployeeEdit";
 import AdminForm from "./components/Admin/AdminForm";
 import TaskEdit from "./components/Task/TaskEdit";
+import ProjectEdit from "./components/Project/ProjectEdit";
 
 // Layout Component for Admin Pages
 const AdminLayout = ({ children }) => (
@@ -144,6 +145,7 @@ function App() {
                   <Route path="/task" element={<TaskList />} />
                   <Route path="/project" element={<ProjectManager />} />
                   <Route path="/add-project" element={<ProjectForm />} />
+                  <Route path="/edit-project/:id" element={<ProjectEdit/>} />
                   <Route path="/client-table" element={<ClientTable />} />
                   <Route path="/client-edit/:id" element={<ClientEdit />} />
                   <Route path="/client-form" element={<Client />} />

@@ -22,6 +22,8 @@ const ProjectForm = () => {
       addOnServices: "",
       duration: "",
       dependencies: "",
+      companyName: "",
+      task: "",
     },
   ]);
 
@@ -54,9 +56,8 @@ const ProjectForm = () => {
         additionalDetails,
       };
 
-  
-      console.log("projectData",projectData)
-  
+      console.log("projectData", projectData);
+
       try {
         const response = await fetch("http://localhost:3000/project/createproject", {
           method: "POST",
@@ -67,12 +68,12 @@ const ProjectForm = () => {
         });
         if (response.ok) {
           const newProject = await response.json();
-          console.log(newProject)
+          console.log(newProject);
           setProjects((prevProjects) => [
             ...prevProjects,
             { id: Date.now(), ...newProject },
           ]);
-          alert("Project added successfully!");  // Show alert after successful submission
+          alert("Project added successfully!");
         } else {
           alert("Failed to create project. Please try again.");
         }
@@ -84,7 +85,6 @@ const ProjectForm = () => {
       alert("Please fill out all mandatory fields!");
     }
   };
-  
 
   const validateForm = () => {
     const projectValidation = projectDetails.every(
@@ -93,7 +93,9 @@ const ProjectForm = () => {
         detail.type &&
         detail.description &&
         detail.category &&
-        detail.techStack
+        detail.techStack &&
+        detail.companyName &&
+        detail.task
     );
 
     const financialValidation = financialDetails.every(
@@ -144,6 +146,8 @@ const ProjectForm = () => {
             addOnServices: "",
             duration: "",
             dependencies: "",
+            companyName: "",
+            task: "",
           }
         : section === "financialDetails"
         ? {
@@ -213,59 +217,79 @@ const ProjectForm = () => {
 
                   <div className="grid grid-cols-3 gap-6">
                     {Object.keys(detail).map((field) => (
-                      <div key={field}>
-                        <label className="block text-gray-600 mb-1 font-medium">
-                          {field.replace(/([A-Z])/g, " $1")}
-                        </label>
-                        {field === "assignedTo" ? (
-                          <select
-                            value={detail[field]}
-                            onChange={(e) =>
-                              handleInputChange(index, section, field, e.target.value)
-                            }
-                            className="w-full border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                          >
-                            <option value="">Select User</option>
-                            {assignableUsers.map((user) => (
-                              <option key={user} value={user}>
-                                {user}
-                              </option>
-                            ))}
-                          </select>
-                        ) : field === "status" ? (
-                          <select
-                            value={detail[field]}
-                            onChange={(e) =>
-                              handleInputChange(index, section, field, e.target.value)
-                            }
-                            className="w-full border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                          >
-                            <option value="">Select Status</option>
-                            {statuses.map((status) => (
-                              <option key={status} value={status}>
-                                {status}
-                              </option>
-                            ))}
-                          </select>
-                        ) : field.includes("Document") ? (
-                          <input
-                            type="file"
-                            onChange={(e) => handleFileChange(index, field, e)}
-                            className="w-full border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                          />
-                        ) : (
-                          <input
-                            type={field.includes("Date") ? "date" : "text"}
-                            value={detail[field]}
-                            onChange={(e) =>
-                              handleInputChange(index, section, field, e.target.value)
-                            }
-                            className="w-full border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                          />
-                        )}
-                      </div>
+                      field !== "task" && (
+                        <div key={field}>
+                          <label className="block text-gray-600 mb-1 font-medium">
+                            {field.replace(/([A-Z])/g, " $1")}
+                          </label>
+                          {field === "assignedTo" ? (
+                            <select
+                              value={detail[field]}
+                              onChange={(e) =>
+                                handleInputChange(index, section, field, e.target.value)
+                              }
+                              className="w-full border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            >
+                              <option value="">Select User</option>
+                              {assignableUsers.map((user) => (
+                                <option key={user} value={user}>
+                                  {user}
+                                </option>
+                              ))}
+                            </select>
+                          ) : field === "status" ? (
+                            <select
+                              value={detail[field]}
+                              onChange={(e) =>
+                                handleInputChange(index, section, field, e.target.value)
+                              }
+                              className="w-full border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            >
+                              <option value="">Select Status</option>
+                              {statuses.map((status) => (
+                                <option key={status} value={status}>
+                                  {status}
+                                </option>
+                              ))}
+                            </select>
+                          ) : field.includes("Document") ? (
+                            <input
+                              type="file"
+                              onChange={(e) => handleFileChange(index, field, e)}
+                              className="w-full border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            />
+                          ) : (
+                            <input
+                              type={field.includes("Date") ? "date" : "text"}
+                              value={detail[field]}
+                              onChange={(e) =>
+                                handleInputChange(index, section, field, e.target.value)
+                              }
+                              className="w-full border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            />
+                          )}
+                        </div>
+                      )
                     ))}
                   </div>
+
+                  {/* Only render task field in Project Details section */}
+                  {section === "projectDetails" && (
+                    <div className="w-full mt-4">
+                      <label className="block text-gray-600 mb-1 font-medium">
+                        Task
+                      </label>
+                      <textarea
+                        value={detail["task"]}
+                        onChange={(e) =>
+                          handleInputChange(index, section, "task", e.target.value)
+                        }
+                        className="w-full border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        rows="4"
+                      />
+                    </div>
+                  )}
+
                 </div>
               ))}
 
@@ -282,7 +306,7 @@ const ProjectForm = () => {
           <div className="flex justify-end space-x-4">
             <button
               type="button"
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/add-project")}
               className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition duration-200"
             >
               Cancel

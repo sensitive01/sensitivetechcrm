@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState } from "react";
 
 function TaskForm() {
@@ -52,21 +53,20 @@ const handleSubmit = async (e) => {
     }
   });
 
+  console.log("formData formData:", task);
   try {
     // Send POST request to backend
-    const response = await fetch("http://localhost:3000/task/createtask", {
-      method: "POST",
-      body: formData,
-    });
+    const response = await axios.post("http://localhost:3000/task/createtask",  task);
 
-    const result = await response.json();
-    if (response.ok) {
+    console.log("Task created:", response);
+
+    if (response.status===201) {
       // Handle success (e.g., show a success message)
-      console.log("Task created:", result);
+
       alert("Task created successfully!");
     } else {
       // Handle error (e.g., show an error message)
-      console.error("Error:", result);
+
       alert("Failed to create task.");
     }
   } catch (error) {
