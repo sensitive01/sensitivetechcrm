@@ -9,13 +9,14 @@ const upload = multer({ dest: "uploads/" });
 // Controller for creating a new task
 const createTask = async (req, res) => {
     try {
+      console.log("req.body",req.body)
         const { project, task, empId, description, timeline, status, date } = req.body;
 
         // Check if there are files and if req.files is defined
-        let attachments = [];
-        if (req.files && req.files.length > 0) {
-            attachments = req.files.map((file) => file.path); // Save file paths or other file info
-        }
+        // let attachments = [];
+        // if (req.files && req.files.length > 0) {
+        //     attachments = req.files.map((file) => file.path); // Save file paths or other file info
+        // }
 
         // Create a new task object with all the data
         const newTask = new Task({
@@ -26,7 +27,7 @@ const createTask = async (req, res) => {
             timeline,
             status,
             date,
-            attachments, // Attach file paths or the file data itself
+            // attachments, // Attach file paths or the file data itself
         });
 
         // Save the new task to the database
@@ -49,7 +50,7 @@ const createTask = async (req, res) => {
 // Get all tasks
 const getAllTasks = async (req, res) => {
   try {
-    const tasks = await Task.find(); // Retrieve all tasks from the database
+    const tasks = await Task.find(); 
     return res.status(200).json({
       message: "Tasks retrieved successfully",
       tasks,
