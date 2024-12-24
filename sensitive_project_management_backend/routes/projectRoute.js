@@ -7,6 +7,7 @@ projectRouter.get("/getallprojects", projectController.getAllProjects);
 projectRouter.get("/getprojectbyid/:id", projectController.getProjectById);
 projectRouter.put("/updateprojectby/:id", projectController.updateProjectById);
 projectRouter.delete("/deleteproject/:id", projectController.deleteProjectById);
+projectRouter.get("/projectname", projectController.getProjectNames);
 
 module.exports = projectRouter;
 

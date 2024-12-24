@@ -35,8 +35,23 @@ const getAllProjects = async (req, res) => {
 // READ: Get project by ID
 const getProjectById = async (req, res) => {
   const { id } = req.params;
+  console.log("id ",id)
   try {
-    const project = await Project.findById(id);
+    // const project = await Project.findById(id);
+
+    const project = await Project.findOne(
+      { _id: id },
+      {
+        "projectDetails._id": 0,
+        "financialDetails._id": 0,
+        "additionalDetails._id": 0
+      }
+    ).lean();
+    
+
+    
+    console.log(project);
+    
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
@@ -85,11 +100,23 @@ const deleteProjectById = async (req, res) => {
   }
 };
 
+const getProjectNames = async(req,res) => {
+  try {
+    const projects = await Project.find({},{_id:1, "projectDetails.projectName":1})
+    console.error("projects", projects);
+  
+    res.json(projects);
+  } catch (error) {
+    res.status(500).json({message: "Error Fetching projects"});
+  }
+};
+
 module.exports = {
   createProject,
   getAllProjects,
   getProjectById,
   updateProjectById,
   deleteProjectById,
+  getProjectNames,
 };
 

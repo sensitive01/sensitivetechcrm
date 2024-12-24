@@ -1,17 +1,17 @@
-const express = require("express");
+// const express = require("express");
 const Task = require("../models/taskSchema"); // Import the Task model
-const multer = require("multer");
+// const multer = require("multer");
 
-const app = express();
+// const app = express();
 
-const upload = multer({ dest: "uploads/" }); 
+// const upload = multer({ dest: "uploads/" }); 
 
 // Controller for creating a new task
 const createTask = async (req, res) => {
     try {
-      console.log("req.body",req.body)
+     
         const { project, task, empId, description, timeline, status, date } = req.body;
-
+        console.log("req.body",req.body)
         // Check if there are files and if req.files is defined
         // let attachments = [];
         // if (req.files && req.files.length > 0) {
@@ -171,12 +171,11 @@ const deleteTask = async (req, res) => {
   }
 };
 
-// Export the controller functions
 module.exports = {
   createTask,
   getAllTasks,
   getTaskById,
   updateTask,
-  updateTaskStatus,  // Export the new updateTaskStatus function
+  updateTaskStatus, 
   deleteTask,
 };

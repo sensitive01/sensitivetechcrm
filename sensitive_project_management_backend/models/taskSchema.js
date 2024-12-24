@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// Define the schema for the task
 const taskSchema = new mongoose.Schema({
   project: {
     type: String,
@@ -29,12 +28,8 @@ const taskSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,  
   },
-  attachments:[{
-    type:String
-}]
+  attachments:[],
 });
 
-const Task = mongoose.model('Task', taskSchema);
 
-
-module.exports = Task;
+module.exports = mongoose.model('Task', taskSchema);

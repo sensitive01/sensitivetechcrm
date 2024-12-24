@@ -12,5 +12,5 @@ employeeRouter.get("/getallemployees", Employee.getAllEmployees)
 employeeRouter.get("/getallemployeesbyid/:id", Employee.getEmployeeById)
 employeeRouter.patch("/updateemployee/:id", Employee.updateEmployee)
 employeeRouter.delete("/deleteemployee/:id", Employee.deleteEmployee)
-
+employeeRouter.get("/employename",Employee.getEmployeeNames)
 module.exports = employeeRouter;

@@ -66,6 +66,14 @@ const deleteEmployee = async (req, res) => {
   }
 };
 
+const getEmployeeNames = async (req, res) => {
+  try {
+    const employees = await Employee.find({role:"employee"});
+    res.json(employees);
+  }catch (error) {
+    res.status(500).json({message: "Error fetching employees"});
+  }
+};
 
 
 module.exports = {
@@ -74,4 +82,5 @@ module.exports = {
   getEmployeeById,
   updateEmployee,
   deleteEmployee,
+  getEmployeeNames,
 };
