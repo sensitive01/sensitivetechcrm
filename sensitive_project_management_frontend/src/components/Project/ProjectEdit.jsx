@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Plus, X } from "lucide-react";
+import { getTheProject } from "../../api/services/projectServices";
 
 const ProjectEdit = () => {
     const navigate = useNavigate();
-    const { projectId } = useParams(); // Get project ID from URL
-console.log(projectId)
+    const { projectId } = useParams();
     const assignableUsers = ["John Doe", "Jane Smith", "Team Alpha", "Team Beta"];
     const statuses = ["Not Started", "In Progress", "Completed", "On Hold"];
 
-    const [projects, setProjects] = useState([]);
     const [projectDetails, setProjectDetails] = useState([{
         projectName: "",
         type: "",
@@ -44,27 +43,33 @@ console.log(projectId)
     }]);
 
     useEffect(() => {
+        const fetchProjectDetails = async () => {
+            try {
+                const response = await getTheProject(projectId);
+                console.log(response)
+                if (response) {
+                    setProjectDetails(response.data.projectDetails || []);
+                    setFinancialDetails(response.data.financialDetails || []);
+                    
+                    const transformedAdditionalDetails = response.data.additionalDetails.map(detail => ({
+                        ...detail,
+                        projectDocument: detail.projectDocument ? detail.projectDocument[0] : null,
+                        createdDate: detail.createdDate.split('T')[0]
+                    }));
+                    setAdditionalDetails(transformedAdditionalDetails || []);
+                }
+            } catch (error) {
+                console.error("Error fetching project:", error);
+                alert("Failed to fetch project details");
+            }
+        };
+
         if (projectId) {
-            fetch(`http://localhost:3000/project/updateprojectby/${projectId}`)
-                .then((response) => response.json())
-                .then((data) => {
-                    console.log(data);
-                    if (data && data.projectDetails) {
-                        setProjectDetails(data.projectDetails || []);
-                        setFinancialDetails(data.financialDetails || []);
-                        setAdditionalDetails(data.additionalDetails || []);
-                    } else {
-                        alert("Project data not found or invalid format.");
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error fetching project data:", error);
-                    alert("Failed to fetch project details.");
-                });
+            fetchProjectDetails();
         }
     }, [projectId]);
 
-    const handleAddProject = async () => {
+    const handleUpdateProject = async () => {
         if (validateForm()) {
             const projectData = {
                 projectDetails,
@@ -72,30 +77,24 @@ console.log(projectId)
                 additionalDetails,
             };
 
-            console.log("projectData", projectData);
-
             try {
-                const response = await fetch("http://localhost:3000/project/createproject", {
-                    method: "POST",
+                const response = await fetch(`http://localhost:3000/project/updateprojectby/${projectId}`, {
+                    method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify(projectData),
                 });
+
                 if (response.ok) {
-                    const newProject = await response.json();
-                    console.log(newProject);
-                    setProjects((prevProjects) => [
-                        ...prevProjects,
-                        { id: Date.now(), ...newProject },
-                    ]);
-                    alert("Project added successfully!");
+                    alert("Project updated successfully!");
+                    navigate("/project");
                 } else {
-                    alert("Failed to create project. Please try again.");
+                    alert("Failed to update project. Please try again.");
                 }
             } catch (error) {
                 console.error("Error:", error);
-                alert("An error occurred while creating the project.");
+                alert("An error occurred while updating the project.");
             }
         } else {
             alert("Please fill out all mandatory fields!");
@@ -142,8 +141,9 @@ console.log(projectId)
     };
 
     const handleFileChange = (index, field, e) => {
+        const file = e.target.files[0];
         const updatedDetails = [...additionalDetails];
-        updatedDetails[index][field] = e.target.files[0];
+        updatedDetails[index][field] = file;
         setAdditionalDetails(updatedDetails);
     };
 
@@ -211,11 +211,15 @@ console.log(projectId)
         <div className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-50 p-6 flex justify-center items-center mt-24">
             <div className="bg-white p-8 rounded-lg shadow-xl max-w-7xl w-full space-y-6">
                 <h1 className="text-3xl font-semibold text-gray-800 mb-6 text-center w-full">
-                    Add New Project
+                    Edit Project
                 </h1>
 
                 <form className="space-y-6">
-                    {[["Project Details", projectDetails, "projectDetails"], ["Financial Details", financialDetails, "financialDetails"], ["Additional Details", additionalDetails, "additionalDetails"]].map(([title, details, section]) => (
+                    {[
+                        ["Project Details", projectDetails, "projectDetails"],
+                        ["Financial Details", financialDetails, "financialDetails"],
+                        ["Additional Details", additionalDetails, "additionalDetails"]
+                    ].map(([title, details, section]) => (
                         <section key={section} className="border-2 border-blue-300 rounded-lg p-6">
                             <h2 className="text-2xl font-semibold text-gray-700 mb-4">{title}</h2>
 
@@ -268,7 +272,7 @@ console.log(projectId)
                                                                 </option>
                                                             ))}
                                                         </select>
-                                                    ) : field.includes("Document") ? (
+                                                    ) : field.includes("Document") || field === "nda" || field === "msa" ? (
                                                         <input
                                                             type="file"
                                                             onChange={(e) => handleFileChange(index, field, e)}
@@ -289,7 +293,7 @@ console.log(projectId)
                                         ))}
 
                                         {section === "projectDetails" && (
-                                            <div className="w-full mt-4">
+                                            <div className="col-span-3">
                                                 <label className="block text-gray-600 mb-1 font-medium">Task</label>
                                                 <textarea
                                                     value={detail["task"] || ''}
@@ -318,17 +322,17 @@ console.log(projectId)
                     <div className="flex justify-end space-x-4">
                         <button
                             type="button"
-                            onClick={() => navigate("/add-project")}
+                            onClick={() => navigate("/project")}
                             className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition duration-200"
                         >
                             Cancel
                         </button>
                         <button
                             type="button"
-                            onClick={handleAddProject}
+                            onClick={handleUpdateProject}
                             className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200"
                         >
-                            Add Project
+                            Update Project
                         </button>
                     </div>
                 </form>

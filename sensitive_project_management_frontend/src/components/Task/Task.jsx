@@ -5,7 +5,7 @@ import {
     useSortBy, 
     usePagination 
 } from 'react-table';
-import { Edit, Trash2 } from 'lucide-react';
+import { Trash2, Eye } from 'lucide-react';
 import { FaPlus, FaFileDownload, FaFilter } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -16,55 +16,45 @@ const TaskList = () => {
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedTask, setSelectedTask] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
       const fetchTasks = async () => {
           try {
               const response = await axios.get('http://localhost:3000/task/getalltask');
-              // Adjust timeline and date fields
+              console.log(response)
               const updatedTasks = response.data.tasks.map(task => {
-                  // Set timeline to current date/time only if it's not already set
                   if (!task.timeline) {
                       task.timeline = new Date().toLocaleString();
                   }
-  
-                  // Format timeline to show only the time (HH:mm)
                   if (task.timeline) {
                       const timeObj = new Date(task.timeline);
                       task.timeline = timeObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                   }
-  
-                  // Format date to dd/mm/yy
                   if (task.date) {
                       const dateObj = new Date(task.date);
                       task.date = `${dateObj.getDate().toString().padStart(2, '0')}/${(dateObj.getMonth() + 1).toString().padStart(2, '0')}/${dateObj.getFullYear().toString().slice(-2)}`;
                   }
-  
                   return task;
               });
-  
-              setTasks(updatedTasks); // Accessing the tasks array
+              setTasks(updatedTasks);
           } catch (err) {
               setError("Failed to load task data");
           } finally {
               setLoading(false);
           }
       };
-  
+
       fetchTasks();
   }, []);
-  
 
-
-
-    // Delete task
     const handleDelete = async (taskId) => {
         if (window.confirm('Are you sure you want to delete this task?')) {
             try {
                 const response = await axios.delete(`http://localhost:3000/task/deletetask/${taskId}`);
                 if (response.status === 200) {
-                    // Successfully deleted, update the state
                     setTasks(tasks.filter((task) => task._id !== taskId));
                 }
             } catch (err) {
@@ -73,12 +63,20 @@ const TaskList = () => {
         }
     };
 
-    // Edit task function (redirect to the task edit form)
     const handleEdit = (taskId) => {
         navigate(`/task-edit/${taskId}`);
     };
 
-    // Export to Excel
+    const handleView = (task) => {
+        setSelectedTask(task);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedTask(null);
+    };
+
     const exportToExcel = () => {
         const exportData = tasks.map((task, index) => ({
             'S.No': index + 1,
@@ -98,7 +96,6 @@ const TaskList = () => {
         XLSX.writeFile(workbook, `Task_Records_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
 
-    // Define columns for react-table
     const columns = useMemo(() => [
         {
             Header: 'S.No',
@@ -137,12 +134,12 @@ const TaskList = () => {
             accessor: '_id',
             Cell: ({ row }) => (
                 <div className="flex justify-center space-x-2">
-                    <button
-                        className="text-green-500 hover:bg-green-100 p-2 rounded-full transition-colors"
-                        title="Edit Task"
-                        onClick={() => handleEdit(row.original._id)}
+                     <button
+                        className="text-blue-500 hover:bg-blue-100 p-2 rounded-full transition-colors"
+                        title="View Task"
+                        onClick={() => handleView(row.original)}
                     >
-                        <Edit size={20} />
+                        <Eye size={20} />
                     </button>
                     <button
                         className="text-red-500 hover:bg-red-100 p-2 rounded-full transition-colors"
@@ -156,7 +153,6 @@ const TaskList = () => {
         }
     ], [tasks]);
 
-    // Initialize react-table
     const {
         getTableProps,
         getTableBodyProps,
@@ -183,7 +179,6 @@ const TaskList = () => {
 
     const { globalFilter, pageIndex } = state;
 
-    // Loading and Error States
     if (loading) {
         return (
             <div className="flex justify-center items-center h-screen">
@@ -204,30 +199,27 @@ const TaskList = () => {
         <div className="container mx-auto p-6">
             <h2 className="text-4xl font-bold mb-10 text-center mt-24">Task Details</h2>
 
-            {/* Action Buttons Section */}
             <div className="flex justify-between items-center mb-4">
-                <div className="flex items-center space-x-4">
-                    <div className="relative">
-                        <input
-                            type="text"
-                            value={globalFilter || ''}
-                            onChange={(e) => setGlobalFilter(e.target.value)}
-                            placeholder="Search records..."
-                            className="border border-blue-500 p-2 rounded w-64 pl-8"
-                        />
-                        <FaFilter className="absolute left-2 top-3 text-blue-500" />
-                    </div>
+                <div className="relative">
+                    <input
+                        type="text"
+                        value={globalFilter || ''}
+                        onChange={(e) => setGlobalFilter(e.target.value)}
+                        placeholder="Search records..."
+                        className="border border-blue-500 p-2 rounded w-64 pl-8"
+                    />
+                    <FaFilter className="absolute left-2 top-3 text-blue-500" />
                 </div>
-                
+
                 <div className="flex space-x-4">
-                    <button 
+                    <button
                         onClick={exportToExcel}
                         className="bg-green-500 text-white px-6 py-2 rounded flex items-center hover:bg-green-600"
                     >
                         <FaFileDownload className="mr-2" />
                         Export Data
                     </button>
-                    
+
                     <Link
                         to="/task-form"
                         className="bg-blue-500 text-white px-6 py-2 rounded flex items-center hover:bg-blue-600"
@@ -238,7 +230,6 @@ const TaskList = () => {
                 </div>
             </div>
 
-            {/* Table Container */}
             <div className="overflow-x-auto bg-white shadow-md rounded-lg">
                 {tasks.length === 0 ? (
                     <p className="text-center p-6">No task records found.</p>
@@ -290,7 +281,6 @@ const TaskList = () => {
                             </tbody>
                         </table>
 
-                        {/* Pagination Controls */}
                         <div className="flex justify-between items-center p-4">
                             <div>
                                 <span>
@@ -320,6 +310,35 @@ const TaskList = () => {
                     </>
                 )}
             </div>
+
+            {/* Modal for Viewing Task */}
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
+                    <div className="bg-white rounded-lg p-8 w-1/2">
+                        <h2 className="text-2xl font-semibold mb-4">Task Details</h2>
+                        {selectedTask && (
+                            <div>
+                                <p><strong>Task Name:</strong> {selectedTask.task}</p>
+                                <p><strong>Project:</strong> {selectedTask.project}</p>
+                                <p><strong>Employee:</strong> {selectedTask.empId}</p>
+                                <p><strong>Description:</strong> {selectedTask.description}</p>
+                                <p><strong>Timeline:</strong> {selectedTask.timeline}</p>
+                                <p><strong>Date:</strong> {selectedTask.date}</p>
+                                <p><strong>Status:</strong> {selectedTask.status}</p>
+                            </div>
+                        )}
+                        <div className="mt-4 flex justify-between">
+                            <button 
+                                onClick={() => handleEdit(selectedTask._id)}
+                                className="bg-blue-500 text-white px-6 py-2 rounded"
+                            >
+                                Edit
+                            </button>
+                            <button onClick={closeModal} className="bg-red-500 text-white px-6 py-2 rounded">Close</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

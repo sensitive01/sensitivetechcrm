@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.webp";
 import axios from "axios";
+import { verifyLogin } from "../../api/services/projectServices";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -26,7 +27,8 @@ const LoginPage = () => {
 
       
   
-      const response = await axios.post("http://localhost:3000/employee-login/login", formData);
+      // const response = await axios.post("http://localhost:3000/employee-login/login", formData);
+      const response = await verifyLogin(formData)
   
       console.log(response);
   

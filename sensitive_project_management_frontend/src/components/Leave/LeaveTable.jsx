@@ -59,7 +59,7 @@ const LeaveTable = () => {
         const exportData = leaves.map((leave, index) => ({
             'S.No': index + 1,
             'Leave ID': leave.leaveId,
-            'Name': leave.name,
+            'Name': leave.employee,
             'Running Projects': leave.runningProjects,
             'Leave Dates': leave.leaveDates,
             'Notes': leave.notes,
@@ -87,7 +87,7 @@ const LeaveTable = () => {
         },
         {
             Header: 'Name',
-            accessor: 'name',
+            accessor: 'employee',
         },
         {
             Header: 'Running Projects',

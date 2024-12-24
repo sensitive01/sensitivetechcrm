@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getAllProject } from "../../api/services/projectServices";
 
 const ProjectDetailsModal = ({ project, onClose,onEdit }) => {
   const renderArrayData = (array, field) => {
@@ -15,7 +16,7 @@ const ProjectDetailsModal = ({ project, onClose,onEdit }) => {
         
         <div className="space-y-4">
           <section>
-            <h3 className="text-lg font-semibold mb-2">Project Information</h3>
+            <h3 className="text-lg font-semibold mb-2">Project Information:</h3>
             <div className="grid grid-cols-2 gap-4">
               <p><strong>Project Name:</strong> {renderArrayData(project.projectDetails, 'projectName')}</p>
               <p><strong>Tech Stack:</strong> {renderArrayData(project.projectDetails, 'techStack')}</p>
@@ -23,22 +24,31 @@ const ProjectDetailsModal = ({ project, onClose,onEdit }) => {
               <p><strong>Category:</strong> {renderArrayData(project.projectDetails, 'category')}</p>
               <p><strong>Domain:</strong> {renderArrayData(project.projectDetails, 'domain')}</p>
               <p><strong>Requirements:</strong> {renderArrayData(project.projectDetails, 'requirements')}</p>
+              <p><strong>Description:</strong> {renderArrayData(project.projectDetails, 'description')}</p>
+              <p><strong>Designation:</strong> {renderArrayData(project.projectDetails, 'designation')}</p>
+              <p><strong>AddOnServices:</strong> {renderArrayData(project.projectDetails, 'addOnServices')}</p>
+              <p><strong>Duration:</strong> {renderArrayData(project.projectDetails, 'duration')}</p>
+              <p><strong>Dependencies:</strong> {renderArrayData(project.projectDetails, 'dependencies')}</p>
+              <p><strong>CompanyName:</strong> {renderArrayData(project.projectDetails, 'companyName')}</p>
+              <p><strong>Task:</strong> {renderArrayData(project.projectDetails, 'task')}</p>
             </div>
           </section>
 
           <section>
-            <h3 className="text-lg font-semibold mb-2">Financial Details</h3>
+            <h3 className="text-lg font-semibold mb-2">Financial Details:</h3>
             <div className="grid grid-cols-2 gap-4">
               <p><strong>Quoted Value:</strong> {renderArrayData(project.financialDetails, 'quotedValue')}</p>
               <p><strong>Approved Value:</strong> {renderArrayData(project.financialDetails, 'approvedValue')}</p>
               <p><strong>Payment Terms:</strong> {renderArrayData(project.financialDetails, 'paymentTerms')}</p>
+              <p><strong>FinalQuotation:</strong> {renderArrayData(project.financialDetails, 'finalQuotation')}</p>
               <p><strong>Tax Terms:</strong> {renderArrayData(project.financialDetails, 'taxTerms')}</p>
             </div>
           </section>
 
           <section>
-            <h3 className="text-lg font-semibold mb-2">Additional Information</h3>
+            <h3 className="text-lg font-semibold mb-2">Additional Information:</h3>
             <div className="grid grid-cols-2 gap-4">
+            <p><strong>ProjectDocument:</strong> {renderArrayData(project.additionalDetails, 'projectDocument')}</p>
               <p><strong>Assigned To:</strong> {renderArrayData(project.additionalDetails, 'assignedTo')}</p>
               <p><strong>Status:</strong> {renderArrayData(project.additionalDetails, 'status')}</p>
               <p><strong>NDA:</strong> {renderArrayData(project.additionalDetails, 'nda')}</p>
@@ -86,10 +96,12 @@ const ProjectManager = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await fetch("http://localhost:3000/project/getallprojects");
-        if (response.ok) {
-          const data = await response.json();
-          setProjects(data);
+        // const response = await fetch("http://localhost:3000/project/getallprojects");
+        const response = await getAllProject()
+        console.log(response)
+        if (response.status===200) {
+       
+          setProjects(response.data);
         } else {
           throw new Error("Failed to fetch projects");
         }

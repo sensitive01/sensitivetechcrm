@@ -5,8 +5,8 @@ import { useParams } from "react-router-dom";
 function LeaveEdit() {
   const [leave, setLeave] = useState({
     employee: "",
-    leaveCategory: "",  
-    leaveType: "",      
+    leaveCategory: "",
+    leaveType: "",
     permissionDate: "",
     startDate: "",
     endDate: "",
@@ -40,11 +40,13 @@ function LeaveEdit() {
     fetchLeaveDetails();
   }, [id]);
 
-  const employees = [
-    { id: 1, name: "John Doe" },
-    { id: 2, name: "Jane Smith" },
-    { id: 3, name: "Michael Johnson" },
-  ];
+  // const employees = [
+  //   { id: 1, name: "John Doe" },
+  //   { id: 2, name: "Jane Smith" },
+  //   { id: 3, name: "Michael Johnson" },
+  // ];
+
+  const employees = ["Puja", "Jeyram", "Aswin", "Adiraj"];
 
   const leaveTypes = ["Sick Leave", "Casual Leave", "Emergency Leave", "Others"];
 
@@ -95,7 +97,7 @@ function LeaveEdit() {
           <div className="space-y-8 pb-4">
             <div>
               <label className="block text-sm font-medium pb-4">Select Employee:</label>
-              <select
+              {/* <select
                 name="employee"
                 value={leave.employee}
                 onChange={handleChange}
@@ -106,6 +108,23 @@ function LeaveEdit() {
                 {employees.map((emp) => (
                   <option key={emp.id} value={emp.id}>
                     {emp.name}
+                  </option>
+                ))}
+              </select> */}
+
+
+
+              <select
+                name="employee"
+                value={leave.employee}
+                onChange={handleChange}
+                required
+                className="border border-blue-300 p-2 w-full rounded"
+              >
+                <option value="">Select Employee</option>
+                {employees.map((type, index) => (
+                  <option key={index} value={type}>
+                    {type}
                   </option>
                 ))}
               </select>
