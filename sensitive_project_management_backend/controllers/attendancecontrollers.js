@@ -5,15 +5,14 @@ exports.createAttendance = async (req, res) => {
   try {
     console.log("CREATE Attendance", req.body);
     const empdata = await employeeSchema.findOne({ _id: req.body.employeeId }, { name: 1, empId: 1 })
-    console.log("Employee data",empdata.empId)
-    console.log("Req bidy",req.body)
+
 
     const attendance = new attendanceModel(req.body);
     attendance.employeeName = empdata.name
     attendance.employeeId = empdata.empId
 
     await attendance.save();
-    console.log("Attence addeed")
+
     res.status(201).json({ message: "Attendance record created successfully", attendance });
   } catch (error) {
     console.error("Error creating attendance record:", error);
