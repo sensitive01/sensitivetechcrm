@@ -65,10 +65,12 @@ const getAllTasks = async (req, res) => {
 
 // Get task by ID
 const getTaskById = async (req, res) => {
+  console.log("Edit task==>")
   const { id } = req.params;
 
   try {
     const task = await Task.findById(id); // Find a task by its ID
+    console.log("task",task)
     if (!task) {
       return res.status(404).json({
         message: "Task not found",
