@@ -18,7 +18,7 @@ const EmployeeTable = () => {
       try {
         setLoading(true); // Show loader
         const response = await axios.get(
-          "http://localhost:3000/getallemployees"
+          "https://sensitivetechcrm.onrender.com/getallemployees"
         );
         setEmployees(response.data); // Assuming data is an array of employees
       } catch (err) {
@@ -152,7 +152,7 @@ const EmployeeTable = () => {
   // Handle employee deletion
   const handleEmployeeDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/deleteemployee/${id}`);
+      await axios.delete(`https://sensitivetechcrm.onrender.com/deleteemployee/${id}`);
       setEmployees((prevEmployees) =>
         prevEmployees.filter((employee) => employee._id !== id)
       );

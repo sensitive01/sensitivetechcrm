@@ -22,7 +22,7 @@ const LeaveTable = () => {
     useEffect(() => {
         const fetchLeaves = async () => {
             try {
-                const response = await axios.get('http://localhost:3000/leaves/get-all');
+                const response = await axios.get('https://sensitivetechcrm.onrender.com/leaves/get-all');
                 setLeaves(response.data);
             } catch (err) {
                 setError("Failed to load leave data");
@@ -38,7 +38,7 @@ const LeaveTable = () => {
     const handleDelete = async (leaveId) => {
         if (window.confirm('Are you sure you want to delete this leave?')) {
             try {
-                const response = await axios.delete(`http://localhost:3000/leaves/delete/${leaveId}`);
+                const response = await axios.delete(`https://sensitivetechcrm.onrender.com/leaves/delete/${leaveId}`);
                 if (response.status === 200) {
                     // Successfully deleted, update the state
                     setLeaves(leaves.filter((leave) => leave._id !== leaveId));

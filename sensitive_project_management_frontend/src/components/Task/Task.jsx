@@ -23,7 +23,7 @@ const TaskList = () => {
     useEffect(() => {
       const fetchTasks = async () => {
           try {
-              const response = await axios.get('http://localhost:3000/task/getalltask');
+              const response = await axios.get('https://sensitivetechcrm.onrender.com/task/getalltask');
               console.log(response)
               const updatedTasks = response.data.tasks.map(task => {
                   if (!task.timeline) {
@@ -53,7 +53,7 @@ const TaskList = () => {
     const handleDelete = async (taskId) => {
         if (window.confirm('Are you sure you want to delete this task?')) {
             try {
-                const response = await axios.delete(`http://localhost:3000/task/deletetask/${taskId}`);
+                const response = await axios.delete(`https://sensitivetechcrm.onrender.com/task/deletetask/${taskId}`);
                 if (response.status === 200) {
                     setTasks(tasks.filter((task) => task._id !== taskId));
                 }
