@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { getAllProject } from "../../api/services/projectServices";
+import { deletetheProject, getAllProject } from "../../api/services/projectServices";
 
 const ProjectDetailsModal = ({ project, onClose,onEdit }) => {
   const renderArrayData = (array, field) => {
@@ -146,22 +146,33 @@ const ProjectManager = () => {
   };
 
   const handleDelete = async (projectId) => {
-    if (window.confirm('Are you sure you want to delete this project?')) {
-      try {
-        const response = await fetch(`http://localhost:3000/project/deleteproject/${projectId}`, {
-          method: "DELETE",
-        });
-        if (response.ok) {
-          setProjects(projects.filter((project) => project._id !== projectId));
-          alert("Project deleted successfully");
-        } else {
-          throw new Error("Failed to delete project");
-        }
-      } catch (err) {
-        alert(err.message);
-      }
+    if (!projectId) {
+        alert("Invalid project ID. Unable to delete.");
+        return;
     }
-  };
+
+    if (window.confirm("Are you sure you want to delete this project?")) {
+        try {
+            const response = await deletetheProject(projectId);
+
+            if (response?.status === 200) {
+                setProjects((prevProjects) =>
+                    prevProjects.filter((project) => project._id !== projectId)
+                );
+                alert("Project deleted successfully!");
+            } else {
+                alert("Failed to delete project. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error deleting project:", error);
+            alert(
+                error.response?.data?.message ||
+                "An error occurred while deleting the project."
+            );
+        }
+    }
+};
+
 
   const handleExportData = () => {
     const csvRows = [];

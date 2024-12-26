@@ -1,11 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, X } from "lucide-react";
+import { createProject, employeename } from "../../api/services/projectServices";
 
 const ProjectForm = () => {
   const navigate = useNavigate();
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const assignableUsers = ["John Doe", "Jane Smith", "Team Alpha", "Team Beta"];
+
+  // const assignableUsers = ["John Doe", "Jane Smith", "Team Alpha", "Team Beta"];
   const statuses = ["Not Started", "In Progress", "Completed", "On Hold"];
 
   const [projects, setProjects] = useState([]);
@@ -48,41 +53,65 @@ const ProjectForm = () => {
     },
   ]);
 
-  const handleAddProject = async () => {
-    if (validateForm()) {
-      const projectData = {
-        projectDetails,
-        financialDetails,
-        additionalDetails,
-      };
-
-      console.log("projectData", projectData);
-
+  useEffect(() => {
+    const fetchEmployees = async () => {
       try {
-        const response = await fetch("http://localhost:3000/project/createproject", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(projectData),
-        });
-        if (response.ok) {
-          const newProject = await response.json();
-          console.log(newProject);
-          setProjects((prevProjects) => [
-            ...prevProjects,
-            { id: Date.now(), ...newProject },
-          ]);
-          alert("Project added successfully!");
+        setLoading(true);
+  
+       
+        const response = await employeename(); 
+        console.log("Employees fetched:", response);
+  
+        if (response) {
+          setEmployees(response.data); 
+          setError(null); 
         } else {
-          alert("Failed to create project. Please try again.");
+          throw new Error("Failed to fetch employees.");
         }
       } catch (error) {
-        console.error("Error:", error);
-        alert("An error occurred while creating the project.");
+        console.error("Error fetching employees:", error);
+        setError("Failed to fetch employees. Please try again later.");
+      } finally {
+        setLoading(false);
       }
-    } else {
+    };
+  
+    fetchEmployees();
+  }, []);
+  
+  const handleAddProject = async () => {
+    if (!validateForm()) {
       alert("Please fill out all mandatory fields!");
+      return;
+    }
+
+    const projectData = {
+      projectDetails,
+      financialDetails,
+      additionalDetails,
+    };
+
+    console.log("projectData", projectData);
+
+    try {
+      const response = await createProject(projectData);
+
+      if (response?.status === 201 || response?.status === 200) {
+        const newProject = response.data;
+        console.log("New Project:", newProject);
+
+        setProjects((prevProjects) => [...prevProjects, newProject]);
+        alert("Project added successfully!");
+      } else {
+        console.error("Error creating project:", response);
+        alert("Failed to create project. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      alert(
+        error.response?.data?.message ||
+        "An error occurred while creating the project."
+      );
     }
   };
 
@@ -114,8 +143,8 @@ const ProjectForm = () => {
       section === "projectDetails"
         ? projectDetails
         : section === "financialDetails"
-        ? financialDetails
-        : additionalDetails;
+          ? financialDetails
+          : additionalDetails;
 
     const updatedDetails = [...sectionState];
     updatedDetails[index][field] = value;
@@ -135,29 +164,29 @@ const ProjectForm = () => {
     const defaultValue =
       section === "projectDetails"
         ? {
-            projectName: "",
-            type: "",
-            requirements: "",
-            description: "",
-            category: "",
-            techStack: "",
-            domain: "",
-            designation: "",
-            addOnServices: "",
-            duration: "",
-            dependencies: "",
-            companyName: "",
-            task: "",
-          }
+          projectName: "",
+          type: "",
+          requirements: "",
+          description: "",
+          category: "",
+          techStack: "",
+          domain: "",
+          designation: "",
+          addOnServices: "",
+          duration: "",
+          dependencies: "",
+          companyName: "",
+          task: "",
+        }
         : section === "financialDetails"
-        ? {
+          ? {
             quotedValue: "",
             approvedValue: "",
             paymentTerms: "",
             finalQuotation: "",
             taxTerms: "",
           }
-        : {
+          : {
             projectDocument: null,
             nda: null,
             msa: null,
@@ -179,8 +208,8 @@ const ProjectForm = () => {
       section === "projectDetails"
         ? projectDetails
         : section === "financialDetails"
-        ? financialDetails
-        : additionalDetails;
+          ? financialDetails
+          : additionalDetails;
 
     if (sectionState.length > 1) {
       const updatedDetails = sectionState.filter((_, i) => i !== index);
@@ -190,6 +219,23 @@ const ProjectForm = () => {
       if (section === "additionalDetails") setAdditionalDetails(updatedDetails);
     }
   };
+
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <p className="text-xl">Loading...</p>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <p className="text-xl text-red-600">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-50 p-6 flex justify-center items-center mt-24">
@@ -231,9 +277,9 @@ const ProjectForm = () => {
                               className="w-full border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
                             >
                               <option value="">Select User</option>
-                              {assignableUsers.map((user) => (
-                                <option key={user} value={user}>
-                                  {user}
+                              {employees.map((employee) => (
+                                <option key={employee._id} value={employee._id}>
+                                  {employee.name}  {/* Adjust the property name based on your API response */}
                                 </option>
                               ))}
                             </select>

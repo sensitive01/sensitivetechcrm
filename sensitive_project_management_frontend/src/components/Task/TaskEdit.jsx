@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { employeename, getTheTask } from "../../api/services/projectServices";
+import axios from "axios";
 
 function TaskEdit() {
-  const { taskId } = useParams(); // Get task ID from URL params
+  const { taskId } = useParams();
   const [task, setTask] = useState({
     project: "",
     task: "",
@@ -14,37 +16,69 @@ function TaskEdit() {
     attachments: null,
   });
 
-  // Manually inserted data for Projects and Employees
-  const projects = [
-    { id: "1", name: "ParkMyWheels" },
-    { id: "2", name: "Capilary" },
-    { id: "3", name: "Mindmentors" },
-  ];
+  const [projects, setprojects] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState([]);
+  const [error, setError] = useState(null);
 
-  const employees = [
-    { id: "101", name: "Aswinraj" },
-    { id: "102", name: "Rakesh N" },
-    { id: "103", name: "Jeyaram" },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
 
-  // Fetch the task data using useEffect
+        // Fetch employees and project names concurrently using Promise.all
+        const [employeesResponse, projectsResponse] = await Promise.all([
+          employeename(), // Assuming employeename() returns the employees data
+          axios.get("http://localhost:3000/project/projectname") // Fetching project names
+        ]);
+
+        console.log("Employees fetched:", employeesResponse);
+        console.log("Projects fetched:", projectsResponse);
+
+        if (employeesResponse && projectsResponse) {
+          setEmployees(employeesResponse.data); // Set employees
+          const flattenedProjects = projectsResponse.data.flatMap(project =>
+            project.projectDetails.map(detail => ({
+              _id: project._id,
+              projectName: detail.projectName // Flatten and extract project name
+            }))
+          );
+          setprojects(flattenedProjects); // Set project names
+          setError(null);
+        } else {
+          throw new Error("Failed to fetch employees or projects.");
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError("Failed to fetch data. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+
+
   useEffect(() => {
     const fetchTaskData = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/task/gettask/${taskId}`);
-        const data = await response.json();
+        const response = await getTheTask(taskId);
+        console.log(response)
 
-        if (response.ok) {
-          setTask({
-            project: data.project,
-            task: data.task,
-            empId: data.empId,
-            description: data.description,
-            timeline: data.timeline,
-            status: data.status,
-            date: data.date,
-            attachments: data.attachments || null,
-          });
+        if (response.status===200) {
+          setTask(response.data.task)
+          // setTask({
+          //   project: response.data.project,
+          //   task: response.data.task,
+          //   empId: response.data.empId,
+          //   description: response.data.description,
+          //   timeline: response.data.timeline,
+          //   status: response.data.status,
+          //   date: response.data.date,
+          //   attachments: response.data.attachments || null,
+          // });
         } else {
           alert("Failed to fetch task data.");
         }
@@ -70,14 +104,11 @@ function TaskEdit() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Prepare the form data
+  
     const formData = new FormData();
-
-    // Append all form fields
+  
     Object.keys(task).forEach((key) => {
       if (key === "attachments" && task[key]) {
-        // For attachments, append all files
         Array.from(task[key]).forEach((file) => {
           formData.append("attachments", file);
         });
@@ -85,29 +116,38 @@ function TaskEdit() {
         formData.append(key, task[key]);
       }
     });
-
+  
     try {
-      // Send POST request to backend
-      const response = await fetch("http://localhost:3000/task/updatetask", {
-        method: "POST",
-        body: formData,
-      });
-
-      const result = await response.json();
-      if (response.ok) {
-        // Handle success (e.g., show a success message)
-        console.log("Task updated:", result);
-        alert("Task updated successfully!");
-      } else {
-        // Handle error (e.g., show an error message)
-        console.error("Error:", result);
-        alert("Failed to update task.");
-      }
+      // Call the API to update the task
+      const result = await getTheTask(taskId, formData);
+  
+      // Handle the response
+      console.log("Task updated:", result);
+      alert("Task updated successfully!");
     } catch (error) {
       console.error("Error:", error);
       alert("An error occurred while updating the task.");
     }
   };
+  
+  
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-8 mt-20 text-center">
+        <p className="text-xl">Loading</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-8 mt-20 text-center">
+        <p className="text-xl text-red-600">{error}</p>
+      </div>
+    );
+  }
+
 
   return (
     <div className="container mx-auto p-8 mt-20">
@@ -130,8 +170,11 @@ function TaskEdit() {
             >
               <option value="">Select Project</option>
               {projects.map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.name}
+                <option
+                  key={project._id}
+                  value={project._id}
+                >
+                  {project.projectName}
                 </option>
               ))}
             </select>

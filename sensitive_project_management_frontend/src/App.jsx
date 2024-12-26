@@ -155,7 +155,7 @@ function App() {
                   <Route path="/leave-table" element={<LeaveTable />} />
                   <Route path="/leave-edit/:id" element={<LeaveEdit />} />
                   <Route path="/task-form" element={<TaskForm />} />
-                  <Route path="/task-edit/:id" element={<TaskEdit/>} />
+                  <Route path="/task-edit/:taskId" element={<TaskEdit/>} />
                 </Routes>
               </AdminLayout>
             )

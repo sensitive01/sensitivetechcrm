@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Plus, X } from "lucide-react";
-import { getTheProject } from "../../api/services/projectServices";
+import { getTheProject, updatetheProject } from "../../api/services/projectServices";
 
 const ProjectEdit = () => {
     const navigate = useNavigate();
@@ -76,17 +76,10 @@ const ProjectEdit = () => {
                 financialDetails,
                 additionalDetails,
             };
-
+    
             try {
-                const response = await fetch(`http://localhost:3000/project/updateprojectby/${projectId}`, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(projectData),
-                });
-
-                if (response.ok) {
+                const response = await updatetheProject(projectId, projectData); // Pass projectData here
+                if (response) {
                     alert("Project updated successfully!");
                     navigate("/project");
                 } else {
@@ -100,6 +93,7 @@ const ProjectEdit = () => {
             alert("Please fill out all mandatory fields!");
         }
     };
+    
 
     const validateForm = () => {
         const projectValidation = projectDetails.every(

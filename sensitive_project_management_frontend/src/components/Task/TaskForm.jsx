@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
+import { createTask, employeename } from "../../api/services/projectServices";
 
 function TaskForm() {
   const [tasks, setTasks] = useState([
@@ -24,31 +25,40 @@ function TaskForm() {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [projectsResponse, employeesResponse] = await Promise.all([
-          axios.get("http://localhost:3000/project/projectname"),
-          axios.get("http://localhost:3000/employename")
+
+        // Fetch employees and project names concurrently using Promise.all
+        const [employeesResponse, projectsResponse] = await Promise.all([
+          employeename(), // Assuming employeename() returns the employees data
+          axios.get("http://localhost:3000/project/projectname") // Fetching project names
         ]);
 
-        // Flatten the project data
-        const flattenedProjects = projectsResponse.data.flatMap(project =>
-          project.projectDetails.map(detail => ({
-            _id: project._id,
-            projectName: detail.projectName
-          }))
-        );
+        console.log("Employees fetched:", employeesResponse);
+        console.log("Projects fetched:", projectsResponse);
 
-        setprojects(flattenedProjects);
-        setEmployees(employeesResponse.data);
-        setError(null);
-      } catch (err) {
-        setError("Failed to fetch data. please try again later.");
-        console.error("Error fetching data:", err);
+        if (employeesResponse && projectsResponse) {
+          setEmployees(employeesResponse.data); // Set employees
+          const flattenedProjects = projectsResponse.data.flatMap(project =>
+            project.projectDetails.map(detail => ({
+              _id: project._id,
+              projectName: detail.projectName // Flatten and extract project name
+            }))
+          );
+          setprojects(flattenedProjects); // Set project names
+          setError(null);
+        } else {
+          throw new Error("Failed to fetch employees or projects.");
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError("Failed to fetch data. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
+
     fetchData();
   }, []);
+
 
 
 
@@ -99,8 +109,7 @@ function TaskForm() {
     try {
 
       for (const formData of tasks) {
-
-        const response = await axios.post("http://localhost:3000/task/createtask", formData);
+        const response = await createTask(formData);
 
         if (response.status === 201) {
           alert("Task created successfully!");
@@ -140,7 +149,7 @@ function TaskForm() {
         {tasks.map((task, index) => (
           <div key={index} className="space-y-8 border-b pb-4 mb-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-             
+
               <div>
                 <label className="block text-sm font-medium pb-2 text-gray-600">Project:</label>
                 <select
