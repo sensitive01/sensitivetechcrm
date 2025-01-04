@@ -20,14 +20,14 @@ const LoginPage = () => {
 
       // Determine whether this is an employee or admin login
       // const endpoint = formData.username.includes("admin") 
-      //   ? "http://localhost:3000/admin-login/adminlogin"  
-      //   : "http://localhost:3000/employee-login/login";
+      //   ? "https://sensitivetechcrm.onrender.comadmin-login/adminlogin"  
+      //   : "https://sensitivetechcrm.onrender.comemployee-login/login";
 
 
 
 
 
-      // const response = await axios.post("http://localhost:3000/employee-login/login", formData);
+      // const response = await axios.post("https://sensitivetechcrm.onrender.comemployee-login/login", formData);
       const response = await verifyLogin(formData)
 
       console.log(response);

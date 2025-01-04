@@ -49,7 +49,7 @@ function Client() {
     e.preventDefault();
   
     try {
-      const response = await axios.post('http://localhost:3000/clients/create', client);
+      const response = await axios.post('https://sensitivetechcrm.onrender.comclients/create', client);
       console.log('Response Status:', response.status); // Log the response status
       console.log('Response Data:', response.data);     // Log the response data
   

@@ -34,7 +34,7 @@ function Leave() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:3000/leaves/create", leave, {
+      const response = await axios.post("https://sensitivetechcrm.onrender.comleaves/create", leave, {
         headers: {
           "Content-Type": "application/json",  // Set the content type header
         },
