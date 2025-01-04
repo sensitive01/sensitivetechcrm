@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Plus, X } from "lucide-react";
-import { getTheProject, updatetheProject } from "../../api/services/projectServices";
+import { employeename, getTheProject, updatetheProject } from "../../api/services/projectServices";
 
 const ProjectEdit = () => {
     const navigate = useNavigate();
     const { projectId } = useParams();
-    const assignableUsers = ["John Doe", "Jane Smith", "Team Alpha", "Team Beta"];
-    const statuses = ["Not Started", "In Progress", "Completed", "On Hold"];
+    const [employees, setEmployees] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
+    const statuses = ["Not Started", "In Progress", "Completed", "On Hold"];
+    const [projects, setProjects] = useState([]);
     const [projectDetails, setProjectDetails] = useState([{
         projectName: "",
         type: "",
@@ -43,6 +46,32 @@ const ProjectEdit = () => {
     }]);
 
     useEffect(() => {
+        const fetchEmployees = async () => {
+            try {
+                setLoading(true);
+
+
+                const response = await employeename();
+                console.log("Employees fetched:", response);
+
+                if (response) {
+                    setEmployees(response.data);
+                    setError(null);
+                } else {
+                    throw new Error("Failed to fetch employees.");
+                }
+            } catch (error) {
+                console.error("Error fetching employees:", error);
+                setError("Failed to fetch employees. Please try again later.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchEmployees();
+    }, []);
+
+    useEffect(() => {
         const fetchProjectDetails = async () => {
             try {
                 const response = await getTheProject(projectId);
@@ -50,7 +79,7 @@ const ProjectEdit = () => {
                 if (response) {
                     setProjectDetails(response.data.projectDetails || []);
                     setFinancialDetails(response.data.financialDetails || []);
-                    
+
                     const transformedAdditionalDetails = response.data.additionalDetails.map(detail => ({
                         ...detail,
                         projectDocument: detail.projectDocument ? detail.projectDocument[0] : null,
@@ -76,7 +105,7 @@ const ProjectEdit = () => {
                 financialDetails,
                 additionalDetails,
             };
-    
+
             try {
                 const response = await updatetheProject(projectId, projectData); // Pass projectData here
                 if (response) {
@@ -93,7 +122,7 @@ const ProjectEdit = () => {
             alert("Please fill out all mandatory fields!");
         }
     };
-    
+
 
     const validateForm = () => {
         const projectValidation = projectDetails.every(
@@ -201,6 +230,22 @@ const ProjectEdit = () => {
         }
     };
 
+
+    if (loading) {
+        return (
+            <div className="min-h-screen flex justify-center items-center">
+                <p className="text-xl">Loading...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="min-h-screen flex justify-center items-center">
+                <p className="text-xl text-red-600">{error}</p>
+            </div>
+        );
+    }
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-50 p-6 flex justify-center items-center mt-24">
             <div className="bg-white p-8 rounded-lg shadow-xl max-w-7xl w-full space-y-6">
@@ -245,9 +290,9 @@ const ProjectEdit = () => {
                                                             className="w-full border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
                                                         >
                                                             <option value="">Select User</option>
-                                                            {assignableUsers.map((user) => (
-                                                                <option key={user} value={user}>
-                                                                    {user}
+                                                            {employees.map((employee) => (
+                                                                <option key={employee._id} value={employee.name}>
+                                                                    {employee.name}  {/* Adjust the property name based on your API response */}
                                                                 </option>
                                                             ))}
                                                         </select>

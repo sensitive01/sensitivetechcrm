@@ -1,37 +1,129 @@
+// EmployeeTable.jsx
 import React, { useState, useMemo, useEffect } from "react";
-import { Eye, Edit, Trash2 } from "lucide-react";
+import { Eye, Edit, Trash2, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaPlus, FaFileDownload, FaFilter } from "react-icons/fa";
 import axios from "axios";
 import * as XLSX from "xlsx";
 import { useTable, useGlobalFilter, useSortBy, usePagination } from "react-table";
 
+// Custom Modal Component
+const Modal = ({ isOpen, onClose, children }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="relative bg-white rounded-lg max-w-2xl w-full m-4">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+// Employee Details Modal Component
+const EmployeeDetailsModal = ({ isOpen, onClose, employee }) => {
+  if (!employee) return null;
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <div className="p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold">Employee Details</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="col-span-2 flex justify-center">
+            <img
+              src={employee.profileImage}
+              alt={employee.name}
+              className="w-32 h-32 rounded-full object-cover border-4 border-blue-100"
+            />
+          </div>
+
+          <div className="space-y-4 col-span-2">
+            <div className="grid grid-cols-2 gap-4">
+              <DetailItem label="Employee ID" value={employee.empId} />
+              <DetailItem label="Name" value={employee.name} />
+              <DetailItem label="Designation" value={employee.designation} />
+              <DetailItem label="Department" value={employee.department} />
+              <DetailItem label="Date of Birth" value={formatDate(employee.dob)} />
+              <DetailItem label="Date of Joining" value={formatDate(employee.doj)} />
+              <DetailItem label="Status" value={employee.status} />
+              <DetailItem label="Created Date" value={employee.createdDate} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
+// Detail Item Component for Modal
+const DetailItem = ({ label, value }) => (
+  <div className="bg-gray-50 p-4 rounded-lg">
+    <p className="text-sm text-gray-600">{label}</p>
+    <p className="font-medium text-gray-900">{value}</p>
+  </div>
+);
+
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-GB").split('/').join('/');
+};
+const formatDateTime = (dateString) => {
+  if (!dateString || isNaN(new Date(dateString).getTime())) {
+    return "N/A"; // Handle missing or invalid date values
+  }
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "2-digit",
+  }) + ", " + date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
+;
+
+
+// Main EmployeeTable Component
 const EmployeeTable = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch employee data from an API
+  // Fetch employee data from API
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        setLoading(true); // Show loader
-        const response = await axios.get(
-          "https://sensitivetechcrm.onrender.com/getallemployees"
-        );
-        setEmployees(response.data); // Assuming data is an array of employees
+        setLoading(true);
+        const response = await axios.get("http://localhost:3000/getallemployees");
+        console.log(response.data);  // Debugging - Check if createdAt exists
+        setEmployees(response.data);
       } catch (err) {
         setError(err.message);
       } finally {
-        setLoading(false); // Stop loader
+        setLoading(false);
       }
     };
-
+  
     fetchEmployees();
   }, []);
+  
 
-  // Define columns for react-table
+  // Define table columns
   const columns = useMemo(
     () => [
       {
@@ -40,9 +132,13 @@ const EmployeeTable = () => {
       },
       {
         Header: "Profile Picture",
-        accessor: "imageUrl",
+        accessor: "profileImage",
         Cell: ({ value }) => (
-          <img src={value} alt="Profile" className="w-16 h-16 rounded-full object-cover" />
+          <img
+            src={value}
+            alt="Profile"
+            className="w-16 h-16 rounded-full object-cover"
+          />
         ),
       },
       {
@@ -64,23 +160,24 @@ const EmployeeTable = () => {
       {
         Header: "DOB",
         accessor: "dob",
+        Cell: ({ value }) => formatDate(value),
       },
       {
         Header: "DOJ",
         accessor: "doj",
+        Cell: ({ value }) => formatDate(value),
       },
       {
         Header: "Status",
         accessor: "status",
         Cell: ({ value }) => (
           <span
-            className={`px-3 py-1 rounded-full text-xs font-medium ${
-              value === "Active"
-                ? "bg-green-100 text-green-800"
-                : value === "On Leave"
+            className={`px-3 py-1 rounded-full text-xs font-medium ${value === "Active"
+              ? "bg-green-100 text-green-800"
+              : value === "On Leave"
                 ? "bg-yellow-100 text-yellow-800"
                 : "bg-red-100 text-red-800"
-            }`}
+              }`}
           >
             {value}
           </span>
@@ -88,14 +185,20 @@ const EmployeeTable = () => {
       },
       {
         Header: "Created Date",
-        accessor: "createdDate",
+        accessor: "createdAt", // This references the automatically generated createdAt field
+        Cell: ({ value }) => formatDateTime(value),
       },
+
       {
         Header: "Actions",
         accessor: "_id",
         Cell: ({ row }) => (
           <div className="flex justify-center space-x-2">
             <button
+              onClick={() => {
+                setSelectedEmployee(row.original);
+                setIsModalOpen(true);
+              }}
               className="text-blue-500 hover:bg-blue-100 p-2 rounded-full transition-colors"
               title="View Details"
             >
@@ -151,14 +254,16 @@ const EmployeeTable = () => {
 
   // Handle employee deletion
   const handleEmployeeDelete = async (id) => {
-    try {
-      await axios.delete(`https://sensitivetechcrm.onrender.com/deleteemployee/${id}`);
-      setEmployees((prevEmployees) =>
-        prevEmployees.filter((employee) => employee._id !== id)
-      );
-      alert("Employee deleted successfully!");
-    } catch (err) {
-      alert("Failed to delete employee.");
+    if (window.confirm("Are you sure you want to delete this employee?")) {
+      try {
+        await axios.delete(`http://localhost:3000/deleteemployee/${id}`);
+        setEmployees((prevEmployees) =>
+          prevEmployees.filter((employee) => employee._id !== id)
+        );
+        alert("Employee deleted successfully!");
+      } catch (err) {
+        alert("Failed to delete employee.");
+      }
     }
   };
 
@@ -167,7 +272,7 @@ const EmployeeTable = () => {
     const exportData = employees.map((employee, index) => ({
       "S.No": index + 1,
       "Emp ID": employee.empId,
-      "Name": employee.contactPerson,
+      "Name": employee.name,
       "Designation": employee.designation,
       "Department": employee.department,
       "DOB": employee.dob,
@@ -192,7 +297,9 @@ const EmployeeTable = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <h2 className="text-4xl font-bold mb-10 text-center mt-20">Employee Details</h2>
+      <h2 className="text-4xl font-bold mb-10 text-center mt-20">
+        Employee Details
+      </h2>
 
       {/* Action Buttons Section */}
       <div className="flex justify-between items-center mb-4">
@@ -295,6 +402,13 @@ const EmployeeTable = () => {
           </div>
         </div>
       </div>
+
+      {/* Employee Details Modal */}
+      <EmployeeDetailsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        employee={selectedEmployee}
+      />
     </div>
   );
 };

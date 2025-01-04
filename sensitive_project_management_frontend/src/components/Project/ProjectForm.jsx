@@ -10,7 +10,7 @@ const ProjectForm = () => {
   const [error, setError] = useState(null);
 
 
-  // const assignableUsers = ["John Doe", "Jane Smith", "Team Alpha", "Team Beta"];
+ 
   const statuses = ["Not Started", "In Progress", "Completed", "On Hold"];
 
   const [projects, setProjects] = useState([]);
@@ -278,7 +278,7 @@ const ProjectForm = () => {
                             >
                               <option value="">Select User</option>
                               {employees.map((employee) => (
-                                <option key={employee._id} value={employee._id}>
+                                <option key={employee._id} value={employee.name}>
                                   {employee.name}  {/* Adjust the property name based on your API response */}
                                 </option>
                               ))}

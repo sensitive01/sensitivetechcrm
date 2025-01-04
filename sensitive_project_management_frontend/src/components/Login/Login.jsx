@@ -17,31 +17,33 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       console.log("Login Data:", formData);
-  
+
       // Determine whether this is an employee or admin login
       // const endpoint = formData.username.includes("admin") 
-      //   ? "https://sensitivetechcrm.onrender.com/admin-login/adminlogin"  
-      //   : "https://sensitivetechcrm.onrender.com/employee-login/login";
+      //   ? "http://localhost:3000/admin-login/adminlogin"  
+      //   : "http://localhost:3000/employee-login/login";
 
 
 
-      
-  
-      // const response = await axios.post("https://sensitivetechcrm.onrender.com/employee-login/login", formData);
+
+
+      // const response = await axios.post("http://localhost:3000/employee-login/login", formData);
       const response = await verifyLogin(formData)
-  
+
       console.log(response);
-  
+
       if (response.status === 200) {
         const { _id, role } = response.data.employee || response.data.admin; // Adapt based on response structure
         localStorage.setItem("empId", _id);
         localStorage.setItem("role", role); // Save role to localStorage
-  
+
         // Navigate based on role
         if (role === "employee") {
           navigate("/attendance-form");
         } else if (role === "Superadmin") {
-          navigate("/dashboard"); // Admin should be navigated to dashboard
+          navigate("/dashboard"); // Admin should be navigated to the dashboard
+        } else if (role === "Lead") {
+          navigate("/dashboard"); // Lead should be navigated to their dashboard
         } else {
           navigate("/attendance-form"); // Default navigation
         }
@@ -51,7 +53,7 @@ const LoginPage = () => {
       alert("Invalid username or password. Please try again.");
     }
   };
-  
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">

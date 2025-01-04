@@ -95,6 +95,9 @@ import EmployeeEdit from "./components/Employee/EmployeeEdit";
 import AdminForm from "./components/Admin/AdminForm";
 import TaskEdit from "./components/Task/TaskEdit";
 import ProjectEdit from "./components/Project/ProjectEdit";
+import LeadForm from "./components/Leads/Leads";
+import LeadsTable from "./components/Leads/LeadTable";
+import LeadTable from "./components/Leads/LeadTable";
 
 // Layout Component for Admin Pages
 const AdminLayout = ({ children }) => (
@@ -156,6 +159,10 @@ function App() {
                   <Route path="/leave-edit/:id" element={<LeaveEdit />} />
                   <Route path="/task-form" element={<TaskForm />} />
                   <Route path="/task-edit/:taskId" element={<TaskEdit/>} />
+                  <Route path="/lead-form" element={<LeadForm/>} />
+                  <Route path="/lead-table" element={<LeadTable/>} />
+                  {/* <Route path="/payments-table" element={<LeadTable/>} />
+                  <Route path="/payroll-table" element={<LeadTable/>} /> */}
                 </Routes>
               </AdminLayout>
             )

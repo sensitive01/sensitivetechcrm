@@ -73,8 +73,8 @@ export const createProject=async(projectData) => {
 
 // export const projectname=async() => {
 //   try {
-//     const response = await projectServices.get(`/projectname` );
-//     return response;
+//     const responsename = await projectServices.get(`/projectname` );
+//     return responsename;
 //   } catch (err) {
 //     return err;
 //   }

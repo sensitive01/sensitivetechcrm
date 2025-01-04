@@ -29,7 +29,7 @@ function TaskEdit() {
         // Fetch employees and project names concurrently using Promise.all
         const [employeesResponse, projectsResponse] = await Promise.all([
           employeename(), // Assuming employeename() returns the employees data
-          axios.get("https://sensitivetechcrm.onrender.com/project/projectname") // Fetching project names
+          axios.get("http://localhost:3000/project/projectname") // Fetching project names
         ]);
 
         console.log("Employees fetched:", employeesResponse);
@@ -119,7 +119,8 @@ function TaskEdit() {
   
     try {
       // Call the API to update the task
-      const result = await getTheTask(taskId, formData);
+      console.log(taskId, task)
+      const result = await getTheTask(taskId, task);
   
       // Handle the response
       console.log("Task updated:", result);
@@ -205,7 +206,7 @@ function TaskEdit() {
             >
               <option value="">Select Employee</option>
               {employees.map((employee) => (
-                <option key={employee.id} value={employee.id}>
+                <option key={employee._id} value={employee.name}>
                   {employee.name}
                 </option>
               ))}

@@ -57,7 +57,7 @@
 //           placeholder="Search..."
 //           className="bg-white text-blue-600 py-2 px-4 rounded-l-md focus:outline-none"
 //         />
-        
+
 //         {/* Logout Button */}
 //         <button 
 //           onClick={handleLogout} 
@@ -124,10 +124,10 @@ export default function Topbar() {
       {/* Logo Section */}
       <div className="flex justify-center md:justify-start items-center mb-4 md:mb-0">
         <Link to="/dashboard">
-          <img 
-            src={logo} 
-            alt="Logo" 
-            className="max-h-16 sm:max-h-20 md:max-w-[350px] lg:max-w-[550px]" 
+          <img
+            src={logo}
+            alt="Logo"
+            className="max-h-16 sm:max-h-20 md:max-w-[350px] lg:max-w-[550px]"
           />
         </Link>
       </div>
@@ -145,6 +145,17 @@ export default function Topbar() {
           <>
             <Link to="/employee-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Employee</Link>
             <Link to="/client-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Client</Link>
+            {/* <Link to="/lead-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Leads</Link>
+            <Link to="/payments-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Payments</Link>
+            <Link to="/payroll-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Payroll</Link> */}
+          </>
+        )}
+
+        {role === "Lead" && (
+          <>
+            <Link to="/lead-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Leads</Link>
+            <Link to="/payments-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Payments</Link>
+            <Link to="/payroll-table" className="font-bold text-white hover:text-gray-200 text-xl transition-colors">Payroll</Link>
           </>
         )}
       </div>
@@ -157,27 +168,27 @@ export default function Topbar() {
           placeholder="Search..."
           className="bg-white text-blue-600 py-2 px-4 rounded-l-md focus:outline-none"
         />
-        
+
         {/* Logout Button */}
-        <button 
-          onClick={handleLogout} 
+        <button
+          onClick={handleLogout}
           className="bg-white text-blue-600 font-bold py-3 px-8 rounded hover:bg-gray-100 transition-colors"
         >
           Logout
         </button>
 
         {/* User Icon */}
-        <FaUser 
-          className="text-white text-2xl cursor-pointer hover:text-gray-200" 
-          onClick={toggleProfile} 
+        <FaUser
+          className="text-white text-2xl cursor-pointer hover:text-gray-200"
+          onClick={toggleProfile}
         />
       </div>
 
       {/* Profile Modal */}
       {showProfile && (
-        <ProfileModal 
-          userProfile={userProfile} 
-          onClose={toggleProfile} 
+        <ProfileModal
+          userProfile={userProfile}
+          onClose={toggleProfile}
         />
       )}
     </div>

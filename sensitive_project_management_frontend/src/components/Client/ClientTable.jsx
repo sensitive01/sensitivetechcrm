@@ -16,7 +16,7 @@ const ClientTable = () => {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await axios.get('https://sensitivetechcrm.onrender.com/clients/get-all');
+        const response = await axios.get('http://localhost:3000/clients/get-all');
         console.log(response);
         setClients(response.data);
 
@@ -34,7 +34,7 @@ const ClientTable = () => {
   const handleDelete = async (clientId) => {
     if (window.confirm('Are you sure you want to delete this client?')) {
       try {
-        const response = await axios.delete(`https://sensitivetechcrm.onrender.com/clients/delete/${clientId}`);
+        const response = await axios.delete(`http://localhost:3000/clients/delete/${clientId}`);
    
         
         if (response.status === 200) {
