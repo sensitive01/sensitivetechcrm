@@ -28,7 +28,7 @@ const taskSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,  
   },
-  attachments:[],
+  attachments:[]
 });
 
 

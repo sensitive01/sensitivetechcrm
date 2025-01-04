@@ -14,6 +14,7 @@ const clientRoutes = require('./routes/clientRoutes')
 const leaveRoutes = require('./routes/leaveRoutes')
 const attendanceRoutes = require('./routes/attendanceRoutes')
 const superadminRouter = require('./routes/superadminRoutes');
+const leadRoutes = require('./routes/leadRoute');
 
 
 dotenv.config();
@@ -30,7 +31,7 @@ app.use('/', attendanceRoutes);
 app.use('/clients', clientRoutes);
 app.use('/leaves', leaveRoutes);
 app.use('/attendance', attendanceRoutes);
-
+app.use('/leads', leadRoutes);
 
 // Connect to database
 db(); // MongoDB connection setup

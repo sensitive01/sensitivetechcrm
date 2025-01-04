@@ -91,6 +91,7 @@ const getTaskById = async (req, res) => {
 
 // Update a task by ID
 const updateTask = async (req, res) => {
+  console.log("Update task",req.body)
   const { id } = req.params;
   const { project, task, empId, description, timeline, status, attachments } =
     req.body;

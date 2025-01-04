@@ -36,6 +36,7 @@ const EmployeeSchema = new mongoose.Schema({
   addressProofType: { type: String,  },
   addressProofNumber: { type: String,  },
   addressProofFile: { type: String, },
+  profileImage:{ type: String, },
   password: { type: String,  },
   status: { type: String, default: "Active" },
 }, { timestamps: true });                     

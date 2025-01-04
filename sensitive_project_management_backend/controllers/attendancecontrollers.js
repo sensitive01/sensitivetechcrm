@@ -29,7 +29,7 @@ exports.getAllAttendance = async (req, res) => {
     console.log("empdata puja", empdata)
     let attendanceRecords
 
-    if (id == "675c0f589c0c7ac25d72bd8c") {
+    if (id == "6779360b3fb6809073b96ef4") {
       attendanceRecords = await attendanceModel.find();
     }
     else {
