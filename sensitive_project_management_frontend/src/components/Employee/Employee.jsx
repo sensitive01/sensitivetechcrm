@@ -79,7 +79,7 @@ const EmployeeForm = () => {
     console.log(formData);
     try {
       const response = await axios.post(
-        "https://sensitivetechcrm.onrender.comcreateemployee",
+        "https://sensitivetechcrm.onrender.com/createemployee",
         formData
       );
       console.log("Response:", response.data);

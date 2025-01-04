@@ -29,7 +29,7 @@ function TaskEdit() {
         // Fetch employees and project names concurrently using Promise.all
         const [employeesResponse, projectsResponse] = await Promise.all([
           employeename(), // Assuming employeename() returns the employees data
-          axios.get("https://sensitivetechcrm.onrender.comproject/projectname") // Fetching project names
+          axios.get("https://sensitivetechcrm.onrender.com/project/projectname") // Fetching project names
         ]);
 
         console.log("Employees fetched:", employeesResponse);

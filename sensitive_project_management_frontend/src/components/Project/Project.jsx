@@ -96,7 +96,7 @@ const ProjectManager = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        // const response = await fetch("https://sensitivetechcrm.onrender.comproject/getallprojects");
+        // const response = await fetch("https://sensitivetechcrm.onrender.com/project/getallprojects");
         const response = await getAllProject()
         console.log(response)
         if (response.status===200) {

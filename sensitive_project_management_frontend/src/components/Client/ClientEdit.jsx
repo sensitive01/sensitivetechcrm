@@ -38,7 +38,7 @@ function ClientEdit() {
 
     const fetchClientDetails = async () => {
       try {
-        const response = await axios.get(`https://sensitivetechcrm.onrender.comclients/get/${id}`);
+        const response = await axios.get(`https://sensitivetechcrm.onrender.com/clients/get/${id}`);
         console.log(response)
         if (response.status === 200) {
           setClient(response.data); // Update the state with fetched data.
@@ -74,8 +74,8 @@ function ClientEdit() {
 
     try {
       const response = id
-        ? await axios.put(`https://sensitivetechcrm.onrender.comclients/update/${id}`, client) // Update client
-        : await axios.post(`https://sensitivetechcrm.onrender.comclients/create`, client); // Create client
+        ? await axios.put(`https://sensitivetechcrm.onrender.com/clients/update/${id}`, client) // Update client
+        : await axios.post(`https://sensitivetechcrm.onrender.com/clients/create`, client); // Create client
         
 
       if (response.status === 200 || response.status === 201) {

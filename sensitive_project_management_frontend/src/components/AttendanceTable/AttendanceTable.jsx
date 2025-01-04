@@ -18,7 +18,7 @@ const AttendanceTable = () => {
     useEffect(() => {
         const fetchAttendance = async () => {
             try {
-                const response = await fetch(`https://sensitivetechcrm.onrender.comattendance/attendance-all/${employeeId}`);
+                const response = await fetch(`https://sensitivetechcrm.onrender.com/attendance/attendance-all/${employeeId}`);
                 console.log(response)
                 if (!response.ok) {
                     throw new Error("Failed to fetch attendance data.");
@@ -56,7 +56,7 @@ const AttendanceTable = () => {
         const logoutTime = new Date().toLocaleTimeString();
 
         try {
-            const response = await fetch(`https://sensitivetechcrm.onrender.comattendance/logout/${recordId}`, {
+            const response = await fetch(`https://sensitivetechcrm.onrender.com/attendance/logout/${recordId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

@@ -25,7 +25,7 @@ function LeaveEdit() {
 
     const fetchLeaveDetails = async () => {
       try {
-        const response = await axios.get(`https://sensitivetechcrm.onrender.comleaves/get/${id}`);
+        const response = await axios.get(`https://sensitivetechcrm.onrender.com/leaves/get/${id}`);
         console.log(response);
         if (response.status === 200) {
           setLeave(response.data); // Update the state with fetched data.
@@ -60,8 +60,8 @@ function LeaveEdit() {
 
     try {
       const response = id
-        ? await axios.put(`https://sensitivetechcrm.onrender.comleaves/update/${id}`, leave) // Update leave
-        : await axios.post(`https://sensitivetechcrm.onrender.comleaves/create`, leave); // Create leave
+        ? await axios.put(`https://sensitivetechcrm.onrender.com/leaves/update/${id}`, leave) // Update leave
+        : await axios.post(`https://sensitivetechcrm.onrender.com/leaves/create`, leave); // Create leave
 
       if (response.status === 200 || response.status === 201) {
         alert("Leave data submitted successfully!");

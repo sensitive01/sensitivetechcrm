@@ -81,7 +81,7 @@ const EmployeeEdit = () => {
       try {
         setLoading(true); // Show loader
         const response = await axios.get(
-          `https://sensitivetechcrm.onrender.comgetallemployeesbyid/${id}`
+          `https://sensitivetechcrm.onrender.com/getallemployeesbyid/${id}`
         ); // Replace with your API endpoint
         console.log(response)
         setFormData(response.data); 
@@ -102,7 +102,7 @@ const EmployeeEdit = () => {
     console.log(formData);
     try {
       const response = await axios.post(
-        "https://sensitivetechcrm.onrender.comcreateemployee",
+        "https://sensitivetechcrm.onrender.com/createemployee",
         formData
       );
       console.log("Response:", response.data);

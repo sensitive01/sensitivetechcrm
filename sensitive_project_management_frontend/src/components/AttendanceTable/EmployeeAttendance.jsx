@@ -98,7 +98,7 @@ const EmployeeAttendance = () => {
     };
 
     try {
-      const response = await fetch("https://sensitivetechcrm.onrender.comattendance/create", {
+      const response = await fetch("https://sensitivetechcrm.onrender.com/attendance/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(submissionData),
