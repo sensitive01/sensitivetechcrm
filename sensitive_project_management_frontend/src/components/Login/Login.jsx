@@ -18,14 +18,6 @@ const LoginPage = () => {
     try {
       console.log("Login Data:", formData);
 
-      // Determine whether this is an employee or admin login
-      // const endpoint = formData.username.includes("admin") 
-      //   ? "https://sensitivetechcrm.onrender.com/admin-login/adminlogin"  
-      //   : "https://sensitivetechcrm.onrender.com/employee-login/login";
-
-
-
-
 
       // const response = await axios.post("https://sensitivetechcrm.onrender.com/employee-login/login", formData);
       const response = await verifyLogin(formData)
@@ -37,6 +29,7 @@ const LoginPage = () => {
         localStorage.setItem("empId", _id);
         localStorage.setItem("role", role); // Save role to localStorage
 
+        
         // Navigate based on role
         if (role === "employee") {
           navigate("/attendance-form");
@@ -117,7 +110,6 @@ const LoginPage = () => {
     </div>
   );
 };
-
 export default LoginPage;
 
 

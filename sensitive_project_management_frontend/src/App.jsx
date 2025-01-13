@@ -34,67 +34,65 @@ const AdminLayout = ({ children }) => (
 );
 
 function App() {
-  const role = localStorage.getItem("role");
+  const role = localStorage.getItem("role"); 
   console.log(role)
 
   return (
     <Router>
-      <div className="hidden lg:block">
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Navigate to="/login" />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignUp />} />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignUp />} />
 
-          {/* Admin Routes */}
-          <Route
-            path="/*"
-            element={
-              role === "employee" ? (
-                <AdminLayout>
-                  <Routes>
-                    {/* Employee-Specific Routes */}
-                    <Route path="/attendance-table" element={<AttendanceTable />} />
-                    <Route path="/attendance-form" element={<EmployeeAttendance />} />
-                    <Route path="/leave-table" element={<LeaveTable />} />
-                    <Route path="/task" element={<TaskList />} />
-                    <Route path="/project" element={<ProjectManager />} />
+        {/* Admin Routes */}
+        <Route
+          path="/*"
+          element={
+            role === "employee" ? (
+              <AdminLayout>
+                <Routes>
+                  {/* Employee-Specific Routes */}
+                  <Route path="/attendance-table" element={<AttendanceTable />} />
+                  <Route path="/attendance-form" element={<EmployeeAttendance />} />
+                  <Route path="/leave-table" element={<LeaveTable />} />
+                  <Route path="/task" element={<TaskList />} />
+                  <Route path="/project" element={<ProjectManager />} />
 
-
-                  </Routes>
-                </AdminLayout>
-              ) : (
-                <AdminLayout>
-                  <Routes>
-                    {/* Admin-Specific Routes */}
-                    <Route path="/admin" element={<AdminForm />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/employee-table" element={<EmployeeTable />} />
-                    <Route path="/employee-form" element={<Employee />} />
-                    <Route path="/employee-edit/:id" element={<EmployeeEdit />} />
-                    <Route path="/task" element={<TaskList />} />
-                    <Route path="/project" element={<ProjectManager />} />
-                    <Route path="/add-project" element={<ProjectForm />} />
-                    <Route path="/edit-project/:projectId" element={<ProjectEdit />} />
-                    <Route path="/client-table" element={<ClientTable />} />
-                    <Route path="/client-edit/:id" element={<ClientEdit />} />
-                    <Route path="/client-form" element={<Client />} />
-                    <Route path="/attendance-table" element={<AttendanceTable />} />
-                    <Route path="/attendance-form" element={<EmployeeAttendance />} />
-                    <Route path="/leave" element={<Leave />} />
-                    <Route path="/leave-table" element={<LeaveTable />} />
-                    <Route path="/leave-edit/:id" element={<LeaveEdit />} />
-                    <Route path="/task-form" element={<TaskForm />} />
-                    <Route path="/task-edit/:taskId" element={<TaskEdit />} />
-                    <Route path="/lead-form" element={<LeadForm />} />
-                    <Route path="/lead-table" element={<LeadTable />} />
-                  </Routes>
-                </AdminLayout>
-              )
-            }
-          />
-        </Routes>
-      </div>
+                  
+                </Routes>
+              </AdminLayout>
+            ) : (
+              <AdminLayout>
+                <Routes>
+                  {/* Admin-Specific Routes */}
+                  <Route path="/admin" element={<AdminForm/>} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/employee-table" element={<EmployeeTable />} />
+                  <Route path="/employee-form" element={<Employee />} />
+                  <Route path="/employee-edit/:id" element={<EmployeeEdit />} />
+                  <Route path="/task" element={<TaskList />} />
+                  <Route path="/project" element={<ProjectManager />} />
+                  <Route path="/add-project" element={<ProjectForm />} />
+                  <Route path="/edit-project/:projectId" element={<ProjectEdit/>} />
+                  <Route path="/client-table" element={<ClientTable />} />
+                  <Route path="/client-edit/:id" element={<ClientEdit />} />
+                  <Route path="/client-form" element={<Client />} />
+                  <Route path="/attendance-table" element={<AttendanceTable />} />
+                  <Route path="/attendance-form" element={<EmployeeAttendance />} />
+                  <Route path="/leave" element={<Leave />} />
+                  <Route path="/leave-table" element={<LeaveTable />} />
+                  <Route path="/leave-edit/:id" element={<LeaveEdit />} />
+                  <Route path="/task-form" element={<TaskForm />} />
+                  <Route path="/task-edit/:taskId" element={<TaskEdit/>} />
+                  <Route path="/lead-form" element={<LeadForm/>} />
+                  <Route path="/lead-table" element={<LeadTable/>} />
+                </Routes>
+              </AdminLayout>
+            )
+          }
+        />
+      </Routes>
     </Router>
   );
 }
