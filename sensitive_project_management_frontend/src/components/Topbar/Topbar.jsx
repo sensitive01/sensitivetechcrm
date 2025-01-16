@@ -153,8 +153,6 @@ const Topbar = () => {
     ] : []),
     ...(role === 'Lead' ? [
       { label: 'Leads', path: '/lead-table' },
-      { label: 'Payments', path: '/payments-table' },
-      { label: 'Payroll', path: '/payroll-table' }
     ] : [])
   ];
 

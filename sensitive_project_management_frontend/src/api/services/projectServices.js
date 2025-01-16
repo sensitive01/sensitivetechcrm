@@ -129,3 +129,54 @@ export const updateTheTask = async (taskId, formData) => {
     return err;
   }
 };
+
+
+export const createPayroll=async(formData) => {
+  try {
+    const response = await projectServices.post(`/payroll/createpayroll`, formData, {
+      headers: {
+          "Content-Type": "application/json",
+      },
+  });
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const getAllPayroll=async() => {
+  try {
+    const response = await projectServices.get(`/payroll/getpayroll` );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const getPayrollById = async (payrollId) => {
+  try {
+    const response = await projectServices.get(`/payroll/getpayrollbyid/${payrollId}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const updatePayroll = async (payrollId, formData) => {
+  try {
+    const response = await projectServices.put(`/payroll/updatepayroll/${payrollId}`, formData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response;
+  } catch (err) {
+    return err;
+  }
+};

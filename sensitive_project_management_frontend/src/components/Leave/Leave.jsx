@@ -12,7 +12,6 @@ function Leave() {
     timeRange: "",
     remarks: "",
     attachment: "",
-    status: "",
     startTime: "",
     endTime: "",
   });
@@ -34,7 +33,7 @@ function Leave() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("https://sensitivetechcrm.onrender.com/leaves/create", leave, {
+      const response = await axios.post("http://localhost:3000/leaves/create", leave, {
         headers: {
           "Content-Type": "application/json",  // Set the content type header
         },
@@ -53,7 +52,7 @@ function Leave() {
           timeRange: "",
           remarks: "",
           attachment: "",
-          status: "",
+         
           startTime: "",
           endTime: "",
         });
@@ -247,21 +246,7 @@ function Leave() {
                 className="border border-blue-300 p-2 w-full rounded"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium pb-4">Status:</label>
-              <select
-                name="status"
-                value={leave.status}
-                onChange={handleChange}
-                required
-                className="border border-blue-300 p-2 w-full rounded"
-              >
-                <option value="">Select Status</option>
-                <option value="Pending">Pending</option>
-                <option value="Approved">Approved</option>
-                <option value="Rejected">Rejected</option>
-              </select>
-            </div>
+            
           </div>
         </div>
 

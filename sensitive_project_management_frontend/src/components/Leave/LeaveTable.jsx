@@ -17,12 +17,11 @@ const LeaveTable = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-  
-    // Fetch data from API
+
     useEffect(() => {
         const fetchLeaves = async () => {
             try {
-                const response = await axios.get('https://sensitivetechcrm.onrender.com/leaves/get-all');
+                const response = await axios.get('http://localhost:3000/leaves/get-all');
                 setLeaves(response.data);
             } catch (err) {
                 setError("Failed to load leave data");
@@ -34,13 +33,30 @@ const LeaveTable = () => {
         fetchLeaves();
     }, []);
 
-    // Delete leave
+    const handleStatusChange = async (leaveId, newStatus) => {
+        try {
+            const response = await axios.put(`http://localhost:3000/leaves/update-status/${leaveId}`, {
+                status: newStatus,
+                statusChangeDate: new Date().toISOString()
+            });
+            
+            if (response.status === 200) {
+                setLeaves(leaves.map(leave => 
+                    leave._id === leaveId 
+                        ? { ...leave, status: newStatus, statusChangeDate: new Date().toISOString() }
+                        : leave
+                ));
+            }
+        } catch (err) {
+            setError('Failed to update status');
+        }
+    };
+
     const handleDelete = async (leaveId) => {
         if (window.confirm('Are you sure you want to delete this leave?')) {
             try {
-                const response = await axios.delete(`https://sensitivetechcrm.onrender.com/leaves/delete/${leaveId}`);
+                const response = await axios.delete(`http://localhost:3000/leaves/delete/${leaveId}`);
                 if (response.status === 200) {
-                    // Successfully deleted, update the state
                     setLeaves(leaves.filter((leave) => leave._id !== leaveId));
                 }
             } catch (err) {
@@ -49,12 +65,10 @@ const LeaveTable = () => {
         }
     };
 
-    // Edit leave function (redirect to the leave edit form)
     const handleEdit = (leaveId) => {
         navigate(`/leave-edit/${leaveId}`);
     };
 
-    // Export to Excel
     const exportToExcel = () => {
         const exportData = leaves.map((leave, index) => ({
             'S.No': index + 1,
@@ -75,7 +89,6 @@ const LeaveTable = () => {
         XLSX.writeFile(workbook, `Leave_Records_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
 
-    // Define columns for react-table
     const columns = useMemo(() => [
         {
             Header: 'S.No',
@@ -108,15 +121,21 @@ const LeaveTable = () => {
         {
             Header: 'Status',
             accessor: 'status',
-            Cell: ({ value }) => (
-                <span className={`
-                    px-2 py-1 rounded text-xs
-                    ${value === 'Approved' ? 'bg-green-100 text-green-800' : 
-                      value === 'Pending' ? 'bg-yellow-100 text-yellow-800' : 
-                      'bg-red-100 text-red-800'}
-                `}>
-                    {value}
-                </span>
+            Cell: ({ row }) => (
+                <select
+                    value={row.original.status}
+                    onChange={(e) => handleStatusChange(row.original._id, e.target.value)}
+                    className={`
+                        px-3 py-1 rounded text-sm border
+                        ${row.original.status === 'Approved' ? 'bg-green-100 text-green-800 border-green-200' : 
+                          row.original.status === 'Pending' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' : 
+                          'bg-red-100 text-red-800 border-red-200'}
+                    `}
+                >
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
             )
         },
         {
@@ -155,7 +174,6 @@ const LeaveTable = () => {
         }
     ], []);
 
-    // Initialize react-table
     const {
         getTableProps,
         getTableBodyProps,
@@ -182,7 +200,6 @@ const LeaveTable = () => {
 
     const { globalFilter, pageIndex } = state;
 
-    // Loading and Error States
     if (loading) {
         return (
             <div className="flex justify-center items-center h-screen">
@@ -203,7 +220,6 @@ const LeaveTable = () => {
         <div className="container mx-auto p-6">
             <h2 className="text-4xl font-bold mb-10 text-center mt-24">Leave Details</h2>
 
-            {/* Action Buttons Section */}
             <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center space-x-4">
                     <div className="relative">
@@ -237,7 +253,6 @@ const LeaveTable = () => {
                 </div>
             </div>
 
-            {/* Table Container */}
             <div className="overflow-x-auto bg-white shadow-md rounded-lg">
                 {leaves.length === 0 ? (
                     <p className="text-center p-6">No leave records found.</p>
@@ -289,7 +304,6 @@ const LeaveTable = () => {
                             </tbody>
                         </table>
 
-                        {/* Pagination Controls */}
                         <div className="flex justify-between items-center p-4">
                             <div>
                                 <span>
