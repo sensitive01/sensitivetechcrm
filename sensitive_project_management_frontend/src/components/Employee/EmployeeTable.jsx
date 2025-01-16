@@ -109,7 +109,7 @@ const EmployeeTable = () => {
     const fetchEmployees = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("http://localhost:3000/getallemployees");
+        const response = await axios.get("https://sensitivetechcrm.onrender.com/getallemployees");
         console.log(response.data);  // Debugging - Check if createdAt exists
         setEmployees(response.data);
       } catch (err) {
@@ -256,7 +256,7 @@ const EmployeeTable = () => {
   const handleEmployeeDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this employee?")) {
       try {
-        await axios.delete(`http://localhost:3000/deleteemployee/${id}`);
+        await axios.delete(`https://sensitivetechcrm.onrender.com/deleteemployee/${id}`);
         setEmployees((prevEmployees) =>
           prevEmployees.filter((employee) => employee._id !== id)
         );

@@ -43,7 +43,7 @@ const PayrollTable = () => {
     const handleDelete = async (payrollId) => {
         if (window.confirm('Are you sure you want to delete this payroll?')) {
             try {
-                const response = await axios.delete(`http://localhost:3000/payroll/deletepayroll/${payrollId}`);
+                const response = await axios.delete(`https://sensitivetechcrm.onrender.com/payroll/deletepayroll/${payrollId}`);
                 if (response.status === 200) {
                     setPayroll(payroll.filter((payrollItem) => payrollItem._id !== payrollId));
                 }

@@ -34,7 +34,7 @@ const AdminForm = () => {
     setMessage(''); // Clear previous message
 
     try {
-      const response = await axios.post('http://localhost:3000/super-admin/createsuperadmin', formData);
+      const response = await axios.post('https://sensitivetechcrm.onrender.com/super-admin/createsuperadmin', formData);
 
       // Handle success
       console.log('Response:', response.data);
