@@ -24,7 +24,7 @@ employeeRouter.post(
     Employee.createEmployee
   )
 employeeRouter.get("/getallemployees", Employee.getAllEmployees)
-employeeRouter.get("/getallemployeesbyid/:id", Employee.getEmployeeById)
+employeeRouter.get("/getemployeesbyid/:id", Employee.getEmployeeById)
 // employeeRouter.patch("/updateemployee/:id", Employee.updateEmployee)
 employeeRouter.patch(
     "/updateemployee/:id",
@@ -34,6 +34,7 @@ employeeRouter.patch(
       { name: "idProofFile", maxCount: 1 },
       { name: "resume", maxCount: 1 }
     ]),
+    
     Employee.updateEmployee
   );
 employeeRouter.delete("/deleteemployee/:id", Employee.deleteEmployee)
