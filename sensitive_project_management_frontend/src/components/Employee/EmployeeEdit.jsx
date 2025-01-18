@@ -84,7 +84,7 @@ const EmployeeEdit = () => {
       try {
         setLoading(true); // Show loader
         const response = await axios.get(
-          `http://localhost:3000/getemployeesbyid/${id}`
+          `https://sensitivetechcrm.onrender.com/getemployeesbyid/${id}`
         ); 
         console.log(response)
         setFormData(response.data); 
@@ -105,7 +105,7 @@ const EmployeeEdit = () => {
     console.log(formData);
     try {
       const response = await axios.post(
-        "http://localhost:3000/createemployee",
+        "https://sensitivetechcrm.onrender.com/createemployee",
         formData
       );
       console.log("Response:", response.data);
