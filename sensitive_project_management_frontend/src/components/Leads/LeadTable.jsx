@@ -16,7 +16,7 @@ const LeadTable = () => {
     useEffect(() => {
         const fetchLeads = async () => {
             try {
-                const response = await axios.get('https://sensitivetechcrm.onrender.com/leads/get-all');
+                const response = await axios.get('http://localhost:3000/leads/get-all');
                 setLeads(response.data);
             } catch (err) {
                 console.error("Error fetching leads:", err);
@@ -31,7 +31,7 @@ const LeadTable = () => {
     const handleDelete = async (leadId) => {
         if (window.confirm('Are you sure you want to delete this lead?')) {
             try {
-                const response = await axios.delete(`https://sensitivetechcrm.onrender.com/leads/delete/${leadId}`);
+                const response = await axios.delete(`http://localhost:3000/leads/delete/${leadId}`);
                 if (response.status === 200) {
                     setLeads(leads.filter((lead) => lead._id !== leadId));
                 }

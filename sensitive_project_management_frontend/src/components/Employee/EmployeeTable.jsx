@@ -55,7 +55,7 @@ const EmployeeDetailsModal = ({ isOpen, onClose, employee }) => {
               <DetailItem label="Date of Birth" value={formatDate(employee.dob)} />
               <DetailItem label="Date of Joining" value={formatDate(employee.doj)} />
               <DetailItem label="Status" value={employee.status} />
-              <DetailItem label="Created Date" value={employee.createdDate} />
+              <DetailItem label="Created Date" value={formatDateTime(employee.createdAt)} />
             </div>
           </div>
         </div>
@@ -109,7 +109,7 @@ const EmployeeTable = () => {
     const fetchEmployees = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("https://sensitivetechcrm.onrender.com/getallemployees");
+        const response = await axios.get("http://localhost:3000/getallemployees");
         console.log(response.data);  // Debugging - Check if createdAt exists
         setEmployees(response.data);
       } catch (err) {
@@ -256,7 +256,7 @@ const EmployeeTable = () => {
   const handleEmployeeDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this employee?")) {
       try {
-        await axios.delete(`https://sensitivetechcrm.onrender.com/deleteemployee/${id}`);
+        await axios.delete(`http://localhost:3000/deleteemployee/${id}`);
         setEmployees((prevEmployees) =>
           prevEmployees.filter((employee) => employee._id !== id)
         );

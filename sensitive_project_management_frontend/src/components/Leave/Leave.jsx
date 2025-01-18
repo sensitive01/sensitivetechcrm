@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";  // Import axios for HTTP requests
+import { employeename } from "../../api/services/projectServices";
 
 function Leave() {
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [leave, setLeave] = useState({
     employee: "",
     leaveCategory: "",
@@ -16,12 +20,32 @@ function Leave() {
     endTime: "",
   });
 
-  // const employees = [
-  //   { id: 1, name: "Puja" },
-  //   { id: 2, name: "Jeyram" },
-  //   { id: 3, name: "Aswin" },
-  // ];
-  const employees = ["Puja", "Jeyram", "Aswin", "Adiraj"];
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        setLoading(true);
+
+
+        const response = await employeename();
+        console.log("Employees fetched:", response);
+
+        if (response) {
+          setEmployees(response.data);
+          setError(null);
+        } else {
+          throw new Error("Failed to fetch employees.");
+        }
+      } catch (error) {
+        console.error("Error fetching employees:", error);
+        setError("Failed to fetch employees. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEmployees();
+  }, []);
 
   const leaveTypes = ["Sick Leave", "Casual Leave", "Emergency Leave", "Others"];
 
@@ -33,7 +57,7 @@ function Leave() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("https://sensitivetechcrm.onrender.com/leaves/create", leave, {
+      const response = await axios.post("http://localhost:3000/leaves/create", leave, {
         headers: {
           "Content-Type": "application/json",  // Set the content type header
         },
@@ -52,7 +76,7 @@ function Leave() {
           timeRange: "",
           remarks: "",
           attachment: "",
-         
+
           startTime: "",
           endTime: "",
         });
@@ -63,6 +87,23 @@ function Leave() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <p className="text-xl">Loading...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <p className="text-xl text-red-600">{error}</p>
+      </div>
+    );
+  }
+
+
   return (
     <div className="container mx-auto p-6 mt-12">
       <h2 className="text-4xl font-bold mb-10 text-center mt-20">Leave Application Form</h2>
@@ -72,22 +113,6 @@ function Leave() {
           <div className="space-y-8 pb-4">
             <div>
               <label className="block text-sm font-medium pb-4">Select Employee:</label>
-              {/* <select
-                name="employee"
-                value={leave.employee}
-                onChange={handleChange}
-                required
-                className="border border-blue-300 p-2 w-full rounded"
-              >
-                <option value="">Select Employee</option>
-                {employees.map((emp) => (
-                  <option key={emp.id} value={emp.id}>
-                    {emp.name}
-                  </option>
-                ))}
-              </select> */}
-
-
               <select
                 name="employee"
                 value={leave.employee}
@@ -96,9 +121,9 @@ function Leave() {
                 className="border border-blue-300 p-2 w-full rounded"
               >
                 <option value="">Select Employee</option>
-                {employees.map((type, index) => (
-                  <option key={index} value={type}>
-                    {type}
+                {employees.map((employee) => (
+                  <option key={employee._id} value={employee.name}>
+                    {employee.name}  
                   </option>
                 ))}
               </select>
@@ -246,7 +271,7 @@ function Leave() {
                 className="border border-blue-300 p-2 w-full rounded"
               />
             </div>
-            
+
           </div>
         </div>
 

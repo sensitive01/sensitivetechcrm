@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useParams } from "react-router-dom";
 
 const EmployeeEdit = () => {
+  const { id } = useParams();
+  console.log(id)
   const [formData, setFormData] = useState({
     empId: '',
     name: '',
@@ -81,8 +84,8 @@ const EmployeeEdit = () => {
       try {
         setLoading(true); // Show loader
         const response = await axios.get(
-          `https://sensitivetechcrm.onrender.com/getallemployeesbyid/${id}`
-        ); // Replace with your API endpoint
+          `http://localhost:3000/getemployeesbyid/${id}`
+        ); 
         console.log(response)
         setFormData(response.data); 
       } catch (err) {
@@ -102,7 +105,7 @@ const EmployeeEdit = () => {
     console.log(formData);
     try {
       const response = await axios.post(
-        "https://sensitivetechcrm.onrender.com/createemployee",
+        "http://localhost:3000/createemployee",
         formData
       );
       console.log("Response:", response.data);

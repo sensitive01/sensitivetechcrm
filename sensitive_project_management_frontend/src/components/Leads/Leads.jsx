@@ -31,7 +31,7 @@ const LeadForm = () => {
     };
 
     try {
-      const response = await axios.post('https://sensitivetechcrm.onrender.com//leads/create', leadData);
+      const response = await axios.post('http://localhost:3000//leads/create', leadData);
       if (response.status === 201) {
         alert('Lead data submitted successfully!');
         setLead({
