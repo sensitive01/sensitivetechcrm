@@ -72,3 +72,20 @@ exports.logoutAttendance = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Get total attendance count
+exports.getTotalAttendance = async (req, res) => {
+  try {
+    // Count the total number of attendance records
+    const totalAttendance = await attendanceModel.countDocuments();
+
+    console.log("Total attendance count:", totalAttendance);
+
+    // Return the total attendance count as a response
+    res.status(200).json({ TotalAttendance: totalAttendance });
+  } catch (error) {
+    console.error("Error fetching total attendance:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+

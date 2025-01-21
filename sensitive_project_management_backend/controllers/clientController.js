@@ -98,3 +98,19 @@ exports.updateClientStatus = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Get total clients count
+exports.getTotalClients = async (req, res) => {
+  try {
+    // Count the total number of client records
+    const totalClients = await clientModel.countDocuments();
+
+    console.log("Total clients count:", totalClients);
+
+    // Return the total clients count as a response
+    res.status(200).json({ TotalClients: totalClients });
+  } catch (error) {
+    console.error("Error fetching total clients:", error);
+    res.status(500).json({ message: error.message });
+  }
+};

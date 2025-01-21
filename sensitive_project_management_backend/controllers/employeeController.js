@@ -142,6 +142,14 @@ const getEmployeeNames = async (req, res) => {
   }
 };
 
+const getTotalEmployees = async (req, res) => {
+  try {
+    const totalEmployees = await Employee.countDocuments();
+    res.status(200).json({ TotalEmployee: totalEmployees });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 module.exports = {
   createEmployee,
@@ -150,4 +158,5 @@ module.exports = {
   updateEmployee,
   deleteEmployee,
   getEmployeeNames,
+  getTotalEmployees,
 };

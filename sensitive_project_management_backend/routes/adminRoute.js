@@ -39,4 +39,5 @@ employeeRouter.patch(
   );
 employeeRouter.delete("/deleteemployee/:id", Employee.deleteEmployee)
 employeeRouter.get("/employename",Employee.getEmployeeNames)
+employeeRouter.get("/totalemployee", Employee.getTotalEmployees);
 module.exports = employeeRouter;

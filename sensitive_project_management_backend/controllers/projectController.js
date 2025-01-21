@@ -111,6 +111,23 @@ const getProjectNames = async(req,res) => {
   }
 };
 
+// Get total projects count
+const getTotalProjects = async (req, res) => {
+  try {
+    // Count the total number of projects
+    const totalProjects = await Project.countDocuments();
+
+    console.log("Total projects count:", totalProjects);
+
+    // Return the total projects count as a response
+    res.status(200).json({ TotalProjects: totalProjects });
+  } catch (error) {
+    console.error("Error fetching total projects:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
 module.exports = {
   createProject,
   getAllProjects,
@@ -118,5 +135,6 @@ module.exports = {
   updateProjectById,
   deleteProjectById,
   getProjectNames,
+  getTotalProjects,
 };
 

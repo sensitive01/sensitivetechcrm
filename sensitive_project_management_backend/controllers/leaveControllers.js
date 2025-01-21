@@ -96,3 +96,19 @@ exports.updateLeaveRequestStatus = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Get total leave requests count
+exports.getTotalLeaveRequests = async (req, res) => {
+  try {
+    // Count the total number of leave request records
+    const totalLeaveRequests = await leaveModel.countDocuments();
+
+    console.log("Total leave requests count:", totalLeaveRequests);
+
+    // Return the total leave requests count as a response
+    res.status(200).json({ TotalLeaveRequests: totalLeaveRequests });
+  } catch (error) {
+    console.error("Error fetching total leave requests:", error);
+    res.status(500).json({ message: error.message });
+  }
+};

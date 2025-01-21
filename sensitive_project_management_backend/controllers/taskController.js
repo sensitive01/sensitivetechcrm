@@ -174,6 +174,23 @@ const deleteTask = async (req, res) => {
   }
 };
 
+// Get total tasks count
+const getTotalTasks = async (req, res) => {
+  try {
+    // Count the total number of tasks
+    const totalTasks = await Task.countDocuments();
+
+    console.log("Total tasks count:", totalTasks);
+
+    // Return the total tasks count as a response
+    res.status(200).json({ TotalTasks: totalTasks });
+  } catch (error) {
+    console.error("Error fetching total tasks:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
 module.exports = {
   createTask,
   getAllTasks,
@@ -181,4 +198,5 @@ module.exports = {
   updateTask,
   updateTaskStatus, 
   deleteTask,
+  getTotalTasks,
 };

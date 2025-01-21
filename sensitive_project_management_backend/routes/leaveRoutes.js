@@ -6,6 +6,7 @@ const {
   updateLeaveRequestById,
   deleteLeaveRequestById,
   updateLeaveRequestStatus,
+  getTotalLeaveRequests,
 } = require('../controllers/leaveControllers');
 
 const router = express.Router(); // Use Router() for modular routing
@@ -17,5 +18,7 @@ router.get('/get/:id', getLeaveRequestById); // Get a leave request by ID
 router.put('/update/:id', updateLeaveRequestById); // Update a leave request by ID
 router.delete('/delete/:id', deleteLeaveRequestById); // Delete a leave request by ID
 router.put('/update-status/:id', updateLeaveRequestStatus); // Update the leave status
+router.get('/totalleaverequests', getTotalLeaveRequests);
+
 
 module.exports = router;

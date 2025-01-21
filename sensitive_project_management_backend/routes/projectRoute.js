@@ -8,6 +8,9 @@ projectRouter.get("/getprojectbyid/:id", projectController.getProjectById);
 projectRouter.put("/updateprojectby/:id", projectController.updateProjectById);
 projectRouter.delete("/deleteproject/:id", projectController.deleteProjectById);
 projectRouter.get("/projectname", projectController.getProjectNames);
+// Route to get total projects count
+projectRouter.get('/totalprojects', projectController.getTotalProjects);
+
 
 module.exports = projectRouter;
 
