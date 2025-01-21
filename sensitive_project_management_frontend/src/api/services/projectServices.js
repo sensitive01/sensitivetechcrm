@@ -180,3 +180,59 @@ export const updatePayroll = async (payrollId, formData) => {
     return err;
   }
 };
+
+export const getTotalEmployees=async() => {
+  try {
+    const response = await projectServices.get(`/totalemployee` );
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const getAttendance = async () => {
+  try {
+    const response = await projectServices.get(`/attendance/totalattendance`);
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const getTotalProjects = async () => {
+  try {
+    const response = await projectServices.get(`/project/totalprojects`);
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const getTasks = async () => {
+  try {
+    const response = await projectServices.get(`/task/totaltasks`);
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const getClients = async () => {
+  try {
+    const response = await projectServices.get(`/clients/totalclients`);
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const getLeave = async () => {
+  try {
+    const response = await projectServices.get(`/leaves/totalleaverequests`);
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+

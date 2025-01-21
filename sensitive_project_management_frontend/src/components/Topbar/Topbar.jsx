@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, User, Search } from 'lucide-react';
+import { FaPowerOff } from 'react-icons/fa'; // Importing the FaPowerOff icon
+import logo from "../../assets/logo.webp";
 
 const Topbar = () => {
   const [showProfile, setShowProfile] = useState(false);
@@ -158,16 +160,17 @@ const Topbar = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-blue-600 text-white shadow-md">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
+      <div className="max-w-8xl mx-auto px-4">
+        <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link to="/dashboard">
-              <img
+              {/* <img
                 src="/src/assets/logo.webp"
                 alt="Logo"
                 className="h-12 w-auto"
-              />
+              /> */}
+               <img src={logo} alt="Logo" className="h-16 w-auto" />
             </Link>
           </div>
 
@@ -198,7 +201,8 @@ const Topbar = () => {
               onClick={handleLogout}
               className="bg-white text-blue-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100"
             >
-              Logout
+              
+              <FaPowerOff className="h-5 w-5" />
             </button>
             <User
               className="h-6 w-6 cursor-pointer hover:text-gray-200"

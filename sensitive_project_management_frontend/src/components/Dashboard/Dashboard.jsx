@@ -1,144 +1,149 @@
-import React from 'react';
+import React, { useState, useEffect } from "react";
+import {
+  getTotalEmployees,
+  getAttendance,
+  getTotalProjects,
+  getTasks,
+  getClients,
+  getLeave,
+} from "../../api/services/projectServices";
 
 export default function Dashboard() {
+  const [totalEmployees, setTotalEmployees] = useState(0);
+  const [attendance, setAttendance] = useState(0);
+  const [totalProjects, setTotalProjects] = useState(0);
+  const [tasks, setTasks] = useState(0);
+  const [clients, setClients] = useState(0);
+  const [leave, setLeave] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const role = localStorage.getItem("role"); // Retrieve role from localStorage
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        // Fetch all data
+        const [empRes, attRes, projRes, taskRes, clientRes, leaveRes] = await Promise.all([
+          getTotalEmployees(),
+          getAttendance(),
+          getTotalProjects(),
+          getTasks(),
+          getClients(),
+          getLeave(),
+        ]);
+
+        // Set state for each metric
+        if (empRes.status === 200) setTotalEmployees(empRes.data.TotalEmployee);
+        if (attRes.status === 200) setAttendance(attRes.data.TotalAttendance);
+        if (projRes.status === 200) setTotalProjects(projRes.data.TotalProjects);
+        if (taskRes.status === 200) setTasks(taskRes.data.TotalTasks);
+        if (clientRes.status === 200) setClients(clientRes.data.TotalClients);
+        if (leaveRes.status === 200) setLeave(leaveRes.data.TotalLeaveRequests);
+
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mt-32 px-28">
-      {/* Total Employee */}
-      <div className="bg-white rounded-xl shadow-2xl p-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-1xl  text-gray-800">Total Employee</h3>
-            <p className="text-2xl font-bold text-gray-800 mt-4">10</p>
-          </div>
-          <div className="p-5 bg-green-100 rounded-full shadow-lg">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-10 w-10 text-green-500"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-        </div>
-      </div>
+      {/* Total Employee - Visible only to Superadmin */}
+      {role === "Superadmin" && (
+        <Card
+          title="Total Employee"
+          value={totalEmployees}
+          loading={loading}
+          error={error}
+          iconColor="green"
+        />
+      )}
 
       {/* Attendance */}
-      <div className="bg-white rounded-xl shadow-2xl p-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-1xl  text-gray-800">Attendance</h3>
-            <p className="text-2xl font-bold text-gray-800 mt-4">13</p>
-          </div>
-          <div className="p-5 bg-blue-100 rounded-full shadow-lg">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-10 w-10 text-blue-500"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-              <path
-                fillRule="evenodd"
-                d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-        </div>
-      </div>
+      <Card
+        title="Attendance"
+        value={attendance}
+        loading={loading}
+        error={error}
+        iconColor="blue"
+      />
 
-      {/* Total Account Balance */}
-      <div className="bg-white rounded-xl shadow-2xl p-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-1xl  text-gray-800">Total Projects</h3>
-            <p className="text-2xl font-bold text-gray-800 mt-4">200+</p>
-          </div>
-          <div className="p-5 bg-orange-100 rounded-full shadow-lg">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-10 w-10 text-orange-500"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
-              <path
-                fillRule="evenodd"
-                d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-        </div>
-      </div>
+      {/* Total Projects */}
+      <Card
+        title="Total Projects"
+        value={totalProjects}
+        loading={loading}
+        error={error}
+        iconColor="orange"
+      />
 
       {/* Tasks */}
-      <div className="bg-white rounded-xl shadow-2xl p-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-1xl text-gray-800">Tasks</h3>
-            <p className="text-2xl font-bold text-gray-800 mt-4">4</p>
-          </div>
-          <div className="p-5 bg-blue-100 rounded-full shadow-lg">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-10 w-10 text-blue-500"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-              <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-            </svg>
-          </div>
-        </div>
-      </div>
+      <Card
+        title="Tasks"
+        value={tasks}
+        loading={loading}
+        error={error}
+        iconColor="blue"
+      />
 
-      {/* Clients */}
-      <div className="bg-white rounded-xl shadow-2xl p-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-1xl  text-gray-800">Clients</h3>
-            <p className="text-2xl font-bold text-gray-800 mt-4">18</p>
-          </div>
-          <div className="p-5 bg-orange-100 rounded-full shadow-lg">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-10 w-10 text-orange-500"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-              <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-            </svg>
-          </div>
-        </div>
-      </div>
+      {/* Clients - Visible only to Superadmin */}
+      {role === "Superadmin" && (
+        <Card
+          title="Clients"
+          value={clients}
+          loading={loading}
+          error={error}
+          iconColor="orange"
+        />
+      )}
 
       {/* Leave */}
-      <div className="bg-white rounded-xl shadow-2xl p-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-1xl  text-gray-800">Leave</h3>
-            <p className="text-2xl font-bold text-gray-800 mt-4">0</p>
-          </div>
-          <div className="p-5 bg-orange-100 rounded-full shadow-lg">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-10 w-10 text-orange-500"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-              <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-            </svg>
-          </div>
-        </div>
-      </div>
+      <Card
+        title="Leave"
+        value={leave}
+        loading={loading}
+        error={error}
+        iconColor="orange"
+      />
     </div>
   );
 }
+
+// Card Component for reusability
+const Card = ({ title, value, loading, error, iconColor }) => (
+  <div className="bg-white rounded-xl shadow-2xl p-8">
+    <div className="flex items-center justify-between">
+      <div>
+        <h3 className="text-1xl text-gray-800">{title}</h3>
+        {loading ? (
+          <p className="text-2xl text-gray-800 mt-4">Loading...</p>
+        ) : error ? (
+          <p className="text-2xl text-red-500 mt-4">{error}</p>
+        ) : (
+          <p className="text-2xl font-bold text-gray-800 mt-4">{value}</p>
+        )}
+      </div>
+      <div className={`p-5 bg-${iconColor}-100 rounded-full shadow-lg`}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className={`h-10 w-10 text-${iconColor}-500`}
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fillRule="evenodd"
+            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </div>
+    </div>
+  </div>
+);
