@@ -216,27 +216,27 @@ const AttendanceTable = () => {
                     value={globalFilter || ""}
                     onChange={(e) => setGlobalFilter(e.target.value)}
                     placeholder="Search records..."
-                    className="border border-blue-500 p-2 rounded w-64"
+                    className="border border-blue-500 p-2 rounded w-64 mr-2 sm:mr-4"
                 />
-
-                <div className="space-x-4">
+                <div className="flex space-x-2 flex-nowrap justify-start">
                     <button
                         onClick={exportToExcel}
-                        className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600"
+                        className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 flex items-center w-auto sm:px-4 sm:py-2 sm:w-auto text-xs sm:text-base flex-shrink-0"
                     >
-                        <FaFileDownload className="mr-2" />
+                        <FaFileDownload className="mr-1" />
                         Export
                     </button>
 
                     <Link
                         to="/attendance-form"
-                        className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
+                        className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 flex items-center w-auto sm:px-4 sm:py-2 sm:w-auto text-xs sm:text-base flex-shrink-0"
                     >
-                        <FaPlus className="mr-2" />
+                        <FaPlus className="mr-1" />
                         Add Attendance
                     </Link>
                 </div>
             </div>
+
 
             <div className="overflow-x-auto bg-white shadow-md rounded-lg">
                 <table {...getTableProps()} className="w-full">

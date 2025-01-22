@@ -7,10 +7,9 @@ const EmployeeAttendance = () => {
   const [attendanceDetails, setAttendanceDetails] = useState({
     employeeId: "",
     employeeName: "",
-    date: "",
-    status: "",
+    date: new Date().toLocaleDateString('en-GB'),  // Set current date in dd/mm/yy format
+    status: "Present",  // Default status as "Present"
     logintime: "",
-    logouttime: "",
   });
   const [submittedData, setSubmittedData] = useState(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -84,17 +83,16 @@ const EmployeeAttendance = () => {
     }
 
     const currentDate = new Date();
-    const formattedDate = currentDate.toLocaleString();
+    const formattedDate = currentDate.toLocaleDateString('en-GB'); // dd/mm/yy format
     const formattedTime = currentDate.toLocaleTimeString();
 
     const submissionData = {
       photo,
       employeeId: employeeId,
       employeeName: attendanceDetails.employeeName,
-      date: attendanceDetails.date,
-      status: attendanceDetails.status,
+      date: formattedDate,  // Use formatted date
+      status: "Present",  // Status set to "Present"
       logintime: formattedTime,
-      logouttime: attendanceDetails.logouttime,
     };
 
     try {
@@ -112,10 +110,9 @@ const EmployeeAttendance = () => {
         setAttendanceDetails({
           employeeId: "",
           employeeName: "",
-          date: "",
-          status: "",
+          date: formattedDate,  // Update the date here
+          status: "Present",  // Update the status here
           logintime: "",
-          logouttime: "",
         });
         setPhoto(null);
       } else {
@@ -191,7 +188,6 @@ const EmployeeAttendance = () => {
             <li><strong>Date:</strong> {submittedData.date}</li>
             <li><strong>Status:</strong> {submittedData.status}</li>
             <li><strong>Login Time:</strong> {submittedData.logintime}</li>
-            <li><strong>Logout Time:</strong> {submittedData.logouttime}</li>
           </ul>
         </div>
       )}
