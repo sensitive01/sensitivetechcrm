@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const leadSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
+    role: {type: String,},
+    password: { type: String,  },
     contact: { type: String, required: true },
     email: { type: String, required: true },
     requirements: { type: String },
