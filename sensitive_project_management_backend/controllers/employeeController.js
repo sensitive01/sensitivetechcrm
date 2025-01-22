@@ -142,17 +142,32 @@ const getTotalEmployees = async (req, res) => {
 const fetchAddressDetailsByPincode = async (pincode) => {
   try {
     const response = await axios.get(`https://api.zippopotam.us/in/${pincode}`);
-    console.log(response.data); // Log the entire response to inspect the structure
-    if (response.data && response.data.places && response.data.places.length > 0) {
-      const { placeName: area, state, country } = response.data.places[0];
-      const city = state || area; // Fallback if state is missing
-      return { area, city, state, country };
+
+    // Validate response structure
+    if (response.data && Array.isArray(response.data.places) && response.data.places.length > 0) {
+      const { "place name": area, state, country } = response.data.places[0]; // Access place name correctly
+      const city = state || area; // Fallback to area if state is not available
+
+      return {
+        area: area || "Unknown Area", // Default value if area is missing
+        city,
+        state: state || "Unknown State", // Default value for state
+        country: country || "India", // Default value for country
+      };
     } else {
+      // No address details found
       return null;
     }
   } catch (error) {
-    console.error("API Error:", error.response ? error.response.data : error.message); // Log API-specific error response
-    throw new Error("Invalid Pincode or API Error");
+    // Log the error with more details
+    console.error("API Error:", error.response?.data || error.message);
+
+    // Throw a more meaningful error
+    if (error.response?.status === 404) {
+      throw new Error("Invalid Pincode: Address details not found.");
+    } else {
+      throw new Error("Failed to fetch address details. Please try again later.");
+    }
   }
 };
 

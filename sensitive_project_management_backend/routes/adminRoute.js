@@ -45,16 +45,27 @@ employeeRouter.get("/totalemployee", Employee.getTotalEmployees);
 employeeRouter.get("/getaddressbypincode/:pincode", async (req, res) => {
   const { pincode } = req.params;
 
+  if (!/^[1-9][0-9]{5}$/.test(pincode)) {
+    return res.status(400).json({ success: false, message: "Invalid pincode format." });
+  }
+
   try {
     const addressDetails = await Employee.fetchAddressDetailsByPincode(pincode);
+
     if (addressDetails) {
       return res.status(200).json({ success: true, address: addressDetails });
     } else {
       return res.status(404).json({ success: false, message: "Address details not found." });
     }
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.error("Error fetching address details:", {
+      pincode,
+      error: error.message,
+      stack: error.stack,
+    });
+    return res.status(500).json({ success: false, message: "Internal server error." });
   }
 });
+
 
 module.exports = employeeRouter;
