@@ -72,3 +72,20 @@ exports.updatePayroll = async (req, res) => {
         res.status(500).json({ message: "Error updating payroll", error });
     }
 };
+
+// Get total payroll count
+exports.getTotalPayrolls = async (req, res) => {
+    try {
+      // Count the total number of payroll entries
+      const totalPayrolls = await Payroll.countDocuments();
+  
+      console.log("Total payrolls count:", totalPayrolls);
+  
+      // Return the total payrolls count as a response
+      res.status(200).json({ TotalPayrolls: totalPayrolls });
+    } catch (error) {
+      console.error("Error fetching total payrolls:", error);
+      res.status(500).json({ message: error.message });
+    }
+  };
+  
