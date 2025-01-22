@@ -149,7 +149,7 @@ const Topbar = () => {
     ...(role === 'Superadmin' ? [
       { label: 'Employee', path: '/employee-table' },
       { label: 'Client', path: '/client-table' },
-      { label: 'Leads', path: '/lead-table' },
+      { label: 'Leads', path: '/lead-table' },  
       { label: 'Payments', path: '/payments-table' },
       { label: 'Payroll', path: '/payroll-table' }
     ] : []),

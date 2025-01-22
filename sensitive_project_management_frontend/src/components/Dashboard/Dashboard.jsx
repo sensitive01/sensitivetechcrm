@@ -6,6 +6,8 @@ import {
   getTasks,
   getClients,
   getLeave,
+  getTotalLeads, // Add this import
+  getTotalPayrolls, // Add this import
 } from "../../api/services/projectServices";
 
 export default function Dashboard() {
@@ -15,6 +17,8 @@ export default function Dashboard() {
   const [tasks, setTasks] = useState(0);
   const [clients, setClients] = useState(0);
   const [leave, setLeave] = useState(0);
+  const [totalLeads, setTotalLeads] = useState(0); // State for total leads
+  const [totalPayrolls, setTotalPayrolls] = useState(0); // State for total payrolls
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -25,14 +29,16 @@ export default function Dashboard() {
       try {
         setLoading(true);
 
-        // Fetch all data
-        const [empRes, attRes, projRes, taskRes, clientRes, leaveRes] = await Promise.all([
+        // Fetch all data including leads and payrolls
+        const [empRes, attRes, projRes, taskRes, clientRes, leaveRes, leadsRes, payrollRes] = await Promise.all([
           getTotalEmployees(),
           getAttendance(),
           getTotalProjects(),
           getTasks(),
           getClients(),
           getLeave(),
+          getTotalLeads(), // Fetch leads data
+          getTotalPayrolls(), // Fetch payrolls data
         ]);
 
         // Set state for each metric
@@ -42,6 +48,8 @@ export default function Dashboard() {
         if (taskRes.status === 200) setTasks(taskRes.data.TotalTasks);
         if (clientRes.status === 200) setClients(clientRes.data.TotalClients);
         if (leaveRes.status === 200) setLeave(leaveRes.data.TotalLeaveRequests);
+        if (leadsRes.status === 200) setTotalLeads(leadsRes.data.TotalLeads); // Set leads data
+        if (payrollRes.status === 200) setTotalPayrolls(payrollRes.data.TotalPayrolls); // Set payroll data
 
       } catch (err) {
         setError(err.message);
@@ -111,6 +119,24 @@ export default function Dashboard() {
         loading={loading}
         error={error}
         iconColor="orange"
+      />
+
+      {/* Total Leads */}
+      <Card
+        title="Total Leads"
+        value={totalLeads}
+        loading={loading}
+        error={error}
+        iconColor="purple" // Example color, you can change it
+      />
+
+      {/* Total Payrolls */}
+      <Card
+        title="Total Payrolls"
+        value={totalPayrolls}
+        loading={loading}
+        error={error}
+        iconColor="pink" // Example color, you can change it
       />
     </div>
   );

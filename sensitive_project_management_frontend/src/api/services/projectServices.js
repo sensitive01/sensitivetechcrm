@@ -236,3 +236,21 @@ export const getLeave = async () => {
   }
 };
 
+export const getTotalPayrolls = async () => {
+  try {
+    const response = await projectServices.get(`/payroll/totalpayrolls`);
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const getTotalLeads = async () => {
+  try {
+    const response = await projectServices.get(`/leads/totalleads`);
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
