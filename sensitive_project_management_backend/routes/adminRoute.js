@@ -23,6 +23,7 @@ employeeRouter.post(
     ]),
     Employee.createEmployee
   )
+  
 employeeRouter.get("/getallemployees", Employee.getAllEmployees)
 employeeRouter.get("/getemployeesbyid/:id", Employee.getEmployeeById)
 // employeeRouter.patch("/updateemployee/:id", Employee.updateEmployee)
