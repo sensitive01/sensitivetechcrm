@@ -41,4 +41,20 @@ employeeRouter.patch(
 employeeRouter.delete("/deleteemployee/:id", Employee.deleteEmployee)
 employeeRouter.get("/employename",Employee.getEmployeeNames)
 employeeRouter.get("/totalemployee", Employee.getTotalEmployees);
+
+employeeRouter.get("/getaddressbypincode/:pincode", async (req, res) => {
+  const { pincode } = req.params;
+
+  try {
+    const addressDetails = await Employee.fetchAddressDetailsByPincode(pincode);
+    if (addressDetails) {
+      return res.status(200).json({ success: true, address: addressDetails });
+    } else {
+      return res.status(404).json({ success: false, message: "Address details not found." });
+    }
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 module.exports = employeeRouter;

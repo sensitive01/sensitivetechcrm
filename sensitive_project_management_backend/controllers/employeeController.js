@@ -1,18 +1,6 @@
 const Employee = require("../models/employeeSchema");
 const { uploadImage } = require("../config/cloudinary");
-
-// Create a new employee
-// const createEmployee = async (req, res) => {
-//   try {
-//     console.log("Welcome to create employee", req.body)
-//     const employeeData = req.body;
-//     const newEmployee = new Employee(employeeData);
-//     await newEmployee.save();
-//     res.status(201).json({ message: "Employee created successfully", employee: newEmployee });
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
+const axios = require('axios');
 
 const createEmployee = async (req, res) => {
   try {
@@ -151,6 +139,23 @@ const getTotalEmployees = async (req, res) => {
   }
 };
 
+const fetchAddressDetailsByPincode = async (pincode) => {
+  try {
+    const response = await axios.get(`https://api.zippopotam.us/in/${pincode}`);
+    console.log(response.data); // Log the entire response to inspect the structure
+    if (response.data && response.data.places && response.data.places.length > 0) {
+      const { placeName: area, state, country } = response.data.places[0];
+      const city = state || area; // Fallback if state is missing
+      return { area, city, state, country };
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("API Error:", error.response ? error.response.data : error.message); // Log API-specific error response
+    throw new Error("Invalid Pincode or API Error");
+  }
+};
+
 module.exports = {
   createEmployee,
   getAllEmployees,
@@ -159,4 +164,5 @@ module.exports = {
   deleteEmployee,
   getEmployeeNames,
   getTotalEmployees,
+  fetchAddressDetailsByPincode,
 };
