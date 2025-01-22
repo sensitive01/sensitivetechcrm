@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";  // Import axios for HTTP requests
 import { useParams } from "react-router-dom";
+import { employeename, getLeaveById } from "../../api/services/projectServices";
 
 function LeaveEdit() {
   const [leave, setLeave] = useState({
     employee: "",
     leaveCategory: "",
     leaveType: "",
+    customLeaveType: "", // State to store the custom leave type
     permissionDate: "",
     startDate: "",
     endDate: "",
@@ -18,17 +20,49 @@ function LeaveEdit() {
     endTime: "",
   });
 
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
   const { id } = useParams();  // Get the ID from URL
-  console.log(id)
+  console.log(id);
+
   useEffect(() => {
-    if (!id) return; // Skip if ID is not provided.
+    const fetchEmployees = async () => {
+      try {
+        setLoading(true);
+
+        const response = await employeename();
+        console.log("Employees fetched:", response);
+
+        if (response) {
+          setEmployees(response.data);
+          setError(null);
+        } else {
+          throw new Error("Failed to fetch employees.");
+        }
+      } catch (error) {
+        console.error("Error fetching employees:", error);
+        setError("Failed to fetch employees. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEmployees();
+  }, []);
+
+
+  useEffect(() => {
+    if (!id) return;
 
     const fetchLeaveDetails = async () => {
       try {
-        const response = await axios.get(`https://sensitivetechcrm.onrender.com/leaves/get/${id}`);
-        console.log(response);
+        const response = await getLeaveById(id);
+        console.log("leave fetch", response);
         if (response.status === 200) {
-          setLeave(response.data); // Update the state with fetched data.
+          setLeave(response.data);
+          console.log("Leave Employee:", response.data.employee); // Add this line to check the leave employee
         } else {
           console.error("Failed to fetch leave details:", response.status);
         }
@@ -40,13 +74,7 @@ function LeaveEdit() {
     fetchLeaveDetails();
   }, [id]);
 
-  // const employees = [
-  //   { id: 1, name: "John Doe" },
-  //   { id: 2, name: "Jane Smith" },
-  //   { id: 3, name: "Michael Johnson" },
-  // ];
 
-  const employees = ["Puja", "Jeyram", "Aswin", "Adiraj"];
 
   const leaveTypes = ["Sick Leave", "Casual Leave", "Emergency Leave", "Others"];
 
@@ -69,6 +97,7 @@ function LeaveEdit() {
           employee: "",
           leaveCategory: "",
           leaveType: "",
+          customLeaveType: "", // Reset custom leave type
           permissionDate: "",
           startDate: "",
           endDate: "",
@@ -88,6 +117,25 @@ function LeaveEdit() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <p className="text-xl">Loading...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex justify-center items-center">
+        <p className="text-xl text-red-600">{error}</p>
+      </div>
+    );
+  }
+
+  console.log("Leave Employee:", leave.employee);
+  console.log("Employees:", employees);
+
   return (
     <div className="container mx-auto p-6 mt-12">
       <h2 className="text-4xl font-bold mb-10 text-center mt-20">Leave Application Form</h2>
@@ -97,37 +145,21 @@ function LeaveEdit() {
           <div className="space-y-8 pb-4">
             <div>
               <label className="block text-sm font-medium pb-4">Select Employee:</label>
-              {/* <select
-                name="employee"
-                value={leave.employee}
-                onChange={handleChange}
-                required
-                className="border border-blue-300 p-2 w-full rounded"
-              >
-                <option value="">Select Employee</option>
-                {employees.map((emp) => (
-                  <option key={emp.id} value={emp.id}>
-                    {emp.name}
-                  </option>
-                ))}
-              </select> */}
-
-
-
               <select
-                name="employee"
-                value={leave.employee}
-                onChange={handleChange}
-                required
-                className="border border-blue-300 p-2 w-full rounded"
-              >
-                <option value="">Select Employee</option>
-                {employees.map((type, index) => (
-                  <option key={index} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
+  name="employee"
+  value={leave.employee}
+  onChange={handleChange}
+  required
+  className="border border-blue-300 p-2 w-full rounded"
+>
+  <option value="">Select Employee</option>
+  {employees.map((employee) => (
+    <option key={employee._id} value={employee.name}>
+      {employee.name}
+    </option>
+  ))}
+</select>
+
             </div>
 
             {/* Leave or Permission Radio Buttons */}
@@ -179,6 +211,20 @@ function LeaveEdit() {
                     </option>
                   ))}
                 </select>
+              </div>
+            )}
+
+            {/* Custom Leave Type Textarea (only shown if "Others" is selected) */}
+            {leave.leaveCategory === "Leave" && leave.leaveType === "Others" && (
+              <div>
+                <label className="block text-sm font-medium pb-4">Specify Leave Type:</label>
+                <textarea
+                  name="customLeaveType"
+                  value={leave.customLeaveType}
+                  onChange={handleChange}
+                  className="border border-blue-300 p-2 w-full rounded"
+                  placeholder="Enter custom leave type"
+                />
               </div>
             )}
 

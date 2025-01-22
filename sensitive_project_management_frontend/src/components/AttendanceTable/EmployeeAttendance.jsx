@@ -81,28 +81,27 @@ const EmployeeAttendance = () => {
       alert("Please capture a photo before submitting.");
       return;
     }
-
+  
     const currentDate = new Date();
-    const formattedDate = currentDate.toLocaleDateString('en-GB'); // dd/mm/yy format
+    const formattedDate = currentDate.toISOString().split('T')[0]; // Converts to "yyyy-mm-dd"
     const formattedTime = currentDate.toLocaleTimeString();
-
+  
     const submissionData = {
       photo,
       employeeId: employeeId,
       employeeName: attendanceDetails.employeeName,
-      date: formattedDate,  // Use formatted date
+      date: formattedDate,  // Use ISO format for the date
       status: "Present",  // Status set to "Present"
       logintime: formattedTime,
     };
-
+  
     try {
       const response = await fetch("https://sensitivetechcrm.onrender.com/attendance/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(submissionData),
       });
-      console.log(response)
-
+  
       if (response.ok) {
         const result = await response.json();
         alert("Attendance submitted successfully!");
@@ -110,15 +109,17 @@ const EmployeeAttendance = () => {
         setAttendanceDetails({
           employeeId: "",
           employeeName: "",
-          date: formattedDate,  // Update the date here
-          status: "Present",  // Update the status here
+          date: formattedDate,
+          status: "Present",
           logintime: "",
         });
         setPhoto(null);
       } else {
-        alert("Failed to submit attendance.");
+        const error = await response.json();
+        alert(`Failed to submit attendance: ${error.message || "Unknown error"}`);
       }
     } catch (error) {
+      console.error("Error submitting attendance:", error);
       alert("Error submitting attendance. Please try again.");
     }
   };

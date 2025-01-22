@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const EmployeeForm = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isPermanentAddressSame, setIsPermanentAddressSame] = useState(false);
   const [formData, setFormData] = useState({
     empId: '',
     name: '',
@@ -73,6 +75,76 @@ const EmployeeForm = () => {
     }));
   };
 
+
+  const fetchAddressDetails = async (pincode, addressType) => {
+    if (!/^[1-9][0-9]{5}$/.test(pincode)) {
+      alert('Please enter a valid 6-digit pincode.');
+      return;
+    }
+  
+    setIsLoading(true);
+    try {
+      const response = await axios.get(`https://sensitivetechcrm.onrender.com/getaddressbypincode/${pincode}`);
+      console.log('API Response:', response.data);
+  
+      if (response.data.success && response.data.address) {
+        const { area, city, state } = response.data.address;
+        setFormData((prevData) => ({
+          ...prevData,
+          [addressType]: {
+            ...prevData[addressType],
+            area: area || '',
+            city: city || '',
+            state: state || ''
+          }
+        }));
+      } else {
+        alert('Invalid Pincode or API Error!');
+      }
+    } catch (error) {
+      console.error('Error fetching address details:', error.response ? error.response.data : error.message);
+      alert('Failed to fetch address details. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+
+  const handlePincodeChange = (e, addressType) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [addressType]: {
+        ...prevData[addressType],
+        [name]: value,
+      },
+    }));
+    if (value.length === 6) fetchAddressDetails(value, addressType);
+  };
+
+  const handlePermanentAddressToggle = (e) => {
+    setIsPermanentAddressSame(e.target.checked);
+    if (e.target.checked) {
+      setFormData((prevData) => ({
+        ...prevData,
+        permanentAddress: { ...prevData.presentAddress }
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        permanentAddress: {
+          addressLine: '',
+          area: '',
+          city: '',
+          state: '',
+          pincode: '',
+          landmark: ''
+        }
+      }));
+    }
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent page reload on form submission
 
@@ -98,11 +170,11 @@ const EmployeeForm = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
             <div>
               <label className="block font-semibold">Emp ID</label>
-              <input 
-                type="text" 
-                name="empId" 
+              <input
+                type="text"
+                name="empId"
                 value={formData.empId}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />
@@ -110,11 +182,11 @@ const EmployeeForm = () => {
 
             <div>
               <label className="block font-semibold">Name</label>
-              <input 
-                type="text" 
-                name="name" 
+              <input
+                type="text"
+                name="name"
                 value={formData.name}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />
@@ -124,33 +196,33 @@ const EmployeeForm = () => {
               <label className="block font-semibold">Gender</label>
               <div className="flex items-center">
                 <label className="mr-4">
-                  <input 
-                    type="radio" 
-                    name="gender" 
-                    value="Male" 
-                    checked={formData.gender === 'Male'} 
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="Male"
+                    checked={formData.gender === 'Male'}
                     onChange={handleChange}
                     className="mr-2"
                   />
                   Male
                 </label>
                 <label className="mr-4">
-                  <input 
-                    type="radio" 
-                    name="gender" 
-                    value="Female" 
-                    checked={formData.gender === 'Female'} 
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="Female"
+                    checked={formData.gender === 'Female'}
                     onChange={handleChange}
                     className="mr-2"
                   />
                   Female
                 </label>
                 <label>
-                  <input 
-                    type="radio" 
-                    name="gender" 
-                    value="Other" 
-                    checked={formData.gender === 'Other'} 
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="Other"
+                    checked={formData.gender === 'Other'}
                     onChange={handleChange}
                     className="mr-2"
                   />
@@ -161,11 +233,11 @@ const EmployeeForm = () => {
 
             <div>
               <label className="block font-semibold">DOB</label>
-              <input 
-                type="date" 
-                name="dob" 
+              <input
+                type="date"
+                name="dob"
                 value={formData.dob}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />
@@ -173,11 +245,11 @@ const EmployeeForm = () => {
 
             <div>
               <label className="block font-semibold">Email</label>
-              <input 
-                type="email" 
-                name="email" 
+              <input
+                type="email"
+                name="email"
                 value={formData.email}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />
@@ -185,11 +257,11 @@ const EmployeeForm = () => {
 
             <div>
               <label className="block font-semibold">Office Email</label>
-              <input 
-                type="email" 
-                name="officeEmail" 
+              <input
+                type="email"
+                name="officeEmail"
                 value={formData.officeEmail}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />
@@ -197,22 +269,22 @@ const EmployeeForm = () => {
 
             <div>
               <label className="block font-semibold">Alternate Email</label>
-              <input 
-                type="email" 
-                name="alternateEmail" 
+              <input
+                type="email"
+                name="alternateEmail"
                 value={formData.alternateEmail}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
 
             <div>
               <label className="block font-semibold">Contact Number</label>
-              <input 
-                type="text" 
-                name="contactNumber" 
+              <input
+                type="text"
+                name="contactNumber"
                 value={formData.contactNumber}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />
@@ -220,22 +292,22 @@ const EmployeeForm = () => {
 
             <div>
               <label className="block font-semibold">Alternate Contact</label>
-              <input 
-                type="text" 
-                name="alternateContact" 
+              <input
+                type="text"
+                name="alternateContact"
                 value={formData.alternateContact}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
 
             <div>
               <label className="block font-semibold">Department</label>
-              <input 
-                type="text" 
-                name="department" 
+              <input
+                type="text"
+                name="department"
                 value={formData.department}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />
@@ -243,11 +315,11 @@ const EmployeeForm = () => {
 
             <div>
               <label className="block font-semibold">Designation</label>
-              <input 
-                type="text" 
-                name="designation" 
+              <input
+                type="text"
+                name="designation"
                 value={formData.designation}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />
@@ -255,10 +327,10 @@ const EmployeeForm = () => {
 
             <div>
               <label className="block font-semibold">ID Proof Type</label>
-              <select 
-                name="idProofType" 
-                value={formData.idProofType} 
-                onChange={handleChange} 
+              <select
+                name="idProofType"
+                value={formData.idProofType}
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               >
                 <option value="">Select ID Proof Type</option>
@@ -274,75 +346,75 @@ const EmployeeForm = () => {
 
             <div>
               <label className="block font-semibold">ID Proof Number</label>
-              <input 
-                type="text" 
-                name="idProofNumber" 
+              <input
+                type="text"
+                name="idProofNumber"
                 value={formData.idProofNumber}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
 
             <div>
               <label className="block font-semibold">Upload ID Proof</label>
-              <input 
-                type="file" 
-                name="idProofFile" 
-                onChange={handleFileChange} 
+              <input
+                type="file"
+                name="idProofFile"
+                onChange={handleFileChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
 
             <div>
               <label className="block font-semibold">Qualification</label>
-              <input 
-                type="text" 
-                name="qualification" 
+              <input
+                type="text"
+                name="qualification"
                 value={formData.qualification}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
 
             <div>
               <label className="block font-semibold">Expertise In</label>
-              <input 
-                type="text" 
-                name="expertise" 
+              <input
+                type="text"
+                name="expertise"
                 value={formData.expertise}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
 
             <div>
               <label className="block font-semibold">Experience</label>
-              <input 
-                type="text" 
-                name="experience" 
+              <input
+                type="text"
+                name="experience"
                 value={formData.experience}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
 
             <div>
               <label className="block font-semibold">Upload Resume</label>
-              <input 
-                type="file" 
-                name="resume" 
-                onChange={handleFileChange} 
+              <input
+                type="file"
+                name="resume"
+                onChange={handleFileChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
 
             <div>
               <label className="block font-semibold">DOJ</label>
-              <input 
-                type="date" 
-                name="doj" 
+              <input
+                type="date"
+                name="doj"
                 value={formData.doj}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />
@@ -350,9 +422,9 @@ const EmployeeForm = () => {
 
             <div>
               <label className="block font-semibold">Marital Status</label>
-              <select 
-                name="maritalStatus" 
-                value={formData.maritalStatus} 
+              <select
+                name="maritalStatus"
+                value={formData.maritalStatus}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
@@ -365,50 +437,64 @@ const EmployeeForm = () => {
               </select>
             </div>
 
+            <div className="col-span-3">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={isPermanentAddressSame}
+                  onChange={handlePermanentAddressToggle}
+                  className="mr-2"
+                />
+                Permanent address is same as present address
+              </label>
+            </div>
+
             <div>
               <label className="block font-semibold">Present Address</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="addressLine"
                 value={formData.presentAddress.addressLine}
                 onChange={(e) => handleAddressChange(e, 'presentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="Address Line"
               />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="area"
                 value={formData.presentAddress.area}
                 onChange={(e) => handleAddressChange(e, 'presentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="Area"
               />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="city"
                 value={formData.presentAddress.city}
                 onChange={(e) => handleAddressChange(e, 'presentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="City"
+                readOnly
               />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="state"
                 value={formData.presentAddress.state}
                 onChange={(e) => handleAddressChange(e, 'presentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="State"
+                readOnly
               />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="pincode"
                 value={formData.presentAddress.pincode}
-                onChange={(e) => handleAddressChange(e, 'presentAddress')}
+                onChange={(e) => handlePincodeChange(e, 'presentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="Pincode"
               />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="landmark"
                 value={formData.presentAddress.landmark}
                 onChange={(e) => handleAddressChange(e, 'presentAddress')}
@@ -418,63 +504,71 @@ const EmployeeForm = () => {
             </div>
 
             <div>
-              <label className="block font-semibold">Permanent Address</label>
-              <input 
-                type="text" 
+            <label className="block font-semibold">Permanent Address</label>
+              <input
+                type="text"
                 name="addressLine"
                 value={formData.permanentAddress.addressLine}
                 onChange={(e) => handleAddressChange(e, 'permanentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="Address Line"
+                disabled={isPermanentAddressSame}
               />
-              <input 
-                type="text" 
+               <input
+                type="text"
                 name="area"
                 value={formData.permanentAddress.area}
                 onChange={(e) => handleAddressChange(e, 'permanentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="Area"
+                disabled={isPermanentAddressSame}
               />
-              <input 
-                type="text" 
+               <input
+                type="text"
                 name="city"
                 value={formData.permanentAddress.city}
                 onChange={(e) => handleAddressChange(e, 'permanentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="City"
+                readOnly
+                disabled={isPermanentAddressSame}
               />
-              <input 
-                type="text" 
+               <input
+                type="text"
                 name="state"
                 value={formData.permanentAddress.state}
                 onChange={(e) => handleAddressChange(e, 'permanentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="State"
+                readOnly
+                disabled={isPermanentAddressSame}
               />
-              <input 
-                type="text" 
+               <input
+                type="text"
                 name="pincode"
                 value={formData.permanentAddress.pincode}
-                onChange={(e) => handleAddressChange(e, 'permanentAddress')}
+                onChange={(e) => handlePincodeChange(e, 'permanentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="Pincode"
+                disabled={isPermanentAddressSame}
               />
-              <input 
-                type="text" 
+               <input
+                type="text"
                 name="landmark"
                 value={formData.permanentAddress.landmark}
                 onChange={(e) => handleAddressChange(e, 'permanentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="Landmark"
+                disabled={isPermanentAddressSame}
               />
             </div>
 
             <div>
               <label className="block font-semibold">Address Proof Type</label>
-              <select 
-                name="addressProofType" 
-                value={formData.addressProofType} 
-                onChange={handleChange} 
+              <select
+                name="addressProofType"
+                value={formData.addressProofType}
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               >
                 <option value="">Select Address Proof Type</option>
@@ -491,32 +585,32 @@ const EmployeeForm = () => {
 
             <div>
               <label className="block font-semibold">Address Proof Number</label>
-              <input 
-                type="text" 
-                name="addressProofNumber" 
+              <input
+                type="text"
+                name="addressProofNumber"
                 value={formData.addressProofNumber}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
 
             <div>
               <label className="block font-semibold">Upload Address Proof</label>
-              <input 
-                type="file" 
-                name="addressProofFile" 
-                onChange={handleFileChange} 
+              <input
+                type="file"
+                name="addressProofFile"
+                onChange={handleFileChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
 
             <div>
               <label className="block font-semibold">Password</label>
-              <input 
-                type="password" 
-                name="password" 
+              <input
+                type="password"
+                name="password"
                 value={formData.password}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />

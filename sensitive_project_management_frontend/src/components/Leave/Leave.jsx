@@ -10,6 +10,7 @@ function Leave() {
     employee: "",
     leaveCategory: "",
     leaveType: "",
+    customLeaveType: "",  // Add state for custom leave type
     permissionDate: "",
     startDate: "",
     endDate: "",
@@ -20,12 +21,10 @@ function Leave() {
     endTime: "",
   });
 
-
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
         setLoading(true);
-
 
         const response = await employeename();
         console.log("Employees fetched:", response);
@@ -70,13 +69,13 @@ function Leave() {
           employee: "",
           leaveCategory: "",
           leaveType: "",
+          customLeaveType: "",  // Reset the custom leave type
           permissionDate: "",
           startDate: "",
           endDate: "",
           timeRange: "",
           remarks: "",
           attachment: "",
-
           startTime: "",
           endTime: "",
         });
@@ -103,7 +102,6 @@ function Leave() {
     );
   }
 
-
   return (
     <div className="container mx-auto p-6 mt-12">
       <h2 className="text-4xl font-bold mb-10 text-center mt-20">Leave Application Form</h2>
@@ -123,7 +121,7 @@ function Leave() {
                 <option value="">Select Employee</option>
                 {employees.map((employee) => (
                   <option key={employee._id} value={employee.name}>
-                    {employee.name}  
+                    {employee.name}
                   </option>
                 ))}
               </select>
@@ -179,6 +177,21 @@ function Leave() {
                 </select>
               </div>
             )}
+
+            {/* Show custom leave type input if "Others" is selected */}
+            {leave.leaveType === "Others" && (
+              <div>
+                <label className="block text-sm font-medium pb-4">Specify Leave Type:</label>
+                <textarea
+                  name="customLeaveType"
+                  value={leave.customLeaveType}
+                  onChange={handleChange}
+                  className="border border-blue-300 p-2 w-full rounded"
+                  placeholder="Enter custom leave type"
+                />
+              </div>
+            )}
+
 
             {leave.leaveCategory === "Leave" && (
               <div>

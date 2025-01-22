@@ -254,3 +254,16 @@ export const getTotalLeads = async () => {
   }
 };
 
+
+export const getLeaveById = async (id) => {
+  try {
+    const response = await projectServices.get(`/leaves/get/${id}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response;
+  } catch (err) {
+    return err;
+  }
+};

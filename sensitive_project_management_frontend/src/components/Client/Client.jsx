@@ -29,6 +29,8 @@ function Client() {
     status: "",
   });
 
+  const [isAddressSame, setIsAddressSame] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name.includes("officeLocation") || name.includes("registeredAddress")) {
@@ -44,6 +46,33 @@ function Client() {
       setClient((prev) => ({ ...prev, [name]: value }));
     }
   };
+
+  const handleCheckboxChange = () => {
+    setIsAddressSame((prev) => {
+      if (!prev) {
+        // If checked, copy Office Location to Registered Address
+        setClient((prevClient) => ({
+          ...prevClient,
+          registeredAddress: { ...prevClient.officeLocation },
+        }));
+      } else {
+        // If unchecked, reset Registered Address fields
+        setClient((prevClient) => ({
+          ...prevClient,
+          registeredAddress: {
+            addressLine: "",
+            area: "",
+            city: "",
+            state: "",
+            pincode: "",
+            landmark: "",
+          },
+        }));
+      }
+      return !prev;
+    });
+  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -242,8 +271,14 @@ function Client() {
 
             {/* Registered Address */}
             <div>
-              <label className="block text-sm font-medium pb-4">Registered Address:</label>
+            <label className="block text-sm font-medium pb-4">Registered Address:</label>
               <input
+                type="checkbox"
+                checked={isAddressSame}
+                onChange={handleCheckboxChange}
+                className="mb-4"
+              /> Office Location is same as Registered Address
+             <input
                 type="text"
                 name="registeredAddress.addressLine"
                 value={client.registeredAddress.addressLine}
@@ -251,8 +286,9 @@ function Client() {
                 required
                 className="border border-blue-300 p-2 mb-2 w-full rounded"
                 placeholder="Address Line"
+                disabled={isAddressSame}
               />
-              <input
+               <input
                 type="text"
                 name="registeredAddress.area"
                 value={client.registeredAddress.area}
@@ -260,6 +296,7 @@ function Client() {
                 required
                 className="border border-blue-300 p-2 mb-2 w-full rounded"
                 placeholder="Area"
+                disabled={isAddressSame}
               />
               <input
                 type="text"
@@ -269,6 +306,7 @@ function Client() {
                 required
                 className="border border-blue-300 p-2 mb-2 w-full rounded"
                 placeholder="City"
+                disabled={isAddressSame}
               />
               <input
                 type="text"
@@ -278,6 +316,7 @@ function Client() {
                 required
                 className="border border-blue-300 p-2 mb-2 w-full rounded"
                 placeholder="State"
+                disabled={isAddressSame}
               />
               <input
                 type="text"
@@ -287,6 +326,7 @@ function Client() {
                 required
                 className="border border-blue-300 p-2 mb-2 w-full rounded"
                 placeholder="Pincode"
+                disabled={isAddressSame}
               />
               <input
                 type="text"
@@ -296,6 +336,7 @@ function Client() {
                 required
                 className="border border-blue-300 p-2 w-full rounded"
                 placeholder="Landmark"
+                disabled={isAddressSame}
               />
             </div>
 
