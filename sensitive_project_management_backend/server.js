@@ -16,6 +16,7 @@ const attendanceRoutes = require('./routes/attendanceRoutes')
 const superadminRouter = require('./routes/superadminRoutes');
 const leadRoutes = require('./routes/leadRoute');
 const payrollRoutes = require('./routes/payrollRoute');
+const updateLogRoutes = require('./routes/updatelogRoute');
 
 
 dotenv.config();
@@ -34,6 +35,7 @@ app.use('/leaves', leaveRoutes);
 app.use('/attendance', attendanceRoutes);
 app.use('/leads', leadRoutes);
 app.use('/payroll',payrollRoutes);
+app.use('/updatelog',updateLogRoutes);
 
 // Connect to database
 db(); // MongoDB connection setup
