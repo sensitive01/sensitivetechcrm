@@ -77,6 +77,7 @@ const EmployeeEdit = () => {
       }
     }));
   };
+  
 
   useEffect(() => {
     // Fetch employee data from an API

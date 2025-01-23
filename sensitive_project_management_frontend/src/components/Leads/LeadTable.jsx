@@ -82,13 +82,26 @@ const LeadTable = () => {
         { Header: 'Comments', accessor: 'comments' },
         { Header: 'Status', accessor: 'status' },
         {
+            Header: 'Update Log', 
+            accessor: 'updateLog',
+            Cell: ({ row }) => (
+                <Link 
+                    to={`/lead-edit/${row.original._id}`} // Link to Update Log page with leadId
+                    className="text-center truncate hover:bg-blue-600 mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+                >
+                    Update Log
+                </Link>
+            )
+        },
+        
+        {
             Header: 'Actions',
             accessor: '_id',
             Cell: ({ row }) => (
                 <div className="flex justify-center space-x-2">
-                    <button className="text-green-500 hover:bg-green-100 p-2 rounded-full transition-colors" onClick={() => handleEdit(row.original._id)}>
+                    {/* <button className="text-green-500 hover:bg-green-100 p-2 rounded-full transition-colors" onClick={() => handleEdit(row.original._id)}>
                         <Edit size={20} />
-                    </button>
+                    </button> */}
                     <button className="text-red-500 hover:bg-red-100 p-2 rounded-full transition-colors" onClick={() => handleDelete(row.original._id)}>
                         <Trash2 size={20} />
                     </button>

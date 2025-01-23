@@ -149,6 +149,7 @@ import PayrollTable from "./components/Payroll/PayrollTable";
 import PayrollEdit from "./components/Payroll/PayrollEdit";
 import Preloader from "./components/preloader/Preloader"; // Import Preloader
 import LeadEdit from "./components/Leads/LeadEdit";
+// import DispositionForm from "./components/UpdateLog/UpdateLog";
 
 // Route Transition Component
 const RouteTransition = ({ children }) => {
@@ -265,6 +266,7 @@ const RoutesWithPreloader = ({ role }) => {
                   <Route path="/payroll-form" element={<Payroll />} />
                   <Route path="/payroll-table" element={<PayrollTable />} />
                   <Route path="/payroll-edit/:id" element={<PayrollEdit />} />
+                  {/* <Route path="/updatelog" element={<DispositionForm />} /> */}
                 </Routes>
               </AdminLayout>
             )

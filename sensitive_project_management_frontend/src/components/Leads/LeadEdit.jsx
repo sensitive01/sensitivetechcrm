@@ -7,16 +7,31 @@ function LeadEdit() {
   console.log(id);
 
   const [lead, setLead] = useState({
-    name: "",
-    contact: "",
-    email: "",
-    requirements: "",
-    company: "",
-    location: "",
-    links: "",
-    comments: "",
-    status: "",
+    disposition: "",
+    notes: "",
   });
+
+  const [isUpdating, setIsUpdating] = useState(false); // To track if we are updating
+
+  // Dropdown values for disposition
+  const dispositionOptions = [
+    "No requirements",
+    "Callback",
+    "Busy",
+    "Disconnected",
+    "RNR / Voicemail",
+    "Not interested",
+    "Request Quote",
+    "Quotation Sent",
+    "Follow up",
+    "Invalid Number",
+    "Taken outside",
+    "Requirement on hold",
+    "Escalated",
+    "Schedule Meeting",
+    "Deal Closed",
+    "Others",
+  ];
 
   // Fetch lead data when component mounts or ID changes
   useEffect(() => {
@@ -24,10 +39,13 @@ function LeadEdit() {
 
     const fetchLeadData = async () => {
       try {
-        const response = await axios.get(`https://sensitivetechcrm.onrender.com/leads/getlead/${id}`);
+        const response = await axios.get(
+          `https://sensitivetechcrm.onrender.com/updatelog/getdispositions/${id}`
+        );
         console.log(response);
         if (response.status === 200) {
           setLead(response.data);
+          setIsUpdating(true); // Set updating mode if the lead data is found
         } else {
           console.error("Failed to fetch lead details:", response.status);
         }
@@ -52,21 +70,20 @@ function LeadEdit() {
 
     try {
       const response = id
-        ? await axios.put(`https://sensitivetechcrm.onrender.com/leads/update/${id}`, lead)
-        : await axios.post(`https://sensitivetechcrm.onrender.com/leads/create`, lead);
+        ? await axios.put(
+            `https://sensitivetechcrm.onrender.com/updatelog/disposition/${id}`,
+            lead
+          )
+        : await axios.post(
+            `https://sensitivetechcrm.onrender.com/updatelog/disposition`,
+            lead
+          );
 
       if (response.status === 200 || response.status === 201) {
         alert("Lead data submitted successfully!");
         setLead({
-          name: "",
-          contact: "",
-          email: "",
-          requirements: "",
-          company: "",
-          location: "",
-          links: "",
-          comments: "",
-          status: "",
+          disposition: "",
+          notes: "",
         });
       } else {
         alert(`Error: ${response.statusText}`);
@@ -79,117 +96,41 @@ function LeadEdit() {
 
   return (
     <div className="container mx-auto p-6 mt-12">
-      <h2 className="text-4xl font-bold mb-10 text-center mt-20">Edit Lead Details</h2>
-      <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
-        {/* First Column */}
+      <h2 className="text-4xl font-bold mb-10 text-center mt-20">
+        {isUpdating ? "Update" : "Create"} Lead Disposition
+      </h2>
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6">
+        {/* Disposition Section */}
         <div className="border border-blue-500 p-6 rounded-lg">
           <div className="space-y-8 pb-4">
             <div>
-              <label className="block text-sm font-medium pb-4">Name:</label>
-              <input
-                type="text"
-                name="name"
-                value={lead.name}
-                onChange={handleChange}
-                required
-                className="border border-blue-300 p-2 w-full rounded"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium pb-4">Contact:</label>
-              <input
-                type="tel"
-                name="contact"
-                value={lead.contact}
-                onChange={handleChange}
-                required
-                className="border border-blue-300 p-2 w-full rounded"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium pb-4">Email:</label>
-              <input
-                type="email"
-                name="email"
-                value={lead.email}
-                onChange={handleChange}
-                required
-                className="border border-blue-300 p-2 w-full rounded"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium pb-4">Company:</label>
-              <input
-                type="text"
-                name="company"
-                value={lead.company}
-                onChange={handleChange}
-                required
-                className="border border-blue-300 p-2 w-full rounded"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium pb-4">Location:</label>
-              <input
-                type="text"
-                name="location"
-                value={lead.location}
-                onChange={handleChange}
-                className="border border-blue-300 p-2 w-full rounded"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Second Column */}
-        <div className="border border-blue-500 p-6 rounded-lg">
-          <div className="space-y-8 pb-4">
-            <div>
-              <label className="block text-sm font-medium pb-4">Requirements:</label>
-              <textarea
-                name="requirements"
-                value={lead.requirements}
-                onChange={handleChange}
-                required
-                className="border border-blue-300 p-2 w-full rounded h-24"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium pb-4">Links:</label>
-              <input
-                type="text"
-                name="links"
-                value={lead.links}
-                onChange={handleChange}
-                className="border border-blue-300 p-2 w-full rounded"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium pb-4">Comments:</label>
-              <textarea
-                name="comments"
-                value={lead.comments}
-                onChange={handleChange}
-                className="border border-blue-300 p-2 w-full rounded h-24"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium pb-4">Status:</label>
+              <label className="block text-sm font-medium pb-4">Disposition:</label>
               <select
-                name="status"
-                value={lead.status}
+                name="disposition"
+                value={lead.disposition}
                 onChange={handleChange}
-                required
                 className="border border-blue-300 p-2 w-full rounded"
               >
-                <option value="">Select Status</option>
-                <option value="new">New</option>
-                <option value="in-progress">In Progress</option>
-                <option value="qualified">Qualified</option>
-                <option value="unqualified">Unqualified</option>
-                <option value="converted">Converted</option>
+                <option value="">Select Disposition</option>
+                {dispositionOptions.map((option, index) => (
+                  <option key={index} value={option}>
+                    {option}
+                  </option>
+                ))}
               </select>
             </div>
+
+            <div>
+              <label className="block text-sm font-medium pb-4">Notes:</label>
+              <textarea
+                name="notes"
+                value={lead.notes}
+                onChange={handleChange}
+                className="border border-blue-300 p-2 w-full rounded h-24"
+                placeholder="Enter notes here..."
+              />
+            </div>
+
             <div className="flex justify-center mt-6">
               <button
                 type="submit"
@@ -201,6 +142,21 @@ function LeadEdit() {
           </div>
         </div>
       </form>
+
+      {/* Display Updated Lead Data */}
+      {isUpdating && (
+        <div className="mt-12 border border-blue-500 p-6 rounded-lg">
+          <h3 className="text-2xl font-bold mb-4">Updated Lead Details:</h3>
+          <div>
+            <p>
+              <strong>Disposition:</strong> {lead.disposition || "Not selected"}
+            </p>
+            <p className="mt-2">
+              <strong>Notes:</strong> {lead.notes || "No notes added"}
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

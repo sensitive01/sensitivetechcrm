@@ -84,7 +84,7 @@ const EmployeeForm = () => {
   
     setIsLoading(true);
     try {
-      const response = await axios.get(`https://sensitivetechcrm.onrender.com/getaddressbypincode/${pincode}`);
+      const response = await axios.get(`http://localhost:3000/getaddressbypincode/${pincode}`);
       console.log('API Response:', response.data);
   
       if (response.data.success && response.data.address) {
