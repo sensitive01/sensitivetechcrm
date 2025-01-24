@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, User, Search } from 'lucide-react';
-import { FaPowerOff } from 'react-icons/fa'; // Importing the FaPowerOff icon
+import { Menu, X, User, Search, ChevronDown } from 'lucide-react';
+import { FaPowerOff } from 'react-icons/fa';
 import logo from "../../assets/logo.webp";
 
 const Topbar = () => {
@@ -9,18 +9,40 @@ const Topbar = () => {
   const [role, setRole] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [openSubMenu, setOpenSubMenu] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const navigate = useNavigate();
+
+  const menuItems = [
+    { label: 'Dashboard', path: '/dashboard' },
+    { 
+      label: 'Clients', 
+      subMenu: [
+        { label: 'Clients', path: '/client-table' },
+        { label: 'Projects', path: '/project' },
+        { label: 'Payments', path: '/payments-table' }
+      ]
+    },
+    { 
+      label: 'Employees', 
+      subMenu: [
+        { label: 'Employee List', path: '/employee-table' },
+        { label: 'Attendance', path: '/attendance-table' },
+        { label: 'Leaves', path: '/leave-table' },
+        { label: 'Payroll', path: '/payroll-table' }
+      ]
+    },
+    { label: 'Tasks', path: '/task' },
+    { label: 'Enquiries', path: '/lead-table' },
+    { label: 'Expenses', path: '/expenses-table' }
+  ];
 
   useEffect(() => {
     const storedRole = localStorage.getItem("role");
     const empId = localStorage.getItem("empId");
     setRole(storedRole);
 
-    // Fetch and set user profile based on role
     const getUserProfile = () => {
-      // In a real application, you would fetch this data from your API
-      // This is a simulation of different profile data based on role
       switch(storedRole) {
         case "Superadmin":
           setUserProfile({
@@ -66,6 +88,7 @@ const Topbar = () => {
       setIsMobile(window.innerWidth <= 768);
       if (window.innerWidth > 768) {
         setIsMenuOpen(false);
+        setOpenSubMenu(null);
       }
     };
     
@@ -85,7 +108,10 @@ const Topbar = () => {
   const toggleProfile = () => setShowProfile(!showProfile);
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
-  // Render profile content based on role
+  const toggleSubMenu = (label) => {
+    setOpenSubMenu(openSubMenu === label ? null : label);
+  };
+
   const renderProfileContent = () => {
     if (!userProfile) return null;
 
@@ -129,7 +155,6 @@ const Topbar = () => {
     }
   };
 
-  // Access restriction message for mobile employees and leads
   if (isMobile && (role === "employee" || role === "Lead")) {
     return (
       <div className="fixed inset-0 bg-gray-800 text-white flex items-center justify-center p-4">
@@ -141,50 +166,96 @@ const Topbar = () => {
     );
   }
 
-  const menuItems = [
-    { label: 'Attendance', path: '/attendance-table' },
-    { label: 'Leave', path: '/leave-table' },
-    { label: 'Task', path: '/task' },
-    { label: 'Project', path: '/project' },
-    ...(role === 'Superadmin' ? [
-      { label: 'Employee', path: '/employee-table' },
-      { label: 'Client', path: '/client-table' },
-      { label: 'Leads', path: '/lead-table' },  
-      { label: 'Payments', path: '/payments-table' },
-      { label: 'Payroll', path: '/payroll-table' }
-    ] : []),
-    ...(role === 'Lead' ? [
-      { label: 'Leads', path: '/lead-table' },
-    ] : [])
-  ];
+  const renderMenuItem = (item, isMobileMenu = false) => {
+    if (item.subMenu) {
+      return (
+        <div key={item.label} className="relative">
+          {isMobileMenu ? (
+            <div 
+              onClick={() => toggleSubMenu(item.label)}
+              className="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium flex justify-between items-center"
+            >
+              {item.label}
+              <ChevronDown className={`h-4 w-4 transform ${openSubMenu === item.label ? 'rotate-180' : ''}`} />
+            </div>
+          ) : (
+            <div 
+              className="relative group"
+              onMouseEnter={() => setOpenSubMenu(item.label)}
+              onMouseLeave={() => setOpenSubMenu(null)}
+            >
+              <span className="text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium flex items-center cursor-pointer">
+                {item.label}
+                <ChevronDown className="h-4 w-4 ml-1" />
+              </span>
+              
+              {openSubMenu === item.label && (
+                <div className="absolute top-full left-0 mt-1 bg-white shadow-lg rounded-md py-2 z-50 min-w-[200px]">
+                  {item.subMenu.map((subItem) => (
+                    <Link
+                      key={subItem.path}
+                      to={subItem.path}
+                      className="block px-4 py-2 text-gray-800 hover:bg-gray-100 text-sm"
+                    >
+                      {subItem.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          
+          {isMobileMenu && openSubMenu === item.label && (
+            <div className="pl-4">
+              {item.subMenu.map((subItem) => (
+                <Link
+                  key={subItem.path}
+                  to={subItem.path}
+                  className="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {subItem.label}
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
+    
+    return isMobileMenu ? (
+      <Link
+        key={item.path}
+        to={item.path}
+        className="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium"
+        onClick={() => setIsMenuOpen(false)}
+      >
+        {item.label}
+      </Link>
+    ) : (
+      <Link
+        key={item.path}
+        to={item.path}
+        className="text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium"
+      >
+        {item.label}
+      </Link>
+    );
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-blue-600 text-white shadow-md">
       <div className="max-w-8xl mx-auto px-4">
         <div className="flex justify-between items-center h-20">
-          {/* Logo */}
           <div className="flex-shrink-0">
             <Link to="/dashboard">
-              {/* <img
-                src="/src/assets/logo.webp"
-                alt="Logo"
-                className="h-12 w-auto"
-              /> */}
-               <img src={logo} alt="Logo" className="h-16 w-auto" />
+              <img src={logo} alt="Logo" className="h-16 w-auto" />
             </Link>
           </div>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-4">
-            {menuItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className="text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {menuItems.map((item) => renderMenuItem(item))}
           </div>
 
           {/* Right Section */}
@@ -201,7 +272,6 @@ const Topbar = () => {
               onClick={handleLogout}
               className="bg-white text-blue-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100"
             >
-              
               <FaPowerOff className="h-5 w-5" />
             </button>
             <User
@@ -225,16 +295,7 @@ const Topbar = () => {
         {isMenuOpen && (
           <div className="md:hidden py-2">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              {menuItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {menuItems.map((item) => renderMenuItem(item, true))}
               <div className="mt-4 space-y-2">
                 <input
                   type="text"

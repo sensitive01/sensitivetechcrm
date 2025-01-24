@@ -79,7 +79,7 @@ function Payroll() {
 
     return (
         <div className="container mx-auto p-8 mt-20">
-            <h2 className="text-4xl font-bold mb-8 text-center text-gray-800">Payroll Form</h2>
+            <h2 className="text-4xl font-bold mb-8 text-center text-gray-800">Adjustments Form</h2>
             <form onSubmit={handleSubmit} className="bg-white p-8 border rounded-lg shadow-lg max-w-4xl mx-auto">
                 {payrolls.map((payroll, index) => (
                     <div key={index} className="space-y-4 border-b pb-4 mb-4">

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useParams } from "react-router-dom";
 
 const EmployeeEdit = () => {
+   const [isPermanentAddressSame, setIsPermanentAddressSame] = useState(false);
   const { id } = useParams();
   console.log(id)
   const [formData, setFormData] = useState({
@@ -99,6 +100,27 @@ const EmployeeEdit = () => {
     fetchEmployees();
   }, []);
 
+  const handlePermanentAddressToggle = (e) => {
+    setIsPermanentAddressSame(e.target.checked);
+    if (e.target.checked) {
+      setFormData((prevData) => ({
+        ...prevData,
+        permanentAddress: { ...prevData.presentAddress }
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        permanentAddress: {
+          addressLine: '',
+          area: '',
+          city: '',
+          state: '',
+          pincode: '',
+          landmark: ''
+        }
+      }));
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent page reload on form submission
@@ -390,6 +412,18 @@ const EmployeeEdit = () => {
                 <option value="Divorced">Divorced</option>
                 <option value="Widowed">Widowed</option>
               </select>
+            </div>
+
+            <div className="col-span-3">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={isPermanentAddressSame}
+                  onChange={handlePermanentAddressToggle}
+                  className="mr-2"
+                />
+                Permanent address is same as present address
+              </label>
             </div>
 
             <div>
