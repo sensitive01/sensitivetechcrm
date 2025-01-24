@@ -29,6 +29,7 @@ const Topbar = () => {
         { label: 'Employee List', path: '/employee-table' },
         { label: 'Attendance', path: '/attendance-table' },
         { label: 'Leaves', path: '/leave-table' },
+        { label: 'Adjustments', path: '/adjustment-table' },
         { label: 'Payroll', path: '/payroll-table' }
       ]
     },

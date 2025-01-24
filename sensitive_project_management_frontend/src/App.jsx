@@ -194,7 +194,7 @@ const RoutesWithPreloader = ({ role }) => {
       '/project',
       '/client-table',
       '/lead-table',
-      '/payroll-table'
+      '/adjustment-table'
     ];
 
     if (loadingRoutes.includes(location.pathname)) {
@@ -264,7 +264,7 @@ const RoutesWithPreloader = ({ role }) => {
                   <Route path="/lead-table" element={<LeadTable />} />
                   <Route path="/lead-edit/:id" element={<LeadEdit />} />
                   <Route path="/payroll-form" element={<Payroll />} />
-                  <Route path="/payroll-table" element={<PayrollTable />} />
+                  <Route path="/adjustment-table" element={<PayrollTable />} />
                   <Route path="/payroll-edit/:id" element={<PayrollEdit />} />
                   {/* <Route path="/updatelog" element={<DispositionForm />} /> */}
                 </Routes>
