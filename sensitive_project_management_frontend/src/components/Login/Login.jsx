@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../../assets/logo.webp";
+import logo from "../../assets/logo light.png";
 import axios from "axios";
 import { verifyLogin } from "../../api/services/projectServices";
 

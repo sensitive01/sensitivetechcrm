@@ -71,14 +71,14 @@ export const createProject=async(projectData) => {
 };
 
 
-// export const projectname=async() => {
-//   try {
-//     const responsename = await projectServices.get(`/projectname` );
-//     return responsename;
-//   } catch (err) {
-//     return err;
-//   }
-// };
+export const projectname=async() => {
+  try {
+    const responsename = await projectServices.get(`/project/projectname` );
+    return responsename;
+  } catch (err) {
+    return err;
+  }
+};
 
 
 
@@ -262,6 +262,30 @@ export const getLeaveById = async (id) => {
         "Content-Type": "application/json",
       },
     });
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createPayment = async (formData) => {
+  try {
+    const response = await projectServices.post(`/payments/createpayment`, formData, {
+      headers: {
+        // No need to set "Content-Type" manually for FormData
+      },
+    });
+    return response; // Return the successful response
+  } catch (error) {
+    console.error("Error in createPayment API:", error);
+    // Re-throw the error to handle it properly in `handleSubmit`
+    throw error;
+  }
+};
+
+export const getTotalPayments = async () => {
+  try {
+    const response = await projectServices.get(`/payments/getallpayments`);
     return response;
   } catch (err) {
     return err;

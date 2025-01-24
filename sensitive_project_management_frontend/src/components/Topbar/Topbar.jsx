@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, X, User, Search, ChevronDown } from 'lucide-react';
+import { 
+  Menu, X, User, Search, ChevronDown, 
+  LayoutDashboard, 
+  Briefcase, 
+  Users, 
+  Clipboard, 
+  MessageCircleQuestion, 
+  CreditCard 
+} from 'lucide-react';
 import { FaPowerOff } from 'react-icons/fa';
-import logo from "../../assets/logo.webp";
+import logo from "../../assets/logo light.png";
 
 const Topbar = () => {
   const [showProfile, setShowProfile] = useState(false);
@@ -14,9 +22,14 @@ const Topbar = () => {
   const navigate = useNavigate();
 
   const menuItems = [
-    { label: 'Dashboard', path: '/dashboard' },
+    { 
+      label: 'Dashboard', 
+      path: '/dashboard',
+      icon: LayoutDashboard
+    },
     { 
       label: 'Clients', 
+      icon: Briefcase,
       subMenu: [
         { label: 'Clients', path: '/client-table' },
         { label: 'Projects', path: '/project' },
@@ -25,6 +38,7 @@ const Topbar = () => {
     },
     { 
       label: 'Employees', 
+      icon: Users,
       subMenu: [
         { label: 'Employee List', path: '/employee-table' },
         { label: 'Attendance', path: '/attendance-table' },
@@ -33,9 +47,21 @@ const Topbar = () => {
         { label: 'Payroll', path: '/payroll-table' }
       ]
     },
-    { label: 'Tasks', path: '/task' },
-    { label: 'Enquiries', path: '/lead-table' },
-    { label: 'Expenses', path: '/expenses-table' }
+    { 
+      label: 'Tasks', 
+      path: '/task',
+      icon: Clipboard 
+    },
+    { 
+      label: 'Enquiries', 
+      path: '/lead-table',
+      icon: MessageCircleQuestion 
+    },
+    { 
+      label: 'Expenses', 
+      path: '/expenses-table',
+      icon: CreditCard 
+    }
   ];
 
   useEffect(() => {
@@ -168,6 +194,8 @@ const Topbar = () => {
   }
 
   const renderMenuItem = (item, isMobileMenu = false) => {
+    const ItemIcon = item.icon;
+    
     if (item.subMenu) {
       return (
         <div key={item.label} className="relative">
@@ -176,7 +204,10 @@ const Topbar = () => {
               onClick={() => toggleSubMenu(item.label)}
               className="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium flex justify-between items-center"
             >
-              {item.label}
+              <div className="flex items-center">
+                {ItemIcon && <ItemIcon className="mr-2 h-5 w-5 text-white" color="white" />}
+                {item.label}
+              </div>
               <ChevronDown className={`h-4 w-4 transform ${openSubMenu === item.label ? 'rotate-180' : ''}`} />
             </div>
           ) : (
@@ -186,6 +217,7 @@ const Topbar = () => {
               onMouseLeave={() => setOpenSubMenu(null)}
             >
               <span className="text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium flex items-center cursor-pointer">
+                {ItemIcon && <ItemIcon className="mr-2 h-5 w-5 text-white" color="white" />}
                 {item.label}
                 <ChevronDown className="h-4 w-4 ml-1" />
               </span>
@@ -228,17 +260,19 @@ const Topbar = () => {
       <Link
         key={item.path}
         to={item.path}
-        className="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium"
+        className="text-white hover:bg-blue-700 block px-3 py-2 rounded-md text-base font-medium flex items-center"
         onClick={() => setIsMenuOpen(false)}
       >
+        {ItemIcon && <ItemIcon className="mr-2 h-5 w-5 text-white" color="white" />}
         {item.label}
       </Link>
     ) : (
       <Link
         key={item.path}
         to={item.path}
-        className="text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium"
+        className="text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium flex items-center"
       >
+        {ItemIcon && <ItemIcon className="mr-2 h-5 w-5 text-white" color="white" />}
         {item.label}
       </Link>
     );
