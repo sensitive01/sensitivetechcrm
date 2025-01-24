@@ -41,13 +41,9 @@ const LeadTable = () => {
             }
         }
     };
-
-    // Edit lead function (redirect to the lead edit form)
     const handleEdit = (leadId) => {
         navigate(`/lead-edit/${leadId}`);
     };
-
-    // Export data to Excel
     const exportToExcel = () => {
         const exportData = leads.map((lead, index) => ({
             'S.No': index + 1,
@@ -68,8 +64,6 @@ const LeadTable = () => {
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Lead Records');
         XLSX.writeFile(workbook, `Lead_Records_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
-
-    // Define columns for react-table
     const columns = useMemo(() => [
         { Header: 'S.No', accessor: (row, index) => index + 1 },
         { Header: 'Name', accessor: 'name' },
@@ -82,26 +76,26 @@ const LeadTable = () => {
         { Header: 'Comments', accessor: 'comments' },
         { Header: 'Status', accessor: 'status' },
         {
-            Header: 'Update Log', 
+            Header: 'Update Log',
             accessor: 'updateLog',
             Cell: ({ row }) => (
-                <Link 
-                    to={`/lead-edit/${row.original._id}`} // Link to Update Log page with leadId
-                    className="text-center truncate hover:bg-blue-600 mt-4 px-4 py-2 bg-blue-500 text-white rounded"
-                >
+                // <Link 
+                //     to={`/lead-edit/${row.original._id}`} // Link to Update Log page with leadId
+                //     className="text-center truncate hover:bg-blue-600 mt-4 px-4 py-2 bg-blue-500 text-white rounded"
+                // >
+                //     Update Log
+                // </Link>
+                <button className="text-center truncate hover:bg-blue-600 mt-4 px-4 py-2 bg-blue-500 text-white rounded" onClick={() => handleEdit(row.original._id)}>
                     Update Log
-                </Link>
+                </button>
             )
         },
-        
+
         {
             Header: 'Actions',
             accessor: '_id',
             Cell: ({ row }) => (
                 <div className="flex justify-center space-x-2">
-                    {/* <button className="text-green-500 hover:bg-green-100 p-2 rounded-full transition-colors" onClick={() => handleEdit(row.original._id)}>
-                        <Edit size={20} />
-                    </button> */}
                     <button className="text-red-500 hover:bg-red-100 p-2 rounded-full transition-colors" onClick={() => handleDelete(row.original._id)}>
                         <Trash2 size={20} />
                     </button>
@@ -110,7 +104,6 @@ const LeadTable = () => {
         }
     ], [leads]);
 
-    // Initialize react-table
     const {
         getTableProps,
         getTableBodyProps,
@@ -148,8 +141,6 @@ const LeadTable = () => {
     return (
         <div className="container mx-auto p-6">
             <h2 className="text-4xl font-bold mb-10 text-center mt-24">Lead Details</h2>
-
-            {/* Action Buttons Section */}
             <div className="flex justify-between items-center mb-4">
                 <div className="relative">
                     <input
@@ -171,7 +162,6 @@ const LeadTable = () => {
                 </div>
             </div>
 
-            {/* Table Container */}
             <div className="overflow-x-auto bg-white shadow-md rounded-lg">
                 {leads.length === 0 ? (
                     <p className="text-center p-6">No lead records found.</p>
@@ -206,7 +196,6 @@ const LeadTable = () => {
                             </tbody>
                         </table>
 
-                        {/* Pagination Controls */}
                         <div className="flex justify-between items-center p-4">
                             <div>
                                 <span>
