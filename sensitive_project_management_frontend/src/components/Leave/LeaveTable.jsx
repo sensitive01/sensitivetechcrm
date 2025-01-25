@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { 
-    useTable, 
-    useGlobalFilter, 
-    useSortBy, 
-    usePagination 
+import {
+    useTable,
+    useGlobalFilter,
+    useSortBy,
+    usePagination
 } from 'react-table';
 import { Edit, Trash2 } from 'lucide-react';
 import { FaPlus, FaFileDownload, FaFilter } from 'react-icons/fa';
@@ -39,10 +39,10 @@ const LeaveTable = () => {
                 status: newStatus,
                 statusChangeDate: new Date().toISOString()
             });
-            
+
             if (response.status === 200) {
-                setLeaves(leaves.map(leave => 
-                    leave._id === leaveId 
+                setLeaves(leaves.map(leave =>
+                    leave._id === leaveId
                         ? { ...leave, status: newStatus, statusChangeDate: new Date().toISOString() }
                         : leave
                 ));
@@ -127,9 +127,9 @@ const LeaveTable = () => {
                     onChange={(e) => handleStatusChange(row.original._id, e.target.value)}
                     className={`
                         px-3 py-1 rounded text-sm border
-                        ${row.original.status === 'Approved' ? 'bg-green-100 text-green-800 border-green-200' : 
-                          row.original.status === 'Pending' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' : 
-                          'bg-red-100 text-red-800 border-red-200'}
+                        ${row.original.status === 'Approved' ? 'bg-green-100 text-green-800 border-green-200' :
+                            row.original.status === 'Pending' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
+                                'bg-red-100 text-red-800 border-red-200'}
                     `}
                 >
                     <option value="Pending">Pending</option>
@@ -217,7 +217,7 @@ const LeaveTable = () => {
     }
 
     return (
-        <div className="container mx-auto p-6">
+        <div className="container mx-auto p-4">
             <h2 className="text-4xl font-bold mb-10 text-center mt-24">Leave Details</h2>
 
             <div className="flex justify-between items-center mb-4">
@@ -233,16 +233,16 @@ const LeaveTable = () => {
                         <FaFilter className="absolute left-2 top-3 text-blue-500" />
                     </div>
                 </div>
-                
+
                 <div className="flex space-x-4">
-                    <button 
+                    <button
                         onClick={exportToExcel}
                         className="bg-green-500 text-white px-6 py-2 rounded flex items-center hover:bg-green-600"
                     >
                         <FaFileDownload className="mr-2" />
                         Export Data
                     </button>
-                    
+
                     <Link
                         to="/leave"
                         className="bg-blue-500 text-white px-6 py-2 rounded flex items-center hover:bg-blue-600"
@@ -255,26 +255,22 @@ const LeaveTable = () => {
 
             <div className="overflow-x-auto bg-white shadow-md rounded-lg">
                 {leaves.length === 0 ? (
-                    <p className="text-center p-6">No leave records found.</p>
+                    <p className="text-center p-4">No leave records found.</p>
                 ) : (
                     <>
                         <table {...getTableProps()} className="w-full">
-                            <thead className="bg-blue-50 border-b">
-                                {headerGroups.map(headerGroup => (
+                            <thead className="bg-[#2563eb] text-white border-b">
+                                {headerGroups.map((headerGroup) => (
                                     <tr {...headerGroup.getHeaderGroupProps()}>
-                                        {headerGroup.headers.map(column => (
-                                            <th 
+                                        {headerGroup.headers.map((column) => (
+                                            <th
                                                 {...column.getHeaderProps(column.getSortByToggleProps())}
-                                                className="p-6 text-left cursor-pointer"
+                                                className="p-4 text-left cursor-pointer whitespace-nowrap" // Added whitespace-nowrap
                                             >
                                                 <div className="flex items-center">
-                                                    {column.render('Header')}
+                                                    {column.render("Header")}
                                                     <span>
-                                                        {column.isSorted 
-                                                            ? (column.isSortedDesc 
-                                                                ? ' 🔽' 
-                                                                : ' 🔼') 
-                                                            : ''}
+                                                        {column.isSorted ? (column.isSortedDesc ? " 🔽" : " 🔼") : ""}
                                                     </span>
                                                 </div>
                                             </th>
@@ -282,18 +278,19 @@ const LeaveTable = () => {
                                     </tr>
                                 ))}
                             </thead>
+
                             <tbody {...getTableBodyProps()}>
                                 {page.map(row => {
                                     prepareRow(row);
                                     return (
-                                        <tr 
-                                            {...row.getRowProps()} 
+                                        <tr
+                                            {...row.getRowProps()}
                                             className="border-b hover:bg-gray-50 transition-colors"
                                         >
                                             {row.cells.map(cell => (
-                                                <td 
-                                                    {...cell.getCellProps()} 
-                                                    className="p-6"
+                                                <td
+                                                    {...cell.getCellProps()}
+                                                    className="p-4"
                                                 >
                                                     {cell.render('Cell')}
                                                 </td>
@@ -314,15 +311,15 @@ const LeaveTable = () => {
                                 </span>
                             </div>
                             <div className="space-x-2">
-                                <button 
-                                    onClick={() => previousPage()} 
+                                <button
+                                    onClick={() => previousPage()}
                                     disabled={!canPreviousPage}
                                     className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
                                 >
                                     Previous
                                 </button>
-                                <button 
-                                    onClick={() => nextPage()} 
+                                <button
+                                    onClick={() => nextPage()}
                                     disabled={!canNextPage}
                                     className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
                                 >

@@ -5,6 +5,7 @@ const EmployeeForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isPermanentAddressSame, setIsPermanentAddressSame] = useState(false);
   const [formData, setFormData] = useState({
+    role: '',
     empId: '',
     name: '',
     gender: '',
@@ -81,12 +82,12 @@ const EmployeeForm = () => {
       alert('Please enter a valid 6-digit pincode.');
       return;
     }
-  
+
     setIsLoading(true);
     try {
       const response = await axios.get(`http://localhost:3000/getaddressbypincode/${pincode}`);
       console.log('API Response:', response.data);
-  
+
       if (response.data.success && response.data.address) {
         const { area, city, state } = response.data.address;
         setFormData((prevData) => ({
@@ -108,7 +109,7 @@ const EmployeeForm = () => {
       setIsLoading(false);
     }
   };
-  
+
 
   const handlePincodeChange = (e, addressType) => {
     const { name, value } = e.target;
@@ -298,6 +299,18 @@ const EmployeeForm = () => {
                 value={formData.alternateContact}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
+              />
+            </div>
+
+            <div>
+              <label className="block font-semibold">Role</label>
+              <input
+                type="text"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-md"
+                required
               />
             </div>
 
@@ -504,7 +517,7 @@ const EmployeeForm = () => {
             </div>
 
             <div>
-            <label className="block font-semibold">Permanent Address</label>
+              <label className="block font-semibold">Permanent Address</label>
               <input
                 type="text"
                 name="addressLine"
@@ -514,7 +527,7 @@ const EmployeeForm = () => {
                 placeholder="Address Line"
                 disabled={isPermanentAddressSame}
               />
-               <input
+              <input
                 type="text"
                 name="area"
                 value={formData.permanentAddress.area}
@@ -523,7 +536,7 @@ const EmployeeForm = () => {
                 placeholder="Area"
                 disabled={isPermanentAddressSame}
               />
-               <input
+              <input
                 type="text"
                 name="city"
                 value={formData.permanentAddress.city}
@@ -533,7 +546,7 @@ const EmployeeForm = () => {
                 readOnly
                 disabled={isPermanentAddressSame}
               />
-               <input
+              <input
                 type="text"
                 name="state"
                 value={formData.permanentAddress.state}
@@ -543,7 +556,7 @@ const EmployeeForm = () => {
                 readOnly
                 disabled={isPermanentAddressSame}
               />
-               <input
+              <input
                 type="text"
                 name="pincode"
                 value={formData.permanentAddress.pincode}
@@ -552,7 +565,7 @@ const EmployeeForm = () => {
                 placeholder="Pincode"
                 disabled={isPermanentAddressSame}
               />
-               <input
+              <input
                 type="text"
                 name="landmark"
                 value={formData.permanentAddress.landmark}

@@ -26,7 +26,7 @@ const EmployeeDetailsModal = ({ isOpen, onClose, employee }) => {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="p-6">
+      <div className="p-4">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Employee Details</h2>
           <button
@@ -37,7 +37,7 @@ const EmployeeDetailsModal = ({ isOpen, onClose, employee }) => {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="col-span-2 flex justify-center">
             <img
               src={employee.profileImage}
@@ -118,10 +118,10 @@ const EmployeeTable = () => {
         setLoading(false);
       }
     };
-  
+
     fetchEmployees();
   }, []);
-  
+
 
   // Define table columns
   const columns = useMemo(
@@ -148,6 +148,10 @@ const EmployeeTable = () => {
       {
         Header: "Name",
         accessor: "name",
+      },
+      {
+        Header: "Role",  // New Role Column
+        accessor: "role",  // Make sure the role field exists in your data
       },
       {
         Header: "Designation",
@@ -296,7 +300,7 @@ const EmployeeTable = () => {
   }
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto p-4">
       <h2 className="text-4xl font-bold mb-10 text-center mt-20">
         Employee Details
       </h2>
@@ -335,13 +339,13 @@ const EmployeeTable = () => {
       {/* Table Section */}
       <div className="overflow-x-auto bg-white shadow-lg rounded-lg border">
         <table {...getTableProps()} className="w-full table-auto">
-          <thead className="bg-blue-50 border-b">
+          <thead className="bg-[#2563eb] text-white border-b">
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column) => (
                   <th
                     {...column.getHeaderProps(column.getSortByToggleProps())}
-                    className="p-4 text-left font-semibold text-gray-600"
+                    className="p-4 text-left font-semibold text-white whitespace-nowrap" // Added whitespace-nowrap
                   >
                     <div className="flex items-center">
                       {column.render("Header")}
@@ -358,6 +362,8 @@ const EmployeeTable = () => {
               </tr>
             ))}
           </thead>
+
+
           <tbody {...getTableBodyProps()}>
             {page.map((row) => {
               prepareRow(row);

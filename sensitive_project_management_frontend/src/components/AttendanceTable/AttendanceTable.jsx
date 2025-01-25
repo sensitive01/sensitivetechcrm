@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 import * as XLSX from "xlsx";
 
 const AttendanceTable = () => {
-    const employeeId = localStorage.getItem("empId")
+    const employeeId = localStorage.getItem("empId");
     const [attendanceRecords, setAttendanceRecords] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -19,12 +19,10 @@ const AttendanceTable = () => {
         const fetchAttendance = async () => {
             try {
                 const response = await fetch(`https://sensitivetechcrm.onrender.com/attendance/attendance-all/${employeeId}`);
-                console.log(response)
                 if (!response.ok) {
                     throw new Error("Failed to fetch attendance data.");
                 }
                 const data = await response.json();
-                console.log(data)
                 data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 setAttendanceRecords(data);
             } catch (err) {
@@ -38,12 +36,9 @@ const AttendanceTable = () => {
     }, []);
 
     const handleLogoutTimeUpdate = async (recordId) => {
-        console.log("Record ID:", recordId);
-        console.log("Attendance Records:", attendanceRecords);
         const record = attendanceRecords.find((rec) => String(rec._id) === String(recordId));
 
         if (!record) {
-            console.error(`Record with ID ${recordId} not found.`);
             alert("Unable to find the record. Please refresh the page and try again.");
             return;
         }
@@ -69,7 +64,6 @@ const AttendanceTable = () => {
                 throw new Error(`Failed to update logout time: ${message}`);
             }
 
-            // Update the local state
             setAttendanceRecords((prevRecords) =>
                 prevRecords.map((rec) =>
                     rec._id === recordId ? { ...rec, logouttime: logoutTime } : rec
@@ -78,7 +72,6 @@ const AttendanceTable = () => {
 
             alert("Logout time updated successfully.");
         } catch (err) {
-            console.error("Error updating logout time:", err);
             alert("Failed to update logout time. Please try again.");
         }
     };
@@ -237,10 +230,9 @@ const AttendanceTable = () => {
                 </div>
             </div>
 
-
             <div className="overflow-x-auto bg-white shadow-md rounded-lg">
                 <table {...getTableProps()} className="w-full">
-                    <thead className="bg-blue-50 border-b">
+                    <thead className="bg-[#2563eb] text-white border-b">
                         {headerGroups.map((headerGroup) => (
                             <tr {...headerGroup.getHeaderGroupProps()}>
                                 {headerGroup.headers.map((column) => (

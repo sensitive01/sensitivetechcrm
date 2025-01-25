@@ -291,3 +291,78 @@ export const getTotalPayments = async () => {
     return err;
   }
 };
+
+export const updatePaymentById = async (paymentId, formData) => {
+  try {
+    const response = await projectServices.put(`/payments/updatepayment/${paymentId}`, formData);
+    return response;
+  } catch (err) {
+    console.error("Error in updatePaymentById:", err);
+    throw err;
+  }
+};
+
+
+export const getPaymentById = async (paymentId) => {
+  try {
+    const response = await projectServices.get(`/payments/getpayment/${paymentId}`,  {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const createExpense = async (formData) => {
+  try {
+    const response = await projectServices.post(`/expense/createexpense`, formData, {
+      headers: {
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Error in createPayment API:", error);
+    throw error;
+  }
+};
+
+export const getTotalExpense = async () => {
+  try {
+    const response = await projectServices.get(`/expense/getallexpense`);
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+export const updateExpenseById = async (expenseId, formData) => {
+  try {
+    const response = await projectServices.put(`/expense/updateexpense/${expenseId}`, formData);
+    return response;
+  } catch (err) {
+    console.error("Error in updateExpenseById:", err);
+    throw err;
+  }
+};
+
+
+export const getExpenseById = async (expenseId) => {
+  try {
+    const response = await projectServices.get(`/expense/getexpense/${expenseId}`,  {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+
+
+

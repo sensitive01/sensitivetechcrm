@@ -11,7 +11,7 @@ const ProjectDetailsModal = ({ project, onClose,onEdit }) => {
 
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+      <div className="bg-white rounded-lg p-4 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Project Details</h2>
         
         <div className="space-y-4">
@@ -277,7 +277,7 @@ const ProjectManager = () => {
   const totalPages = Math.ceil(filteredAndSortedProjects.length / ITEMS_PER_PAGE);
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-4 bg-gray-50 min-h-screen">
       <h1 className="text-3xl font-semibold text-gray-800 mb-6 text-center mt-28">Project List</h1>
 
       <div className="flex justify-between items-center mb-4">
@@ -316,7 +316,7 @@ const ProjectManager = () => {
       ) : paginatedProjects.length > 0 ? (
         <div className="overflow-x-auto bg-white shadow-md rounded-lg">
           <table className="w-full">
-            <thead className="bg-gray-100">
+            <thead className="bg-[#2563eb] text-white border-b">
               <tr>
                 <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200" 
                     onClick={() => handleSort('projectName')}>

@@ -3,10 +3,11 @@ import axios from 'axios';
 import { useParams } from "react-router-dom";
 
 const EmployeeEdit = () => {
-   const [isPermanentAddressSame, setIsPermanentAddressSame] = useState(false);
+  const [isPermanentAddressSame, setIsPermanentAddressSame] = useState(false);
   const { id } = useParams();
   console.log(id)
   const [formData, setFormData] = useState({
+    role: '',
     empId: '',
     name: '',
     gender: '',
@@ -78,7 +79,7 @@ const EmployeeEdit = () => {
       }
     }));
   };
-  
+
 
   useEffect(() => {
     // Fetch employee data from an API
@@ -87,9 +88,13 @@ const EmployeeEdit = () => {
         setLoading(true); // Show loader
         const response = await axios.get(
           `https://sensitivetechcrm.onrender.com/getemployeesbyid/${id}`
-        ); 
-        console.log(response)
-        setFormData(response.data); 
+        );
+        console.log(response);
+        // Ensure ID Proof Type and Address Proof Type are included in response data
+        setFormData((prevData) => ({
+          ...prevData,
+          ...response.data, // Spread API data to ensure proper mapping
+        }));
       } catch (err) {
         setError(err.message);
       } finally {
@@ -98,7 +103,7 @@ const EmployeeEdit = () => {
     };
 
     fetchEmployees();
-  }, []);
+  }, [id]);  // Ensure useEffect re-runs when the `id` parameter changes
 
   const handlePermanentAddressToggle = (e) => {
     setIsPermanentAddressSame(e.target.checked);
@@ -147,11 +152,11 @@ const EmployeeEdit = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6">
             <div>
               <label className="block font-semibold">Emp ID</label>
-              <input 
-                type="text" 
-                name="empId" 
+              <input
+                type="text"
+                name="empId"
                 value={formData.empId}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />
@@ -159,11 +164,11 @@ const EmployeeEdit = () => {
 
             <div>
               <label className="block font-semibold">Name</label>
-              <input 
-                type="text" 
-                name="name" 
+              <input
+                type="text"
+                name="name"
                 value={formData.name}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />
@@ -173,33 +178,33 @@ const EmployeeEdit = () => {
               <label className="block font-semibold">Gender</label>
               <div className="flex items-center">
                 <label className="mr-4">
-                  <input 
-                    type="radio" 
-                    name="gender" 
-                    value="Male" 
-                    checked={formData.gender === 'Male'} 
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="Male"
+                    checked={formData.gender === 'Male'}
                     onChange={handleChange}
                     className="mr-2"
                   />
                   Male
                 </label>
                 <label className="mr-4">
-                  <input 
-                    type="radio" 
-                    name="gender" 
-                    value="Female" 
-                    checked={formData.gender === 'Female'} 
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="Female"
+                    checked={formData.gender === 'Female'}
                     onChange={handleChange}
                     className="mr-2"
                   />
                   Female
                 </label>
                 <label>
-                  <input 
-                    type="radio" 
-                    name="gender" 
-                    value="Other" 
-                    checked={formData.gender === 'Other'} 
+                  <input
+                    type="radio"
+                    name="gender"
+                    value="Other"
+                    checked={formData.gender === 'Other'}
                     onChange={handleChange}
                     className="mr-2"
                   />
@@ -210,11 +215,11 @@ const EmployeeEdit = () => {
 
             <div>
               <label className="block font-semibold">DOB</label>
-              <input 
-                type="date" 
-                name="dob" 
+              <input
+                type="date"
+                name="dob"
                 value={formData.dob}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />
@@ -222,11 +227,11 @@ const EmployeeEdit = () => {
 
             <div>
               <label className="block font-semibold">Email</label>
-              <input 
-                type="email" 
-                name="email" 
+              <input
+                type="email"
+                name="email"
                 value={formData.email}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />
@@ -234,11 +239,11 @@ const EmployeeEdit = () => {
 
             <div>
               <label className="block font-semibold">Office Email</label>
-              <input 
-                type="email" 
-                name="officeEmail" 
+              <input
+                type="email"
+                name="officeEmail"
                 value={formData.officeEmail}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />
@@ -246,22 +251,22 @@ const EmployeeEdit = () => {
 
             <div>
               <label className="block font-semibold">Alternate Email</label>
-              <input 
-                type="email" 
-                name="alternateEmail" 
+              <input
+                type="email"
+                name="alternateEmail"
                 value={formData.alternateEmail}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
 
             <div>
               <label className="block font-semibold">Contact Number</label>
-              <input 
-                type="text" 
-                name="contactNumber" 
+              <input
+                type="text"
+                name="contactNumber"
                 value={formData.contactNumber}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />
@@ -269,22 +274,34 @@ const EmployeeEdit = () => {
 
             <div>
               <label className="block font-semibold">Alternate Contact</label>
-              <input 
-                type="text" 
-                name="alternateContact" 
+              <input
+                type="text"
+                name="alternateContact"
                 value={formData.alternateContact}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
 
             <div>
+              <label className="block font-semibold">Role</label>
+              <input
+                type="text"
+                name="role"
+                value={formData.role}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-md"
+                required
+              />
+            </div>
+
+            <div>
               <label className="block font-semibold">Department</label>
-              <input 
-                type="text" 
-                name="department" 
+              <input
+                type="text"
+                name="department"
                 value={formData.department}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />
@@ -292,11 +309,11 @@ const EmployeeEdit = () => {
 
             <div>
               <label className="block font-semibold">Designation</label>
-              <input 
-                type="text" 
-                name="designation" 
+              <input
+                type="text"
+                name="designation"
                 value={formData.designation}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />
@@ -304,10 +321,10 @@ const EmployeeEdit = () => {
 
             <div>
               <label className="block font-semibold">ID Proof Type</label>
-              <select 
-                name="idProofType" 
-                value={formData.idProofType} 
-                onChange={handleChange} 
+              <select
+                name="idProofType"
+                value={formData.idProofType}  // Ensure the value is bound to formData.idProofType
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               >
                 <option value="">Select ID Proof Type</option>
@@ -323,75 +340,89 @@ const EmployeeEdit = () => {
 
             <div>
               <label className="block font-semibold">ID Proof Number</label>
-              <input 
-                type="text" 
-                name="idProofNumber" 
+              <input
+                type="text"
+                name="idProofNumber"
                 value={formData.idProofNumber}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
 
             <div>
               <label className="block font-semibold">Upload ID Proof</label>
-              <input 
-                type="file" 
-                name="idProofFile" 
-                onChange={handleFileChange} 
+              <input
+                type="file"
+                name="idProofFile"
+                onChange={handleFileChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
 
             <div>
               <label className="block font-semibold">Qualification</label>
-              <input 
-                type="text" 
-                name="qualification" 
+              <input
+                type="text"
+                name="qualification"
                 value={formData.qualification}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
 
             <div>
               <label className="block font-semibold">Expertise In</label>
-              <input 
-                type="text" 
-                name="expertise" 
+              <input
+                type="text"
+                name="expertise"
                 value={formData.expertise}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
 
             <div>
               <label className="block font-semibold">Experience</label>
-              <input 
-                type="text" 
-                name="experience" 
+              <input
+                type="text"
+                name="experience"
                 value={formData.experience}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
 
             <div>
+              <label className="block font-semibold">Resume</label>
+              {formData.resume ? (
+                <div>
+                  {/* Assuming resume is an image */}
+                  <img
+                    src={formData.resume} // URL of the resume file from the backend
+                    alt="Resume"
+                    className="w-32 h-32 object-cover"
+                  />
+                </div>
+              ) : (
+                <p>No resume uploaded</p>
+              )}
               <label className="block font-semibold">Upload Resume</label>
-              <input 
-                type="file" 
-                name="resume" 
-                onChange={handleFileChange} 
+              <input
+                type="file"
+                name="resume"
+                onChange={handleFileChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
+
 
             <div>
               <label className="block font-semibold">DOJ</label>
-              <input 
-                type="date" 
-                name="doj" 
+              <input
+                type="date"
+                name="doj"
                 value={formData.doj}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />
@@ -399,9 +430,9 @@ const EmployeeEdit = () => {
 
             <div>
               <label className="block font-semibold">Marital Status</label>
-              <select 
-                name="maritalStatus" 
-                value={formData.maritalStatus} 
+              <select
+                name="maritalStatus"
+                value={formData.maritalStatus}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
@@ -428,48 +459,48 @@ const EmployeeEdit = () => {
 
             <div>
               <label className="block font-semibold">Present Address</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="addressLine"
                 value={formData.presentAddress.addressLine}
                 onChange={(e) => handleAddressChange(e, 'presentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="Address Line"
               />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="area"
                 value={formData.presentAddress.area}
                 onChange={(e) => handleAddressChange(e, 'presentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="Area"
               />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="city"
                 value={formData.presentAddress.city}
                 onChange={(e) => handleAddressChange(e, 'presentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="City"
               />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="state"
                 value={formData.presentAddress.state}
                 onChange={(e) => handleAddressChange(e, 'presentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="State"
               />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="pincode"
                 value={formData.presentAddress.pincode}
                 onChange={(e) => handleAddressChange(e, 'presentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="Pincode"
               />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="landmark"
                 value={formData.presentAddress.landmark}
                 onChange={(e) => handleAddressChange(e, 'presentAddress')}
@@ -480,48 +511,48 @@ const EmployeeEdit = () => {
 
             <div>
               <label className="block font-semibold">Permanent Address</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="addressLine"
                 value={formData.permanentAddress.addressLine}
                 onChange={(e) => handleAddressChange(e, 'permanentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="Address Line"
               />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="area"
                 value={formData.permanentAddress.area}
                 onChange={(e) => handleAddressChange(e, 'permanentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="Area"
               />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="city"
                 value={formData.permanentAddress.city}
                 onChange={(e) => handleAddressChange(e, 'permanentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="City"
               />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="state"
                 value={formData.permanentAddress.state}
                 onChange={(e) => handleAddressChange(e, 'permanentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="State"
               />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="pincode"
                 value={formData.permanentAddress.pincode}
                 onChange={(e) => handleAddressChange(e, 'permanentAddress')}
                 className="w-full px-4 py-2 border rounded-md"
                 placeholder="Pincode"
               />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 name="landmark"
                 value={formData.permanentAddress.landmark}
                 onChange={(e) => handleAddressChange(e, 'permanentAddress')}
@@ -532,10 +563,10 @@ const EmployeeEdit = () => {
 
             <div>
               <label className="block font-semibold">Address Proof Type</label>
-              <select 
-                name="addressProofType" 
-                value={formData.addressProofType} 
-                onChange={handleChange} 
+              <select
+                name="addressProofType"
+                value={formData.addressProofType}  // Ensure the value is bound to formData.addressProofType
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               >
                 <option value="">Select Address Proof Type</option>
@@ -552,32 +583,32 @@ const EmployeeEdit = () => {
 
             <div>
               <label className="block font-semibold">Address Proof Number</label>
-              <input 
-                type="text" 
-                name="addressProofNumber" 
+              <input
+                type="text"
+                name="addressProofNumber"
                 value={formData.addressProofNumber}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
 
             <div>
               <label className="block font-semibold">Upload Address Proof</label>
-              <input 
-                type="file" 
-                name="addressProofFile" 
-                onChange={handleFileChange} 
+              <input
+                type="file"
+                name="addressProofFile"
+                onChange={handleFileChange}
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
 
             <div>
               <label className="block font-semibold">Password</label>
-              <input 
-                type="password" 
-                name="password" 
+              <input
+                type="password"
+                name="password"
                 value={formData.password}
-                onChange={handleChange} 
+                onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />

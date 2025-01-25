@@ -151,6 +151,10 @@ import Preloader from "./components/preloader/Preloader"; // Import Preloader
 import LeadEdit from "./components/Leads/LeadEdit";
 import Payments from "./components/Payments/Payments";
 import PaymentTable from "./components/Payments/PaymentTable";
+import Expenses from "./components/Expenses/Expenses";
+import ExpenseTable from "./components/Expenses/ExpensesTable";
+import ExpensesEdit from "./components/Expenses/ExpensesEdit";
+import PaymentEdit from "./components/Payments/PaymentEdit";
 // import DispositionForm from "./components/UpdateLog/UpdateLog";
 
 // Route Transition Component
@@ -196,7 +200,10 @@ const RoutesWithPreloader = ({ role }) => {
       '/project',
       '/client-table',
       '/lead-table',
-      '/adjustment-table'
+      '/adjustment-table',
+      '/payments-table',
+      '/payroll-table',
+      '/expense-table',
     ];
 
     if (loadingRoutes.includes(location.pathname)) {
@@ -270,6 +277,10 @@ const RoutesWithPreloader = ({ role }) => {
                   <Route path="/payroll-edit/:id" element={<PayrollEdit />} />
                   <Route path="/payments-form" element={<Payments />} />
                   <Route path="/payments-table" element={<PaymentTable />} />
+                  <Route path="/payments-edit/:id" element={<PaymentEdit />} />
+                  <Route path="/expense-form" element={<Expenses />} />
+                  <Route path="/expense-table" element={<ExpenseTable />} />
+                  <Route path="/expense-edit/:id" element={<ExpensesEdit />} />
                   {/* <Route path="/updatelog" element={<DispositionForm />} /> */}
                 </Routes>
               </AdminLayout>

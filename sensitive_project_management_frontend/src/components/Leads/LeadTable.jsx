@@ -139,7 +139,7 @@ const LeadTable = () => {
     }
 
     return (
-        <div className="container mx-auto p-6">
+        <div className="container mx-auto p-4">
             <h2 className="text-4xl font-bold mb-10 text-center mt-24">Lead Details</h2>
             <div className="flex justify-between items-center mb-4">
                 <div className="relative">
@@ -164,15 +164,15 @@ const LeadTable = () => {
 
             <div className="overflow-x-auto bg-white shadow-md rounded-lg">
                 {leads.length === 0 ? (
-                    <p className="text-center p-6">No lead records found.</p>
+                    <p className="text-center p-4">No lead records found.</p>
                 ) : (
                     <>
                         <table {...getTableProps()} className="w-full">
-                            <thead className="bg-blue-50 border-b">
+                            <thead className="bg-[#2563eb] text-white border-b">
                                 {headerGroups.map(headerGroup => (
                                     <tr {...headerGroup.getHeaderGroupProps()}>
                                         {headerGroup.headers.map(column => (
-                                            <th {...column.getHeaderProps(column.getSortByToggleProps())} className="p-6 text-left cursor-pointer">
+                                            <th {...column.getHeaderProps(column.getSortByToggleProps())} className="p-4 text-left cursor-pointer">
                                                 <div className="flex items-center">
                                                     {column.render('Header')}
                                                     <span>{column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}</span>
@@ -188,7 +188,7 @@ const LeadTable = () => {
                                     return (
                                         <tr {...row.getRowProps()} className="border-b hover:bg-gray-50 transition-colors">
                                             {row.cells.map(cell => (
-                                                <td {...cell.getCellProps()} className="p-6">{cell.render('Cell')}</td>
+                                                <td {...cell.getCellProps()} className="p-4">{cell.render('Cell')}</td>
                                             ))}
                                         </tr>
                                     );

@@ -1,112 +1,87 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
-import * as XLSX from 'xlsx';
-import { Eye } from 'lucide-react';
-import { FaFileDownload, FaFilter } from 'react-icons/fa';
 import { useTable, useGlobalFilter, useSortBy, usePagination } from 'react-table';
-import { getTotalPayments } from '../../api/services/projectServices';
+import { Trash2, Eye } from 'lucide-react';
+import { FaFileDownload, FaFilter } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import * as XLSX from 'xlsx';
+import { getTotalExpense } from '../../api/services/projectServices';
 
-const PaymentTable = () => {
-    const [payments, setPayments] = useState([]);
+const ExpenseTable = () => {
+    const [expenses, setExpenses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedPayment, setSelectedPayment] = useState(null);
+    const [selectedExpense, setSelectedExpense] = useState(null);
 
     const navigate = useNavigate(); // Initialize useNavigate hook
 
-    // Fetch payment data
+    // Fetch expense data
     useEffect(() => {
-        const fetchPaymentData = async () => {
+        const fetchExpenseData = async () => {
             try {
-                // Replace with your actual API call
-                const response = await getTotalPayments();
-                console.log("total payment fetched:", response);
-
+                const response = await getTotalExpense();
                 if (response.status === 200) {
-                    // Ensure payments is an array
-                    const paymentData = Array.isArray(response.data) ? response.data : response.data.payments || [];
-                    setPayments(paymentData);
+                    const expenseData = Array.isArray(response.data) ? response.data : response.data.expenses || [];
+                    setExpenses(expenseData);
                 } else {
-                    console.error("Failed to fetch payment details:", response.status);
+                    setError('Failed to load expense data');
                 }
             } catch (error) {
-                console.error("Error fetching payment details:", error);
-                setError('Failed to load payment data');
+                setError('Failed to load expense data');
             } finally {
                 setLoading(false);
             }
         };
-        fetchPaymentData();
+        fetchExpenseData();
     }, []);
 
-    const handleEdit = (paymentId) => {
-        navigate(`/payments-edit/${paymentId}`);
+    // Handle delete action
+    // const handleDelete = (expenseId) => {
+    //     if (window.confirm('Are you sure you want to delete this expense?')) {
+    //         // Call your delete API endpoint here
+    //         const updatedExpenses = expenses.filter((expense) => expense._id !== expenseId);
+    //         setExpenses(updatedExpenses);
+    //     }
+    // };
+
+    const handleEdit = (expenseId) => {
+        navigate(`/expense-edit/${expenseId}`);
     };
 
-    const handleView = (payment) => {
-        setSelectedPayment(payment);
+    const handleView = (expense) => {
+        setSelectedExpense(expense);
         setIsModalOpen(true);
     };
 
     const closeModal = () => {
         setIsModalOpen(false);
-        setSelectedPayment(null);
+        setSelectedExpense(null);
     };
 
     // Download table as Excel file
     const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(payments); // Convert data to sheet
-        const workbook = XLSX.utils.book_new(); // Create new workbook
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Payments"); // Add sheet to workbook
-        XLSX.writeFile(workbook, "payments.xlsx"); // Download Excel file
+        const worksheet = XLSX.utils.json_to_sheet(expenses);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Expenses");
+        XLSX.writeFile(workbook, "expenses.xlsx");
     };
 
     // Define columns for react-table
     const columns = useMemo(() => [
         { Header: 'S.No', accessor: (row, index) => index + 1 },
+        { Header: 'Type', accessor: 'type' },
         { Header: 'Project', accessor: 'project' },
-        { Header: 'Payment Type', accessor: 'paymentType' },
         { Header: 'Amount', accessor: 'amount' },
-        { Header: 'Mode', accessor: 'mode' },
+        { Header: 'Notes', accessor: 'notes' },
         {
-            Header: 'Date',
-            accessor: 'date',
-            Cell: ({ value }) => new Date(value).toLocaleDateString('en-GB') // Format date
-        },
-        { Header: 'TDS Applicable', accessor: 'tdsApplicable' },
-        { Header: 'Tax Applicable', accessor: 'taxApplicable' },
-        { Header: 'Payment Reference Number', accessor: 'paymentReferenceNumber' },
-        {
-            Header: 'Payment Quotation',
-            accessor: 'paymentQuotation',
+            Header: 'Attachments',
+            accessor: 'attachments',
             Cell: ({ value }) => (
                 <div>
                     {value ? (
-                        <img
-                            src={value}
-                            alt="Payment Quotation"
-                            className="w-20 h-20 object-cover rounded"
-                        />
+                        <img src={value} alt="Attachment" className="w-20 h-20 object-cover rounded" />
                     ) : (
-                        <span>No Quotation</span>
-                    )}
-                </div>
-            ),
-        },
-        {
-            Header: 'Payment Proof',
-            accessor: 'paymentProof',
-            Cell: ({ value }) => (
-                <div>
-                    {value ? (
-                        <img
-                            src={value}
-                            alt="Payment Proof"
-                            className="w-20 h-20 object-cover rounded"
-                        />
-                    ) : (
-                        <span>No Proof</span>
+                        <span>No attachment</span>
                     )}
                 </div>
             ),
@@ -115,13 +90,13 @@ const PaymentTable = () => {
             Header: 'Create Date',
             accessor: 'createdAt',
             Cell: ({ value }) => new Date(value).toLocaleDateString('en-GB'),
-            id: 'createdate',
+            id: 'date',
         },
         {
             Header: 'Create Time',
             accessor: 'createdAt',
             Cell: ({ value }) => new Date(value).toLocaleTimeString(),
-            id: 'createtime',
+            id: 'time',
         },
         {
             Header: 'Update Date',
@@ -135,7 +110,6 @@ const PaymentTable = () => {
             Cell: ({ value }) => (value ? new Date(value).toLocaleTimeString() : 'N/A'),
             id: 'updateTime',
         },
-        { Header: 'Notes', accessor: 'notes' },
         {
             Header: 'Actions',
             accessor: '_id',
@@ -148,12 +122,18 @@ const PaymentTable = () => {
                     >
                         <Eye size={20} />
                     </button>
+                    {/* <button
+                        className="text-red-500 hover:bg-red-100 p-2 rounded-full"
+                        title="Delete Expense"
+                        onClick={() => handleDelete(row.original._id)}
+                    >
+                        <Trash2 size={20} />
+                    </button> */}
                 </div>
             ),
-        }
-    ], [payments]);
-
-
+        },
+    ], [expenses]);
+    
     // Initialize react-table
     const {
         getTableProps,
@@ -171,7 +151,7 @@ const PaymentTable = () => {
     } = useTable(
         {
             columns,
-            data: payments,
+            data: expenses,
             initialState: { pageSize: 10 }
         },
         useGlobalFilter,
@@ -181,16 +161,26 @@ const PaymentTable = () => {
 
     const { globalFilter, pageIndex } = state;
 
-    // Ensure payments are loaded correctly
-    console.log("Payments before rendering:", payments);
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="text-xl">Loading...</div>
+            </div>
+        );
+    }
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>{error}</div>;
+    if (error) {
+        return (
+            <div className="flex justify-center items-center h-screen text-red-500">
+                {error}
+            </div>
+        );
+    }
 
     return (
         <div className="container mx-auto p-4 mt-12">
             <h2 className="text-4xl font-bold mb-10 text-center mt-24">
-                Add Payment
+                Expense Table
             </h2>
 
             {/* Data Table Section */}
@@ -208,10 +198,10 @@ const PaymentTable = () => {
                     </div>
                     <div className="flex space-x-4">
                         <button
-                            onClick={() => navigate('/payments-form')} // Navigate to /payments-form on click
+                            onClick={() => navigate('/expense-form')}
                             className="bg-blue-500 text-white px-6 py-2 rounded flex items-center hover:bg-blue-600"
                         >
-                            Add Payment
+                            Add Expense
                         </button>
                         <button onClick={downloadExcel} className="bg-green-500 text-white px-6 py-2 rounded flex items-center hover:bg-green-600">
                             <FaFileDownload className="mr-2" /> Export Data
@@ -219,8 +209,8 @@ const PaymentTable = () => {
                     </div>
                 </div>
                 <div className="overflow-x-auto bg-white shadow-md rounded-lg">
-                    {payments.length === 0 ? (
-                        <p className="text-center p-4">No payment records found.</p>
+                    {expenses.length === 0 ? (
+                        <p className="text-center p-4">No expense records found.</p>
                     ) : (
                         <>
                             <table {...getTableProps()} className="w-full">
@@ -230,7 +220,7 @@ const PaymentTable = () => {
                                             {headerGroup.headers.map(column => (
                                                 <th
                                                     {...column.getHeaderProps(column.getSortByToggleProps())}
-                                                    className="p-4 text-left cursor-pointer whitespace-nowrap"
+                                                    className="p-4 text-left cursor-pointer"
                                                 >
                                                     <div className="flex items-center">
                                                         {column.render('Header')}
@@ -282,65 +272,35 @@ const PaymentTable = () => {
                         </>
                     )}
                 </div>
-
+                {/* Modal for Viewing Expense */}
                 {isModalOpen && (
-                    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center mt-20">
-                        <div className="bg-white rounded-lg p-4 w-full sm:w-2/3 md:w-1/2 lg:w-1/3 max-h-[500px] overflow-auto flex flex-col"> {/* Adjust width for mobile */}
-                            {/* Title and Main Content Section */}
-                            <h2 className="text-2xl font-semibold mb-4">Payment Details</h2>
-                            <div className="flex flex-row justify-between">
-                                {/* Left Side - Text Data */}
-                                <div className="w-1/2 pr-4">
-                                    {selectedPayment && (
-                                        <div className="space-y-2">
-                                            <p><strong>Project:</strong> {selectedPayment.project}</p>
-                                            <p><strong>Payment Type:</strong> {selectedPayment.paymentType}</p>
-                                            <p><strong>Amount:</strong> {selectedPayment.amount}</p>
-                                            <p><strong>Mode:</strong> {selectedPayment.mode}</p>
-                                            <p><strong>Date:</strong> {new Date(selectedPayment.date).toLocaleDateString('en-GB')}</p>
-                                            <p><strong>TDS Applicable:</strong> {selectedPayment.tdsApplicable ? 'Yes' : 'No'}</p>
-                                            <p><strong>Tax Applicable:</strong> {selectedPayment.taxApplicable ? 'Yes' : 'No'}</p>
-                                            <p><strong>Payment Reference Number:</strong> {selectedPayment.paymentReferenceNumber}</p>
-                                            <p><strong>Notes:</strong> {selectedPayment.notes}</p>
-                                            <p><strong>Created Date&Time:</strong> {new Date(selectedPayment.createdAt).toLocaleString()}</p>
-                                            <p><strong>Updated Date&Time:</strong> {selectedPayment.updatedAt ? new Date(selectedPayment.updatedAt).toLocaleString() : 'N/A'}</p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Right Side - Attachment Image Data */}
-                                <div className="w-1/2 pl-4 flex flex-col justify-start">
-                                    <div className="mb-2">
-                                        <strong>Payment Quotation:</strong>
-                                        {selectedPayment.paymentQuotation ? (
-                                            <img
-                                                src={selectedPayment.paymentQuotation}
-                                                alt="Payment Quotation"
-                                                className="w-24 h-24 object-cover rounded mt-2"
-                                            />
-                                        ) : (
-                                            <span>No Quotation Available</span>
-                                        )}
+                    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
+                        <div className="bg-white rounded-lg p-8 w-1/2">
+                            <h2 className="text-2xl font-semibold mb-4">Expense Details</h2>
+                            {selectedExpense && (
+                                <div className="flex flex-col md:flex-row md:space-x-4">
+                                    <div className="flex-1">
+                                        <p><strong>Employee ID:</strong> {selectedExpense.empId}</p>
+                                        <p><strong>Type:</strong> {selectedExpense.type}</p>
+                                        <p><strong>Project:</strong> {selectedExpense.project}</p>
+                                        <p><strong>Amount:</strong> {selectedExpense.amount}</p>
+                                        <p><strong>Note:</strong> {selectedExpense.notes}</p>
+                                        <p><strong>Date:</strong> {new Date(selectedExpense.createdAt).toLocaleDateString('en-GB')}</p>
+                                        <p><strong>Time:</strong> {new Date(selectedExpense.createdAt).toLocaleTimeString()}</p>
                                     </div>
-                                    <div>
-                                        <strong>Payment Proof:</strong>
-                                        {selectedPayment.paymentProof ? (
-                                            <img
-                                                src={selectedPayment.paymentProof}
-                                                alt="Payment Proof"
-                                                className="w-24 h-24 object-cover rounded mt-2"
-                                            />
-                                        ) : (
-                                            <span>No Proof Available</span>
+                                    <div className="mt-4 md:mt-0 flex justify-end items-center">
+                                        {selectedExpense.attachments && (
+                                            <div>
+                                                <strong>Attachment:</strong>
+                                                <img src={selectedExpense.attachments} alt="Attachment" className="mt-2 w-40 h-40 object-cover rounded" />
+                                            </div>
                                         )}
                                     </div>
                                 </div>
-                            </div>
-
-                            {/* Modal Buttons Below the Images */}
+                            )}
                             <div className="mt-4 flex justify-between">
                                 <button
-                                    onClick={() => handleEdit(selectedPayment._id)}
+                                    onClick={() => handleEdit(selectedExpense._id)}
                                     className="bg-blue-500 text-white px-6 py-2 rounded"
                                 >
                                     Edit
@@ -356,4 +316,4 @@ const PaymentTable = () => {
     );
 };
 
-export default PaymentTable;
+export default ExpenseTable;

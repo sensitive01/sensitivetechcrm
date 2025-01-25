@@ -7,7 +7,8 @@ import {
   Users, 
   Clipboard, 
   MessageCircleQuestion, 
-  CreditCard 
+  CreditCard,
+  FileText
 } from 'lucide-react';
 import { FaPowerOff } from 'react-icons/fa';
 import logo from "../../assets/logo light.png";
@@ -59,9 +60,14 @@ const Topbar = () => {
     },
     { 
       label: 'Expenses', 
-      path: '/expenses-table',
+      path: '/expense-table',
       icon: CreditCard 
-    }
+    },
+    { 
+      label: 'MoM', 
+      path: '/mom',
+      icon: FileText
+    },
   ];
 
   useEffect(() => {
