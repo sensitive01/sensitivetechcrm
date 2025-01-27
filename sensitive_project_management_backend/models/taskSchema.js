@@ -31,7 +31,7 @@ const taskSchema = new mongoose.Schema({
   attachments:[]
 },
 {
-    timestamps: true, // Automatically add createdAt and updatedAt fields
+    timestamps: true, 
 }
 );
 
