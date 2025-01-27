@@ -1,51 +1,30 @@
-// const express = require("express");
-const Task = require("../models/taskSchema"); // Import the Task model
-// const multer = require("multer");
+const Task = require("../models/taskSchema"); 
+const { uploadImage } = require("../config/cloudinary");
 
-// const app = express();
-
-// const upload = multer({ dest: "uploads/" }); 
-
-// Controller for creating a new task
 const createTask = async (req, res) => {
-    try {
-     
-        const { project, task, empId, description, timeline, status, date } = req.body;
-        console.log("req.body",req.body)
-        // Check if there are files and if req.files is defined
-        // let attachments = [];
-        // if (req.files && req.files.length > 0) {
-        //     attachments = req.files.map((file) => file.path); // Save file paths or other file info
-        // }
+  try {
+      const taskData = req.body;
+      console.log("req.body", req.body);
+      if (req.file) {
+          taskData.attachments = await uploadImage(req.file.buffer);
+      }
+      const newTask = new Task(taskData); 
 
-        // Create a new task object with all the data
-        const newTask = new Task({
-            project,
-            task,
-            empId,
-            description,
-            timeline,
-            status,
-            date,
-            // attachments, // Attach file paths or the file data itself
-        });
+      await newTask.save();
 
-        // Save the new task to the database
-        const savedTask = await newTask.save();
-
-        // Return a success response with the full task object
-        return res.status(201).json({
-            message: 'Task created successfully',
-            task: savedTask, // Ensure the full task object is returned here
-        });
-    } catch (error) {
-        console.error('Error creating task:', error);
-        return res.status(500).json({
-            message: 'Error creating task',
-            error: error.message,
-        });
-    }
+      res.status(201).json({
+          message: 'Task created successfully',
+          task: newTask,  
+      });
+  } catch (error) {
+      console.error('Error creating task:', error);
+      res.status(500).json({
+          message: 'Error creating task',
+          error: error.message,
+      });
+  }
 };
+
 
 // Get all tasks
 const getAllTasks = async (req, res) => {
@@ -92,16 +71,14 @@ const getTaskById = async (req, res) => {
 // Update a task by ID
 const updateTask = async (req, res) => {
   console.log("Update task",req.body)
-  const { id } = req.params;
-  const { project, task, empId, description, timeline, status, attachments } =
-    req.body;
 
   try {
-    const updatedTask = await Task.findByIdAndUpdate(
-      id,
-      { project, task, empId, description, timeline, status, attachments },
-      { new: true } // Return the updated task
-    );
+    const { id } = req.params;
+    const updateData = req.body;
+    if (req.file) {
+      updateData.attachments = await uploadImage(req.file.buffer); // Process file upload
+  }
+   const updatedTask = await Task.findByIdAndUpdate(id, updateData, { new: true });
 
     if (!updatedTask) {
       return res.status(404).json({

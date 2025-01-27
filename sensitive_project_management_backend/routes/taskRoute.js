@@ -1,13 +1,17 @@
 const express = require('express');
 const taskRouter = express.Router();
 const taskController = require('../controllers/taskController');
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
 
 // Define routes
 taskRouter.get('/getalltask', taskController.getAllTasks); // Get all tasks
 taskRouter.get('/gettaskbyid/:id', taskController.getTaskById); // Get task by ID
-taskRouter.put('/updatetask/:id', taskController.updateTask); // Update task
+taskRouter.put('/updatetask/:id', upload.single("attachments"), taskController.updateTask); // Update task
 taskRouter.delete('/deletetask/:id', taskController.deleteTask); // Delete task
-taskRouter.post('/createtask',taskController.createTask);
+taskRouter.post('/createtask',upload.single("attachments"), taskController.createTask);
 taskRouter.put('/update-status/:id',taskController.updateTaskStatus); 
 taskRouter.get('/totaltasks', taskController.getTotalTasks);
 
