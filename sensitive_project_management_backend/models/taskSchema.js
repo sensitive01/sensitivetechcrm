@@ -29,7 +29,11 @@ const taskSchema = new mongoose.Schema({
     default: Date.now,  
   },
   attachments:[]
-});
+},
+{
+    timestamps: true, // Automatically add createdAt and updatedAt fields
+}
+);
 
 
 module.exports = mongoose.model('Task', taskSchema);
