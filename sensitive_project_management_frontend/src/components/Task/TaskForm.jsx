@@ -102,15 +102,29 @@ function TaskForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(tasks)
-
-
-
+  
     try {
-
-      for (const formData of tasks) {
+      for (const formTask of tasks) {
+        const formData = new FormData();
+        formData.append("project", formTask.project);
+        formData.append("task", formTask.task);
+        formData.append("empId", formTask.empId);
+        formData.append("description", formTask.description);
+        formData.append("timeline", formTask.timeline);
+        formData.append("status", formTask.status);
+        formData.append("date", formTask.date);
+  
+        // Append files properly
+        if (formTask.attachments) {
+          Array.from(formTask.attachments).forEach((file) => {
+            formData.append("attachments", file); // Append files one by one
+          });
+        } else {
+          formData.append("attachments", ""); // Ensure backend gets at least an empty string
+        }
+  
         const response = await createTask(formData);
-
+  
         if (response.status === 201) {
           alert("Task created successfully!");
         } else {
@@ -122,7 +136,7 @@ function TaskForm() {
       alert("An error occurred while creating the tasks.");
     }
   };
-
+  
   if (loading) {
     return (
       <div className="container mx-auto p-8 mt-20 text-center">

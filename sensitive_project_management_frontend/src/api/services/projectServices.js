@@ -92,15 +92,16 @@ export const employeename=async() => {
 };
 
 
-export const createTask=async(formData) => {
+export const createTask = async (formData) => {
   try {
     const response = await projectServices.post(`/task/createtask`, formData, {
       headers: {
-          "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data", // Important for file uploads
       },
-  });
+    });
     return response;
   } catch (err) {
+    console.error("Error creating task:", err);
     return err;
   }
 };

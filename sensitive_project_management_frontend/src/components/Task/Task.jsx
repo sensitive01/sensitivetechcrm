@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { 
-    useTable, 
-    useGlobalFilter, 
-    useSortBy, 
-    usePagination 
+import {
+    useTable,
+    useGlobalFilter,
+    useSortBy,
+    usePagination
 } from 'react-table';
 import { Trash2, Eye } from 'lucide-react';
 import { FaPlus, FaFileDownload, FaFilter } from 'react-icons/fa';
@@ -18,30 +18,38 @@ const TaskList = () => {
     const [error, setError] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedTask, setSelectedTask] = useState(null);
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
-      const fetchTasks = async () => {
-          try {
-              const response = await axios.get('https://sensitivetechcrm.onrender.com/task/getalltask');
-              console.log(response)
-              const updatedTasks = response.data.tasks.map(task => {
-                  if (task.date) {
-                      const dateObj = new Date(task.date);
-                      task.date = `${dateObj.getDate().toString().padStart(2, '0')}/${(dateObj.getMonth() + 1).toString().padStart(2, '0')}/${dateObj.getFullYear().toString().slice(-2)}`;
-                  }
-                  return task;
-              });
-              setTasks(updatedTasks);
-          } catch (err) {
-              setError("Failed to load task data");
-          } finally {
-              setLoading(false);
-          }
-      };
+        const fetchTasks = async () => {
+            try {
+                const response = await axios.get('https://sensitivetechcrm.onrender.com/task/getalltask');
+                console.log(response)
+                const updatedTasks = response.data.tasks.map(task => {
+                    if (task.date) {
+                        const dateObj = new Date(task.date);
+                        task.date = `${dateObj.getDate().toString().padStart(2, '0')}/${(dateObj.getMonth() + 1).toString().padStart(2, '0')}/${dateObj.getFullYear().toString().slice(-2)}`;
+                    }
 
-      fetchTasks();
-  }, []);
+                    if (task.createdAt) {
+                        const createdAtObj = new Date(task.createdAt);
+                        task.createDate = `${createdAtObj.getDate().toString().padStart(2, '0')}/${(createdAtObj.getMonth() + 1).toString().padStart(2, '0')}/${createdAtObj.getFullYear()}`;
+                        task.createTime = `${createdAtObj.getHours().toString().padStart(2, '0')}:${createdAtObj.getMinutes().toString().padStart(2, '0')}:${createdAtObj.getSeconds().toString().padStart(2, '0')}`;
+                    }
+                    return task;
+                });
+                setTasks(updatedTasks);
+            } catch (err) {
+                setError("Failed to load task data");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchTasks();
+    }, []);
 
     const handleDelete = async (taskId) => {
         if (window.confirm('Are you sure you want to delete this task?')) {
@@ -89,6 +97,26 @@ const TaskList = () => {
         XLSX.writeFile(workbook, `Task_Records_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
 
+    const applyDateFilter = () => {
+        if (!startDate || !endDate) {
+            alert('Please select both start and end dates.');
+            return;
+        }
+
+        // Convert dates to Date objects for comparison
+        const start = new Date(startDate.split('/').reverse().join('/'));
+        const end = new Date(endDate.split('/').reverse().join('/'));
+
+        const filteredTasks = tasks.filter((task) => {
+            const taskDateParts = task.date.split('/');
+            const taskDate = new Date(`20${taskDateParts[2]}-${taskDateParts[1]}-${taskDateParts[0]}`);
+
+            return taskDate >= start && taskDate <= end;
+        });
+
+        setTasks(filteredTasks);
+    };
+
     const columns = useMemo(() => [
         {
             Header: 'S.No',
@@ -121,13 +149,77 @@ const TaskList = () => {
         {
             Header: 'Status',
             accessor: 'status',
+            Cell: ({ row }) => {
+                const handleStatusChange = async (e) => {
+                    const updatedStatus = e.target.value;
+                    try {
+                        const taskId = row.original._id;
+                        // Update the task status in the backend
+                        await axios.put(`https://sensitivetechcrm.onrender.com/task/update-status/${taskId}`, {
+                            status: updatedStatus,
+                        });
+
+                        // Update the status locally in the state
+                        row.original.status = updatedStatus;
+                        setTasks([...tasks]);
+                    } catch (err) {
+                        alert("Failed to update status");
+                    }
+                };
+
+                const getStatusStyle = (status) => {
+                    switch (status) {
+                        case 'Completed':
+                            return 'bg-green-500 text-white';
+                        case 'In Progress':
+                            return 'bg-yellow-500 text-white';
+                        case 'Pending':
+                        default:
+                            return 'bg-red-500 text-white';
+                    }
+                };
+
+                return (
+                    <select
+                        value={row.original.status || "Pending"}  // Default to "Pending"
+                        onChange={handleStatusChange}
+                        className={`border p-2 rounded w-32 ${getStatusStyle(row.original.status)}`}
+                    >
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                );
+            },
+        },
+        {
+            Header: 'Attachment',  // New column for attachments
+            accessor: 'attachments',
+            Cell: ({ value }) => {
+                if (value) {
+                    return (
+                        <a href={value} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                            View Attachment
+                        </a>
+                    );
+                }
+                return <span>No Attachment</span>;
+            },
+        },
+        {
+            Header: 'Created Date',
+            accessor: 'createDate',
+        },
+        {
+            Header: 'Created Time',
+            accessor: 'createTime',
         },
         {
             Header: 'Actions',
             accessor: '_id',
             Cell: ({ row }) => (
                 <div className="flex justify-center space-x-2">
-                     <button
+                    <button
                         className="text-blue-500 hover:bg-blue-100 p-2 rounded-full transition-colors"
                         title="View Task"
                         onClick={() => handleView(row.original)}
@@ -204,6 +296,37 @@ const TaskList = () => {
                     <FaFilter className="absolute left-2 top-3 text-blue-500" />
                 </div>
 
+                <div className="flex space-x-4 items-center -mt-6">
+                    <div>
+                        <label htmlFor="startDate" className="block">Start Date</label>
+                        <input
+                            type="date"
+                            id="startDate"
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            className="border border-blue-500 p-2 rounded w-32"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="endDate" className="block">End Date</label>
+                        <input
+                            type="date"
+                            id="endDate"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            className="border border-blue-500 p-2 rounded w-32"
+                        />
+                    </div>
+                    <button
+
+                        onClick={applyDateFilter}
+                        className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
+                    >
+                        Apply Filter
+                    </button>
+                </div>
+
+
                 <div className="flex space-x-4">
                     <button
                         onClick={exportToExcel}
@@ -233,17 +356,17 @@ const TaskList = () => {
                                 {headerGroups.map(headerGroup => (
                                     <tr {...headerGroup.getHeaderGroupProps()}>
                                         {headerGroup.headers.map(column => (
-                                            <th 
+                                            <th
                                                 {...column.getHeaderProps(column.getSortByToggleProps())}
-                                                className="p-4 text-left cursor-pointer"
+                                                className="p-4 text-left cursor-pointer  whitespace-nowrap"
                                             >
                                                 <div className="flex items-center">
                                                     {column.render('Header')}
                                                     <span>
-                                                        {column.isSorted 
-                                                            ? (column.isSortedDesc 
-                                                                ? ' 🔽' 
-                                                                : ' 🔼') 
+                                                        {column.isSorted
+                                                            ? (column.isSortedDesc
+                                                                ? ' 🔽'
+                                                                : ' 🔼')
                                                             : ''}
                                                     </span>
                                                 </div>
@@ -256,13 +379,13 @@ const TaskList = () => {
                                 {page.map(row => {
                                     prepareRow(row);
                                     return (
-                                        <tr 
-                                            {...row.getRowProps()} 
-                                            className="border-b hover:bg-gray-50 transition-colors"
+                                        <tr
+                                            {...row.getRowProps()}
+                                            className="border-b hover:bg-gray-50 transition-colors whitespace-nowrap"
                                         >
                                             {row.cells.map(cell => (
-                                                <td 
-                                                    {...cell.getCellProps()} 
+                                                <td
+                                                    {...cell.getCellProps()}
                                                     className="p-4"
                                                 >
                                                     {cell.render('Cell')}
@@ -284,15 +407,15 @@ const TaskList = () => {
                                 </span>
                             </div>
                             <div className="space-x-2">
-                                <button 
-                                    onClick={() => previousPage()} 
+                                <button
+                                    onClick={() => previousPage()}
                                     disabled={!canPreviousPage}
                                     className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
                                 >
                                     Previous
                                 </button>
-                                <button 
-                                    onClick={() => nextPage()} 
+                                <button
+                                    onClick={() => nextPage()}
                                     disabled={!canNextPage}
                                     className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
                                 >
@@ -306,32 +429,64 @@ const TaskList = () => {
 
             {/* Modal for Viewing Task */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
-                    <div className="bg-white rounded-lg p-8 w-1/2">
-                        <h2 className="text-2xl font-semibold mb-4">Task Details</h2>
-                        {selectedTask && (
-                            <div>
-                                <p><strong>Task Name:</strong> {selectedTask.task}</p>
-                                <p><strong>Project:</strong> {selectedTask.project}</p>
-                                <p><strong>Employee:</strong> {selectedTask.empId}</p>
-                                <p><strong>Description:</strong> {selectedTask.description}</p>
-                                <p><strong>Timeline:</strong> {selectedTask.timeline}</p>
-                                <p><strong>Date:</strong> {selectedTask.date}</p>
-                                <p><strong>Status:</strong> {selectedTask.status}</p>
-                            </div>
-                        )}
-                        <div className="mt-4 flex justify-between">
-                            <button 
-                                onClick={() => handleEdit(selectedTask._id)}
-                                className="bg-blue-500 text-white px-6 py-2 rounded"
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-[500px]">
+                        <h2 className="text-xl font-bold mb-4">Task Details</h2>
+                        <div className="mb-4">
+                            <strong>Task Name:</strong> {selectedTask.task}
+                        </div>
+                        <div className="mb-4">
+                            <strong>Project:</strong> {selectedTask.project}
+                        </div>
+                        <div className="mb-4">
+                            <strong>Employee:</strong> {selectedTask.empId}
+                        </div>
+                        <div className="mb-4">
+                            <strong>Description:</strong> {selectedTask.description}
+                        </div>
+                        <div className="mb-4">
+                            <strong>Timeline:</strong> {selectedTask.timeline}
+                        </div>
+                        <div className="mb-4">
+                            <strong>Date:</strong> {selectedTask.date}
+                        </div>
+                        <div className="mb-4">
+                            <strong>Status:</strong> {selectedTask.status}
+                        </div>
+                        <div className="mb-4">
+                            <strong>Attachment:</strong>
+                            {selectedTask.attachments ? (
+                                <a
+                                    href={selectedTask.attachments}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-500 hover:underline"
+                                >
+                                    View Attachment
+                                </a>
+                            ) : (
+                                <span>No Attachment</span>
+                            )}
+                        </div>
+                        <div className="flex justify-end space-x-4">
+                            <button
+                                className="bg-blue-500 text-white px-4 py-2 rounded"
+                                onClick={() => navigate(`/task-edit/${selectedTask._id}`)}
                             >
                                 Edit
                             </button>
-                            <button onClick={closeModal} className="bg-red-500 text-white px-6 py-2 rounded">Close</button>
-                        </div>  
+                            <button
+                                className="bg-red-500 text-white px-4 py-2 rounded"
+                                onClick={closeModal}
+                            >
+                                Close
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
+
+
         </div>
     );
 };

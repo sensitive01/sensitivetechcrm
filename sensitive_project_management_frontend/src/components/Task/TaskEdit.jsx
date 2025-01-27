@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { employeename, getTheTask } from "../../api/services/projectServices";
+import { employeename, getTheTask, projectname } from "../../api/services/projectServices";
 import axios from "axios";
 
 function TaskEdit() {
@@ -13,12 +13,12 @@ function TaskEdit() {
     timeline: "",
     status: "Pending",
     date: "",
-    attachments: null,
+    attachments: "", // Store as a single string (URL or filename)
   });
 
-  const [projects, setprojects] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [employees, setEmployees] = useState([]);
-  const [loading, setLoading] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -26,24 +26,22 @@ function TaskEdit() {
       try {
         setLoading(true);
 
-        // Fetch employees and project names concurrently using Promise.all
+        // Fetch employees and project names concurrently
         const [employeesResponse, projectsResponse] = await Promise.all([
-          employeename(), // Assuming employeename() returns the employees data
-          axios.get("https://sensitivetechcrm.onrender.com/project/projectname") // Fetching project names
+          employeename(),
+          projectname(), 
+          // axios.get("https://sensitivetechcrm.onrender.com/project/projectname"),
         ]);
 
-        console.log("Employees fetched:", employeesResponse);
-        console.log("Projects fetched:", projectsResponse);
-
         if (employeesResponse && projectsResponse) {
-          setEmployees(employeesResponse.data); // Set employees
+          setEmployees(employeesResponse.data);
           const flattenedProjects = projectsResponse.data.flatMap(project =>
             project.projectDetails.map(detail => ({
               _id: project._id,
-              projectName: detail.projectName // Flatten and extract project name
+              projectName: detail.projectName
             }))
           );
-          setprojects(flattenedProjects); // Set project names
+          setProjects(flattenedProjects);
           setError(null);
         } else {
           throw new Error("Failed to fetch employees or projects.");
@@ -59,27 +57,29 @@ function TaskEdit() {
     fetchData();
   }, []);
 
-
-
   useEffect(() => {
     const fetchTaskData = async () => {
       try {
         const response = await getTheTask(taskId);
-        console.log(response)
-
-        if (response.status===200) {
-          setTask(response.data.task)
-          // setTask({
-          //   project: response.data.project,
-          //   task: response.data.task,
-          //   empId: response.data.empId,
-          //   description: response.data.description,
-          //   timeline: response.data.timeline,
-          //   status: response.data.status,
-          //   date: response.data.date,
-          //   attachments: response.data.attachments || null,
-          // });
+        if (response.status === 200) {
+          let fetchedTask = response.data.task;
+  
+          console.log("Fetched Task Data:", fetchedTask); 
+  
+          if (fetchedTask.date) {
+            // Convert ISO date format to DD/MM/YY
+            let dateObj = new Date(fetchedTask.date);
+            let day = String(dateObj.getDate()).padStart(2, "0");
+            let month = String(dateObj.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+            let year = String(dateObj.getFullYear()).slice(-2); // Get last two digits of year
+  
+            fetchedTask.dateFormatted = `${day}/${month}/${year}`; // Store DD/MM/YY for display
+            fetchedTask.date = dateObj.toISOString().split("T")[0]; // Store YYYY-MM-DD for input field
+          }
+  
+          setTask(fetchedTask);
         } else {
+          console.error("Failed to fetch task data. Response status:", response.status);
           alert("Failed to fetch task data.");
         }
       } catch (error) {
@@ -87,42 +87,57 @@ function TaskEdit() {
         alert("An error occurred while fetching task data.");
       }
     };
-
+  
     if (taskId) {
       fetchTaskData();
     }
   }, [taskId]);
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setTask((prev) => ({ ...prev, [name]: value }));
+  
+    if (name === "date") {
+      let dateObj = new Date(value);
+      let day = String(dateObj.getDate()).padStart(2, "0");
+      let month = String(dateObj.getMonth() + 1).padStart(2, "0");
+      let year = String(dateObj.getFullYear()).slice(-2);
+  
+      setTask((prev) => ({
+        ...prev,
+        date: value, // Store YYYY-MM-DD for input field
+        dateFormatted: `${day}/${month}/${year}`, // Store DD/MM/YY for display
+      }));
+    } else {
+      setTask((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
+  
 
   const handleFileChange = (e) => {
-    setTask((prev) => ({ ...prev, attachments: e.target.files }));
+    const file = e.target.files[0]; // Only store one file
+    if (file) {
+      setTask((prev) => ({
+        ...prev,
+        attachments: URL.createObjectURL(file), // Convert file to URL for preview
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const formData = new FormData();
-  
     Object.keys(task).forEach((key) => {
-      if (key === "attachments" && task[key]) {
-        Array.from(task[key]).forEach((file) => {
-          formData.append("attachments", file);
-        });
-      } else {
-        formData.append(key, task[key]);
-      }
+      formData.append(key, task[key]); // Attachments as a string
     });
-  
+
     try {
-      // Call the API to update the task
-      console.log(taskId, task)
+      console.log(taskId, task);
       const result = await getTheTask(taskId, task);
-  
-      // Handle the response
       console.log("Task updated:", result);
       alert("Task updated successfully!");
     } catch (error) {
@@ -130,53 +145,27 @@ function TaskEdit() {
       alert("An error occurred while updating the task.");
     }
   };
-  
-  
 
   if (loading) {
-    return (
-      <div className="container mx-auto p-8 mt-20 text-center">
-        <p className="text-xl">Loading</p>
-      </div>
-    );
+    return <div className="container mx-auto p-8 mt-20 text-center"><p className="text-xl">Loading...</p></div>;
   }
 
   if (error) {
-    return (
-      <div className="container mx-auto p-8 mt-20 text-center">
-        <p className="text-xl text-red-600">{error}</p>
-      </div>
-    );
+    return <div className="container mx-auto p-8 mt-20 text-center"><p className="text-xl text-red-600">{error}</p></div>;
   }
-
 
   return (
     <div className="container mx-auto p-8 mt-20">
       <h2 className="text-4xl font-bold mb-8 text-center text-gray-800">Task Form</h2>
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-8 bg-white p-8 border rounded-lg shadow-lg max-w-4xl mx-auto"
-      >
-        {/* Task Details Section */}
+      <form onSubmit={handleSubmit} className="space-y-8 bg-white p-8 border rounded-lg shadow-lg max-w-4xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Project */}
           <div>
             <label className="block text-sm font-medium pb-2 text-gray-600">Project:</label>
-            <select
-              name="project"
-              value={task.project}
-              onChange={handleChange}
-              required
-              className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"
-            >
+            <select name="project" value={task.project} onChange={handleChange} required className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500">
               <option value="">Select Project</option>
               {projects.map((project) => (
-                <option
-                  key={project._id}
-                  value={project._id}
-                >
-                  {project.projectName}
-                </option>
+                <option key={project.id} value={project.id}>{project.projectName}</option>
               ))}
             </select>
           </div>
@@ -184,31 +173,16 @@ function TaskEdit() {
           {/* Task */}
           <div>
             <label className="block text-sm font-medium pb-2 text-gray-600">Task:</label>
-            <input
-              type="text"
-              name="task"
-              value={task.task}
-              onChange={handleChange}
-              required
-              className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"
-            />
+            <input type="text" name="task" value={task.task} onChange={handleChange} required className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"/>
           </div>
 
-          {/* EmpID */}
+          {/* Employee */}
           <div>
             <label className="block text-sm font-medium pb-2 text-gray-600">Employee:</label>
-            <select
-              name="empId"
-              value={task.empId}
-              onChange={handleChange}
-              required
-              className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"
-            >
+            <select name="empId" value={task.empId} onChange={handleChange} required className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500">
               <option value="">Select Employee</option>
               {employees.map((employee) => (
-                <option key={employee._id} value={employee.name}>
-                  {employee.name}
-                </option>
+                <option key={employee._id} value={employee.name}>{employee.name}</option>
               ))}
             </select>
           </div>
@@ -216,81 +190,46 @@ function TaskEdit() {
           {/* Description */}
           <div>
             <label className="block text-sm font-medium pb-2 text-gray-600">Description:</label>
-            <textarea
-              name="description"
-              value={task.description}
-              onChange={handleChange}
-              required
-              className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"
-              rows="4"
-            />
+            <textarea name="description" value={task.description} onChange={handleChange} required className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500" rows="4"/>
           </div>
         </div>
 
         {/* Second Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Timeline */}
           <div>
             <label className="block text-sm font-medium pb-2 text-gray-600">Timeline:</label>
-            <input
-              type="text"
-              name="timeline"
-              value={task.timeline}
-              onChange={handleChange}
-              className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"
-            />
+            <input type="text" name="timeline" value={task.timeline} onChange={handleChange} className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"/>
           </div>
 
-          {/* Status */}
           <div>
             <label className="block text-sm font-medium pb-2 text-gray-600">Status:</label>
-            <select
-              name="status"
-              value={task.status}
-              onChange={handleChange}
-              required
-              className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"
-            >
+            <select name="status" value={task.status} onChange={handleChange} required className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500">
               <option value="Pending">Pending</option>
               <option value="In Progress">In Progress</option>
               <option value="Completed">Completed</option>
             </select>
           </div>
 
-          {/* Date */}
           <div>
             <label className="block text-sm font-medium pb-2 text-gray-600">Date:</label>
-            <input
-              type="date"
-              name="date"
-              value={task.date}
-              onChange={handleChange}
-              required
-              className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"
-            />
+            <input type="date" name="date" value={task.date} onChange={handleChange} required className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"/>
           </div>
 
           {/* Attachments */}
           <div>
             <label className="block text-sm font-medium pb-2 text-gray-600">Attachments:</label>
-            <input
-              type="file"
-              name="attachments"
-              onChange={handleFileChange}
-              multiple
-              className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"
-            />
+            {task.attachments && (
+              <div className="mb-4">
+                <p className="text-gray-600">Existing Attachment:</p>
+                <a href={task.attachments} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View Attachment</a>
+              </div>
+            )}
+            <input type="file" name="attachments" onChange={handleFileChange} className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"/>
           </div>
         </div>
 
-        {/* Submit Button */}
         <div className="flex justify-center mt-8">
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-300"
-          >
-            Submit
-          </button>
+          <button type="submit" className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-300">Submit</button>
         </div>
       </form>
     </div>
