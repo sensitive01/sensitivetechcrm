@@ -26,13 +26,6 @@ const TaskList = () => {
               const response = await axios.get('https://sensitivetechcrm.onrender.com/task/getalltask');
               console.log(response)
               const updatedTasks = response.data.tasks.map(task => {
-                  if (!task.timeline) {
-                      task.timeline = new Date().toLocaleString();
-                  }
-                  if (task.timeline) {
-                      const timeObj = new Date(task.timeline);
-                      task.timeline = timeObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                  }
                   if (task.date) {
                       const dateObj = new Date(task.date);
                       task.date = `${dateObj.getDate().toString().padStart(2, '0')}/${(dateObj.getMonth() + 1).toString().padStart(2, '0')}/${dateObj.getFullYear().toString().slice(-2)}`;
