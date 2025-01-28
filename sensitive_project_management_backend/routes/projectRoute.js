@@ -1,14 +1,16 @@
 const express = require("express");
 const projectRouter = express.Router();
 const projectController = require("../controllers/projectController");
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
-projectRouter.post("/createproject", projectController.createProject);
+projectRouter.post("/createproject",upload.single("projectDocument"), projectController.createProject);
 projectRouter.get("/getallprojects", projectController.getAllProjects);
 projectRouter.get("/getprojectbyid/:id", projectController.getProjectById);
-projectRouter.put("/updateprojectby/:id", projectController.updateProjectById);
+projectRouter.put("/updateprojectby/:id",upload.single("projectDocument"), projectController.updateProjectById);
 projectRouter.delete("/deleteproject/:id", projectController.deleteProjectById);
 projectRouter.get("/projectname", projectController.getProjectNames);
-// Route to get total projects count
 projectRouter.get('/totalprojects', projectController.getTotalProjects);
 
 
