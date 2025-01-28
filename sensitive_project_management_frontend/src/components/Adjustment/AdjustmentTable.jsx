@@ -13,18 +13,21 @@ import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import { getAllPayroll } from '../../api/services/projectServices';
 
-const PayrollTable = () => {
+const AdjustmentTable = () => {
     const [payroll, setPayroll] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedPayroll, setSelectedPayroll] = useState(null);
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchPayrolls = async () => {
             try {
                 const response = await getAllPayroll();
+                console.log(response)
                 if (response.status === 200) {
                     setPayroll(response.data);
                 } else {
@@ -54,7 +57,7 @@ const PayrollTable = () => {
     };
 
     const handleEdit = (payrollId) => {
-        navigate(`/payroll-edit/${payrollId}`);
+        navigate(`/adjustment-edit/${payrollId}`);
     };
 
     const handleView = (payroll) => {
@@ -83,6 +86,25 @@ const PayrollTable = () => {
         XLSX.utils.book_append_sheet(workbook, worksheet, "Payroll Records");
         XLSX.writeFile(workbook, `Payroll_Records_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
+
+    const applyDateFilter = () => {
+        if (!startDate || !endDate) {
+            alert('Please select both start and end dates.');
+            return;
+        }
+
+        // Convert dates to Date objects for comparison
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        const filteredPayrolls = payroll.filter((Payroll) => {
+            const PayrollDate = new Date(Payroll.createdAt);
+            return PayrollDate >= start && PayrollDate <= end;
+        });
+
+        setPayroll(filteredPayrolls);
+    };
+
 
     const columns = useMemo(() => [
         {
@@ -247,6 +269,37 @@ const PayrollTable = () => {
                     <FaFilter className="absolute left-2 top-3 text-blue-500" />
                 </div>
 
+
+                <div className="flex space-x-4 items-center -mt-6">
+                    <div>
+                        <label htmlFor="startDate" className="block">Start Date</label>
+                        <input
+                            type="date"
+                            id="startDate"
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            className="border border-blue-500 p-2 rounded w-32"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="endDate" className="block">End Date</label>
+                        <input
+                            type="date"
+                            id="endDate"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            className="border border-blue-500 p-2 rounded w-32"
+                        />
+                    </div>
+                    <button
+
+                        onClick={applyDateFilter}
+                        className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
+                    >
+                        Apply Filter
+                    </button>
+                </div>
+
                 <div className="flex space-x-4">
                     <button
                         onClick={exportToExcel}
@@ -257,11 +310,11 @@ const PayrollTable = () => {
                     </button>
 
                     <Link
-                        to="/payroll-form"
+                        to="/adjustment-form"
                         className="bg-blue-500 text-white px-6 py-2 rounded flex items-center hover:bg-blue-600"
                     >
                         <FaPlus className="mr-2" />
-                        Add Payroll
+                        Add Adjustments
                     </Link>
                 </div>
             </div>
@@ -351,14 +404,26 @@ const PayrollTable = () => {
             {isModalOpen && (
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white rounded-lg p-8 w-1/2">
-                        <h2 className="text-2xl font-semibold mb-4">Payroll Details</h2>
+                        <h2 className="text-2xl font-semibold mb-4">adjustment Details</h2>
                         {selectedPayroll && (
                             <div>
                                 <p><strong>Employee ID:</strong> {selectedPayroll.empId}</p>
                                 <p><strong>Type:</strong> {selectedPayroll.type}</p>
                                 <p><strong>Amount:</strong> {selectedPayroll.amount}</p>
                                 <p><strong>Note:</strong> {selectedPayroll.note}</p>
-                                <p><strong>Date:</strong> {selectedPayroll.createdAt}</p>
+                                <p>
+                                    <strong>Date:</strong>{' '}
+                                    {new Date(selectedPayroll.createdAt).toLocaleString('en-GB', {
+                                        day: '2-digit',
+                                        month: '2-digit',
+                                        year: '2-digit',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        second: '2-digit',
+                                        hour12: true,
+                                    })}
+                                </p>
+
                             </div>
                         )}
                         <div className="mt-4 flex justify-between">
@@ -377,4 +442,4 @@ const PayrollTable = () => {
     );
 };
 
-export default PayrollTable;
+export default AdjustmentTable;

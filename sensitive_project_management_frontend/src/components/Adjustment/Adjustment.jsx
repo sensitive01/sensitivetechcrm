@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { createPayroll, employeename } from "../../api/services/projectServices";
 
-function Payroll() {
+function Adjustment() {
     const [payrolls, setPayrolls] = useState([
         {
             empId: "",
@@ -171,4 +171,4 @@ function Payroll() {
     );
 }
 
-export default Payroll;
+export default Adjustment;

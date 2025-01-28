@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { createPayroll, updatePayroll, getPayrollById, employeename } from "../../api/services/projectServices";
+import { updatePayroll, getPayrollById, employeename } from "../../api/services/projectServices";
+import { useParams } from "react-router-dom";
 
-function PayrollEdit({ payrollId }) {
+function AdjustmentEdit({payrollId}) {
+    const {id} = useParams();
+    console.log(id);
     const [payrolls, setPayrolls] = useState([
         {
             empId: "",
@@ -19,6 +22,7 @@ function PayrollEdit({ payrollId }) {
             try {
                 setLoading(true);
                 const employeesResponse = await employeename();
+                console.log(employeesResponse.data)
                 setEmployees(employeesResponse.data);
                 setError(null);
             } catch (error) {
@@ -30,20 +34,21 @@ function PayrollEdit({ payrollId }) {
         };
 
         const fetchPayrollData = async () => {
-            if (payrollId) {
+            if (id) {
                 try {
-                    const payrollResponse = await getPayrollById(payrollId);
+                    const payrollResponse = await getPayrollById(id);
+                    console.log("Fetched Adjustment Data:", payrollResponse.data);
                     setPayrolls([payrollResponse.data]);
                 } catch (error) {
-                    console.error("Error fetching payroll data:", error);
-                    setError("Failed to fetch payroll data.");
+                    console.error("Error fetching Adjustment data:", error);
+                    setError("Failed to fetch Adjustment data.");
                 }
             }
         };
 
         fetchEmployees();
         fetchPayrollData();
-    }, [payrollId]);
+    }, [id]);
 
     const handleChange = (index, e) => {
         const { name, value } = e.target;
@@ -64,29 +69,25 @@ function PayrollEdit({ payrollId }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
+        if (!id) {
+            alert("No payroll ID available for updating.");
+            return;
+        }
+    
         try {
             for (const formData of payrolls) {
-                let response;
-                if (payrollId) {
-                    // Update payroll if payrollId is available
-                    response = await updatePayroll(payrollId, formData);
-                    if (response.status === 200) {
-                        alert("Payroll updated successfully!");
-                    }
-                } else {
-                    // Create new payroll
-                    response = await createPayroll(formData);
-                    if (response.status === 201) {
-                        alert("Payroll entry created successfully!");
-                    }
+                const response = await updatePayroll(id, formData); // Update the payroll
+                if (response.status === 200) {
+                    alert("Adjustment updated successfully!");
                 }
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("An error occurred while submitting the payroll data.");
+            alert("An error occurred while updating the payroll data.");
         }
     };
+    
 
     if (loading) {
         return <p className="text-xl text-center mt-20">Loading...</p>;
@@ -99,7 +100,7 @@ function PayrollEdit({ payrollId }) {
     return (
         <div className="container mx-auto p-8 mt-20">
             <h2 className="text-4xl font-bold mb-8 text-center text-gray-800">
-                {payrollId ? "Update Payroll" : "Create Payroll"}
+                {payrollId ? "Update Payroll" : "Edit Adjustment"}
             </h2>
             <form onSubmit={handleSubmit} className="bg-white p-8 border rounded-lg shadow-lg max-w-4xl mx-auto">
                 {payrolls.map((payroll, index) => (
@@ -184,7 +185,7 @@ function PayrollEdit({ payrollId }) {
                         type="submit"
                         className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-300"
                     >
-                        {payrollId ? "Update Payroll" : "Submit"}
+                        {payrollId ? "Update Adjustment" : "Submit"}
                     </button>
                 </div>
             </form>
@@ -192,4 +193,4 @@ function PayrollEdit({ payrollId }) {
     );
 }
 
-export default PayrollEdit;
+export default AdjustmentEdit;

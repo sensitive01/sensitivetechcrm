@@ -14,6 +14,8 @@ const AttendanceTable = () => {
     const [attendanceRecords, setAttendanceRecords] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
 
     useEffect(() => {
         const fetchAttendance = async () => {
@@ -98,6 +100,21 @@ const AttendanceTable = () => {
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance Records");
         XLSX.writeFile(workbook, `Attendance_Records_${new Date().toISOString().split("T")[0]}.xlsx`);
+    };
+
+    const handleDateFilterChange = () => {
+        const filteredData = attendanceRecords.filter((record) => {
+            const recordDate = new Date(record.createdAt);
+            const start = startDate ? new Date(startDate) : null;
+            const end = endDate ? new Date(endDate) : null;
+
+            if (start && recordDate < start) return false;
+            if (end && recordDate > end) return false;
+
+            return true;
+        });
+
+        setAttendanceRecords(filteredData);
     };
 
     const columns = useMemo(
@@ -204,14 +221,49 @@ const AttendanceTable = () => {
             <h2 className="text-4xl font-bold mb-10 text-center mt-24">Attendance Records</h2>
 
             <div className="flex justify-between items-center mb-4">
-                <input
-                    type="text"
-                    value={globalFilter || ""}
-                    onChange={(e) => setGlobalFilter(e.target.value)}
-                    placeholder="Search records..."
-                    className="border border-blue-500 p-2 rounded w-64 mr-2 sm:mr-4"
-                />
-                <div className="flex space-x-2 flex-nowrap justify-start">
+                <div className="relative">
+                    <input
+                        type="text"
+                        value={globalFilter || ''}
+                        onChange={(e) => setGlobalFilter(e.target.value)}
+                        placeholder="Search records..."
+                        className="border border-blue-500 p-2 rounded w-64 pl-8"
+                    />
+                    <FaFilter className="absolute left-2 top-3 text-blue-500" />
+                </div>
+
+                <div className="flex space-x-4 items-center -mt-6">
+                    <div>
+                        <label htmlFor="startDate" className="block">Start Date</label>
+                        <input
+                            type="date"
+                            id="startDate"
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            className="border border-blue-500 p-2 rounded w-32"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="endDate" className="block">End Date</label>
+                        <input
+                            type="date"
+                            id="endDate"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            className="border border-blue-500 p-2 rounded w-32"
+                        />
+                    </div>
+                    <button
+
+                        onClick={handleDateFilterChange}
+                        className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
+                    >
+                        Apply Filter
+                    </button>
+                </div>
+
+
+                <div className="flex space-x-4">
                     <button
                         onClick={exportToExcel}
                         className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 flex items-center w-auto sm:px-4 sm:py-2 sm:w-auto text-xs sm:text-base flex-shrink-0"

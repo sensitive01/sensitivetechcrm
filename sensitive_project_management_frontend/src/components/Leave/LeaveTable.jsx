@@ -16,12 +16,15 @@ const LeaveTable = () => {
     const [leaves, setLeaves] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [startDate, setStartDate] = useState("");
+        const [endDate, setEndDate] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchLeaves = async () => {
             try {
                 const response = await axios.get('https://sensitivetechcrm.onrender.com/leaves/get-all');
+                console.log(response)
                 setLeaves(response.data);
             } catch (err) {
                 setError("Failed to load leave data");
@@ -88,6 +91,25 @@ const LeaveTable = () => {
         XLSX.utils.book_append_sheet(workbook, worksheet, "Leave Records");
         XLSX.writeFile(workbook, `Leave_Records_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
+
+    const applyDateFilter = () => {
+        if (!startDate || !endDate) {
+            alert('Please select both start and end dates.');
+            return;
+        }
+    
+        // Convert dates to Date objects for comparison
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+    
+        const filteredLeaves = leaves.filter((leave) => {
+            const leaveDate = new Date(leave.leaveAppliedOn); // Or another date property
+            return leaveDate >= start && leaveDate <= end;
+        });
+    
+        setLeaves(filteredLeaves); // Update the leaves state with the filtered results
+    };
+    
 
     const columns = useMemo(() => [
         {
@@ -232,6 +254,36 @@ const LeaveTable = () => {
                         />
                         <FaFilter className="absolute left-2 top-3 text-blue-500" />
                     </div>
+
+                    <div className="flex space-x-4 items-center -mt-6">
+                    <div>
+                        <label htmlFor="startDate" className="block">Start Date</label>
+                        <input
+                            type="date"
+                            id="startDate"
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            className="border border-blue-500 p-2 rounded w-32"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="endDate" className="block">End Date</label>
+                        <input
+                            type="date"
+                            id="endDate"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            className="border border-blue-500 p-2 rounded w-32"
+                        />
+                    </div>
+                    <button
+
+                        onClick={applyDateFilter}
+                        className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
+                    >
+                        Apply Filter
+                    </button>
+                </div>
                 </div>
 
                 <div className="flex space-x-4">

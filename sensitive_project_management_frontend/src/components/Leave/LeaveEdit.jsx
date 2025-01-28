@@ -146,19 +146,19 @@ function LeaveEdit() {
             <div>
               <label className="block text-sm font-medium pb-4">Select Employee:</label>
               <select
-  name="employee"
-  value={leave.employee}
-  onChange={handleChange}
-  required
-  className="border border-blue-300 p-2 w-full rounded"
->
-  <option value="">Select Employee</option>
-  {employees.map((employee) => (
-    <option key={employee._id} value={employee.name}>
-      {employee.name}
-    </option>
-  ))}
-</select>
+                name="employee"
+                value={leave.employee}
+                onChange={handleChange}
+                required
+                className="border border-blue-300 p-2 w-full rounded"
+              >
+                <option value="">Select Employee</option>
+                {employees.map((employee) => (
+                  <option key={employee._id} value={employee.name}>
+                    {employee.name}
+                  </option>
+                ))}
+              </select>
 
             </div>
 

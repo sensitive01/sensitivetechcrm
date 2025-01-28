@@ -1,17 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
+
 
 const EmployeeEdit = () => {
   const [isPermanentAddressSame, setIsPermanentAddressSame] = useState(false);
   const { id } = useParams();
   console.log(id)
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
   const [formData, setFormData] = useState({
     role: '',
     empId: '',
     name: '',
     gender: '',
     dob: '',
+    dobFormatted: '',
     email: '',
     officeEmail: '',
     alternateEmail: '',
@@ -27,6 +35,7 @@ const EmployeeEdit = () => {
     experience: '',
     resume: null,
     doj: '',
+    dojFormatted: '',
     maritalStatus: '',
     presentAddress: {
       addressLine: '',
@@ -53,12 +62,39 @@ const EmployeeEdit = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const formatDate = (dateString) => {
+    if (!dateString) return { formatted: '', isoDate: '' };
+    const dateObj = new Date(dateString);
+    const day = String(dateObj.getDate()).padStart(2, "0");
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const year = String(dateObj.getFullYear()).slice(-2);
+    return {
+      formatted: `${day}/${month}/${year}`,
+      isoDate: dateObj.toISOString().split('T')[0]
+    };
+  };
+
+  // const handleChange = (e) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     [name]: value
+  //   }));
+  // };
+
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value
-    }));
+    if (name === "dob" || name === "doj") {
+      const { formatted, isoDate } = formatDate(value);
+      setFormData(prev => ({
+        ...prev,
+        [name]: isoDate,
+        [`${name}Formatted`]: formatted
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleFileChange = (e) => {
@@ -90,10 +126,19 @@ const EmployeeEdit = () => {
           `https://sensitivetechcrm.onrender.com/getemployeesbyid/${id}`
         );
         console.log(response);
+        const employeeData = response.data;
+        const { formatted: dobFormatted, isoDate: dobIso } = formatDate(employeeData.dob);
+        const { formatted: dojFormatted, isoDate: dojIso } = formatDate(employeeData.doj);
+  
         // Ensure ID Proof Type and Address Proof Type are included in response data
         setFormData((prevData) => ({
           ...prevData,
-          ...response.data, // Spread API data to ensure proper mapping
+          ...employeeData,
+          dob: dobIso,
+          dobFormatted,
+          doj: dojIso,
+          dojFormatted
+
         }));
       } catch (err) {
         setError(err.message);
@@ -143,6 +188,8 @@ const EmployeeEdit = () => {
       alert("Failed to submit the form.");
     }
   };
+
+  
 
   return (
     <div className="container mx-auto p-6 mt-20">
@@ -351,6 +398,18 @@ const EmployeeEdit = () => {
 
             <div>
               <label className="block font-semibold">Upload ID Proof</label>
+              {formData.idProofFile ? (
+                <div>
+                  {/* Assuming resume is an image */}
+                  <img
+                    src={formData.idProofFile} // URL of the resume file from the backend
+                    alt="idProofFile"
+                    className="w-32 h-32 object-cover"
+                  />
+                </div>
+              ) : (
+                <p>No idProofFile uploaded</p>
+              )}
               <input
                 type="file"
                 name="idProofFile"
@@ -594,6 +653,18 @@ const EmployeeEdit = () => {
 
             <div>
               <label className="block font-semibold">Upload Address Proof</label>
+              {formData.addressProofFile ? (
+                <div>
+                  {/* Assuming resume is an image */}
+                  <img
+                    src={formData.addressProofFile} // URL of the resume file from the backend
+                    alt="idProofFile"
+                    className="w-32 h-32 object-cover"
+                  />
+                </div>
+              ) : (
+                <p>No addressProofFile uploaded</p>
+              )}
               <input
                 type="file"
                 name="addressProofFile"
@@ -603,16 +674,26 @@ const EmployeeEdit = () => {
             </div>
 
             <div>
-              <label className="block font-semibold">Password</label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-md"
-                required
-              />
-            </div>
+  <label className="block font-semibold mb-2">Password</label>
+  <div className="relative">
+    <input
+      type={showPassword ? "text" : "password"} // Dynamically toggle the type
+      name="password"
+      value={formData.password}
+      onChange={handleChange}
+      className="w-full px-4 py-2 border rounded-md"
+      required
+    />
+    <button
+      type="button"
+      onClick={() => setShowPassword((prev) => !prev)} // Toggle visibility
+      className="absolute right-3 top-3 text-gray-500"
+    >
+      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />} {/* Icon */}
+    </button>
+  </div>
+</div>
+
 
             <div className="col-span-3 flex justify-center">
               <button type="submit" className="px-6 py-3 bg-blue-500 text-white font-semibold rounded-md">Submit</button>

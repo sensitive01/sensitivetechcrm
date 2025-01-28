@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { createPayment, getPaymentById, projectname, updatePaymentById } from "../../api/services/projectServices";
-import { useParams } from "react-router-dom"; // Just for the expenseId in the URL
+import { useParams, Link } from "react-router-dom"; // Just for the expenseId in the URL
 
 function PaymentEdit() {
     const { id } = useParams(); // Get expenseId from the URL
@@ -15,6 +15,8 @@ function PaymentEdit() {
         taxApplicable: "",
         paymentType: "",
         paymentReferenceNumber: "",
+        paymentQuotation: "",
+        paymentProof: "",
         notes: "",
     });
     const [projects, setProjects] = useState([]);
@@ -49,16 +51,32 @@ function PaymentEdit() {
                     if (paymentResponse?.data) {
                         // Assuming response data structure, adjust if necessary
                         setPayment({
-                            project: paymentResponse.data.project || "",
-                            amount: paymentResponse.data.amount || "",
-                            mode: paymentResponse.data.mode || "",
-                            date: paymentResponse.data.date || "",
-                            tdsApplicable: paymentResponse.data.tdsApplicable || "",
-                            taxApplicable: paymentResponse.data.taxApplicable || "",
-                            paymentType: paymentResponse.data.paymentType || "",
-                            paymentReferenceNumber: paymentResponse.data.paymentReferenceNumber || "",
-                            notes: paymentResponse.data.notes || "",
+                            project: paymentResponse.data.payment.project || "",
+                            amount: paymentResponse.data.payment.amount || "",
+                            mode: paymentResponse.data.payment.mode || "",
+                            date: paymentResponse.data.payment.date || "",
+                            tdsApplicable: paymentResponse.data.payment.tdsApplicable || "",
+                            taxApplicable: paymentResponse.data.payment.taxApplicable || "",
+                            paymentType: paymentResponse.data.payment.paymentType || "",
+                            paymentReferenceNumber: paymentResponse.data.payment.paymentReferenceNumber || "",
+                            paymentQuotation: paymentResponse.data.payment.paymentQuotation || "",
+                            paymentProof: paymentResponse.data.payment.paymentProof || "",
+                            notes: paymentResponse.data.payment.notes || "",
                         });
+                        let fetchedPayment =paymentResponse.data.payment
+                        if (fetchedPayment.date) {
+                            // Convert ISO date format to DD/MM/YY
+                            let dateObj = new Date(fetchedPayment.date);
+                            let day = String(dateObj.getDate()).padStart(2, "0");
+                            let month = String(dateObj.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+                            let year = String(dateObj.getFullYear()).slice(-2); // Get last two digits of year
+
+                            fetchedPayment.dateFormatted = `${day}/${month}/${year}`; // Store DD/MM/YY for display
+                            fetchedPayment.date = dateObj.toISOString().split("T")[0]; // Store YYYY-MM-DD for input field
+                        }
+
+                        setPayment(fetchedPayment);
+                        console.log("Payment state set to:", payment);
                     } else {
                         throw new Error("Failed to fetch payment data.");
                     }
@@ -76,7 +94,20 @@ function PaymentEdit() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setPayment((prev) => ({ ...prev, [name]: value }));
+        if (name === "date") {
+            let dateObj = new Date(value);
+            let day = String(dateObj.getDate()).padStart(2, "0");
+            let month = String(dateObj.getMonth() + 1).padStart(2, "0");
+            let year = String(dateObj.getFullYear()).slice(-2);
+            setPayment((prev) => ({
+                ...prev,
+                date: value, // Store YYYY-MM-DD for input field
+                dateFormatted: `${day}/${month}/${year}`, // Store DD/MM/YY for display
+            }));
+        } else {
+            setPayment((prev) => ({ ...prev, [name]: value }));
+        }
+
     };
 
     const handleFileChange = (e) => {
@@ -109,6 +140,8 @@ function PaymentEdit() {
                     taxApplicable: "",
                     paymentType: "",
                     paymentReferenceNumber: "",
+                    paymentQuotation: "",
+                    paymentProof: "",
                     notes: "",
                 });
             } else {
@@ -315,6 +348,16 @@ function PaymentEdit() {
                         <label className="block text-sm font-medium pb-1">
                             Payment Quotation (Optional):
                         </label>
+                        {payment.paymentQuotation && (
+                            <Link
+                                to={payment.paymentQuotation}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 underline"
+                            >
+                                View Payment Quotation
+                            </Link>
+                        )}
                         <input
                             type="file"
                             name="paymentQuotation"
@@ -328,6 +371,14 @@ function PaymentEdit() {
                         <label className="block text-sm font-medium pb-1">
                             Payment Proof (Optional):
                         </label>
+                        {payment.paymentProof && (
+                            <Link to={payment.paymentProof}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 underline">
+                                View Payment Proof
+                            </Link>
+                        )}
                         <input
                             type="file"
                             name="paymentProof"

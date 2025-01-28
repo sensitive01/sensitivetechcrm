@@ -12,6 +12,8 @@ const ExpenseTable = () => {
     const [error, setError] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedExpense, setSelectedExpense] = useState(null);
+      const [startDate, setStartDate] = useState("");
+        const [endDate, setEndDate] = useState("");
 
     const navigate = useNavigate(); // Initialize useNavigate hook
 
@@ -65,6 +67,25 @@ const ExpenseTable = () => {
         XLSX.utils.book_append_sheet(workbook, worksheet, "Expenses");
         XLSX.writeFile(workbook, "expenses.xlsx");
     };
+
+    const applyDateFilter = () => {
+        if (!startDate || !endDate) {
+            alert('Please select both start and end dates.');
+            return;
+        }
+    
+        // Convert dates to Date objects for comparison
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+    
+        const filteredExpenses = expenses.filter((expense) => {
+            const expenseDate = new Date(expense.createdAt);
+            return expenseDate >= start && expenseDate <= end;
+        });
+    
+        setExpenses(filteredExpenses);  // Update expenses state with filtered data
+    };
+    
 
     // Define columns for react-table
     const columns = useMemo(() => [
@@ -196,6 +217,36 @@ const ExpenseTable = () => {
                         />
                         <FaFilter className="absolute left-2 top-3 text-blue-500" />
                     </div>
+
+                    <div className="flex space-x-4 items-center -mt-6">
+                    <div>
+                        <label htmlFor="startDate" className="block">Start Date</label>
+                        <input
+                            type="date"
+                            id="startDate"
+                            value={startDate}
+                            onChange={(e) => setStartDate(e.target.value)}
+                            className="border border-blue-500 p-2 rounded w-32"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="endDate" className="block">End Date</label>
+                        <input
+                            type="date"
+                            id="endDate"
+                            value={endDate}
+                            onChange={(e) => setEndDate(e.target.value)}
+                            className="border border-blue-500 p-2 rounded w-32"
+                        />
+                    </div>
+                    <button
+
+                        onClick={applyDateFilter}
+                        className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
+                    >
+                        Apply Filter
+                    </button>
+                </div>
                     <div className="flex space-x-4">
                         <button
                             onClick={() => navigate('/expense-form')}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { employeename, getTheTask, projectname } from "../../api/services/projectServices";
 import axios from "axios";
 
@@ -221,7 +221,7 @@ function TaskEdit() {
             {task.attachments && (
               <div className="mb-4">
                 <p className="text-gray-600">Existing Attachment:</p>
-                <a href={task.attachments} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View Attachment</a>
+                <Link to={task.attachments} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View Attachment</Link>
               </div>
             )}
             <input type="file" name="attachments" onChange={handleFileChange} className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"/>
