@@ -35,9 +35,20 @@ const createEmployee = async (req, res) => {
 
 
 // Get all employees
+// const getAllEmployees = async (req, res) => {
+//   try {
+//     const employees = await Employee.find();
+//     res.status(200).json(employees);
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
 const getAllEmployees = async (req, res) => {
   try {
-    const employees = await Employee.find();
+    const employees = await Employee.find({
+      role: { $nin: ['Superadmin', 'Lead'] }  // Excludes superadmin and lead roles
+    });
     res.status(200).json(employees);
   } catch (error) {
     res.status(500).json({ error: error.message });

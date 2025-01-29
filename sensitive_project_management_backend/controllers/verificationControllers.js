@@ -37,7 +37,7 @@ const superadminLogin = async (req, res) => {
         const { username, password } = req.body;
 
         // Find the superadmin by email (username) and password
-        const superadminData = await superadminSchema.findOne({ email: username, password: password});
+        const superadminData = await superadminSchema.findOne({ officeEmail: username, password: password});
 
         // Check if superadmin data was found
         if (!superadminData) {

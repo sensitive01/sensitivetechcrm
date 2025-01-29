@@ -10,6 +10,7 @@ const adminSchema = new mongoose.Schema({
   password: {
     type: String,
   },
+  role: {type: String,},
   adminType: {
     type: String,
   }
