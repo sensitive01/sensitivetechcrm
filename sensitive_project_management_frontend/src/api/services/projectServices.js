@@ -12,6 +12,18 @@ export const verifyLogin = async (formData) => {
   }
 };
 
+// export const verifyLoginAdmin = async (formData) => {
+//   try {
+//     const response = await projectServices.post(`/super-admin/admin-login/adminlogin`, 
+//         formData,
+//     );
+//     return response;
+//   } catch (err) {
+//     return err;
+//   }
+// };
+
+
 export const getAllProject=async() => {
     try {
       const response = await projectServices.get(`/project/getallprojects` );
