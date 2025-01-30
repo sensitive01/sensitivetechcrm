@@ -53,23 +53,48 @@ function Leave() {
     setLeave((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+    setLeave((prev) => ({ ...prev, [name]: files[0] })); // Store the file object in the state
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const formData = new FormData();
+
+    // Append form fields (except attachment)
+    Object.keys(leave).forEach((key) => {
+      if (key !== 'attachment') {
+        formData.append(key, leave[key]);
+      }
+    });
+
+    // Append the attachment file
+    if (leave.attachment) {
+      formData.append('attachment', leave.attachment);
+    }
+
     try {
-      const response = await axios.post("https://sensitivetechcrm.onrender.com/leaves/create", leave, {
-        headers: {
-          "Content-Type": "application/json",  // Set the content type header
-        },
-      });
+      const response = await axios.post(
+        "https://sensitivetechcrm.onrender.com/leaves/create",
+        formData,  // Send formData instead of JSON
+        {
+          headers: {
+            "Content-Type": "multipart/form-data", // Correct content type for file upload
+          },
+        }
+      );
+      console.log(response);
 
       if (response.status === 201) {
         alert("Leave data submitted successfully!");
-        // Optionally, reset the form after successful submission
         setLeave({
           employee: "",
           leaveCategory: "",
           leaveType: "",
-          customLeaveType: "",  // Reset the custom leave type
+          customLeaveType: "",
           permissionDate: "",
           startDate: "",
           endDate: "",
@@ -85,6 +110,7 @@ function Leave() {
       alert("There was an error submitting the data.");
     }
   };
+
 
   if (loading) {
     return (
@@ -280,10 +306,11 @@ function Leave() {
               <input
                 type="file"
                 name="attachment"
-                onChange={handleChange}
+                onChange={handleFileChange}  // Use the handleFileChange function here
                 className="border border-blue-300 p-2 w-full rounded"
               />
             </div>
+
 
           </div>
         </div>

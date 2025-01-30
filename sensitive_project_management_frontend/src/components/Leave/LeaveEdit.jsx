@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";  // Import axios for HTTP requests
+import axios from "axios";
 import { useParams } from "react-router-dom";
 import { employeename, getLeaveById } from "../../api/services/projectServices";
 
@@ -8,7 +8,7 @@ function LeaveEdit() {
     employee: "",
     leaveCategory: "",
     leaveType: "",
-    customLeaveType: "", // State to store the custom leave type
+    customLeaveType: "",
     permissionDate: "",
     startDate: "",
     endDate: "",
@@ -24,17 +24,25 @@ function LeaveEdit() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const { id } = useParams();  // Get the ID from URL
-  console.log(id);
+  const { id } = useParams();
+
+  // Define the leave types here
+  const leaveTypes = ["Sick Leave", "Casual Leave", "Emergency Leave", "Others"];
+
+  const formatDateForInput = (date) => {
+    if (!date) return '';
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
         setLoading(true);
-
         const response = await employeename();
-        console.log("Employees fetched:", response);
-
         if (response) {
           setEmployees(response.data);
           setError(null);
@@ -52,17 +60,20 @@ function LeaveEdit() {
     fetchEmployees();
   }, []);
 
-
   useEffect(() => {
     if (!id) return;
 
     const fetchLeaveDetails = async () => {
       try {
         const response = await getLeaveById(id);
-        console.log("leave fetch", response);
         if (response.status === 200) {
-          setLeave(response.data);
-          console.log("Leave Employee:", response.data.employee); // Add this line to check the leave employee
+          const fetchedLeave = response.data;
+          setLeave({
+            ...fetchedLeave,
+            startDate: formatDateForInput(fetchedLeave.startDate),
+            endDate: formatDateForInput(fetchedLeave.endDate),
+            permissionDate: formatDateForInput(fetchedLeave.permissionDate),
+          });
         } else {
           console.error("Failed to fetch leave details:", response.status);
         }
@@ -74,30 +85,45 @@ function LeaveEdit() {
     fetchLeaveDetails();
   }, [id]);
 
-
-
-  const leaveTypes = ["Sick Leave", "Casual Leave", "Emergency Leave", "Others"];
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setLeave((prev) => ({ ...prev, [name]: value }));
   };
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+    setLeave((prev) => ({ ...prev, [name]: files[0] }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    const formData = new FormData();
+  
+    // Append other fields to formData
+    Object.keys(leave).forEach((key) => {
+      formData.append(key, leave[key]);
+    });
+  
     try {
       const response = id
-        ? await axios.put(`https://sensitivetechcrm.onrender.com/leaves/update/${id}`, leave) // Update leave
-        : await axios.post(`https://sensitivetechcrm.onrender.com/leaves/create`, leave); // Create leave
-
+        ? await axios.put(`https://sensitivetechcrm.onrender.com/leaves/update/${id}`, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }) // Update leave
+        : await axios.post(`https://sensitivetechcrm.onrender.com/leaves/create`, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }); // Create leave
+  
       if (response.status === 200 || response.status === 201) {
         alert("Leave data submitted successfully!");
         setLeave({
           employee: "",
           leaveCategory: "",
           leaveType: "",
-          customLeaveType: "", // Reset custom leave type
+          customLeaveType: "",
           permissionDate: "",
           startDate: "",
           endDate: "",
@@ -116,6 +142,7 @@ function LeaveEdit() {
       alert(`Submission failed: ${error.message}`);
     }
   };
+  
 
   if (loading) {
     return (
@@ -132,9 +159,6 @@ function LeaveEdit() {
       </div>
     );
   }
-
-  console.log("Leave Employee:", leave.employee);
-  console.log("Employees:", employees);
 
   return (
     <div className="container mx-auto p-6 mt-12">
@@ -159,7 +183,6 @@ function LeaveEdit() {
                   </option>
                 ))}
               </select>
-
             </div>
 
             {/* Leave or Permission Radio Buttons */}
@@ -268,32 +291,6 @@ function LeaveEdit() {
                 />
               </div>
             )}
-
-            {/* Time Range Input (only shown if "Permission" is selected) */}
-            {leave.leaveCategory === "Permission" && (
-              <div>
-                <label className="block text-sm font-medium pb-4">Time Range:</label>
-                <div className="flex space-x-4">
-                  <input
-                    type="time"
-                    name="startTime"
-                    value={leave.startTime}
-                    onChange={handleChange}
-                    className="border border-blue-300 p-2 w-full rounded"
-                    required
-                  />
-                  <span className="pt-2">to</span>
-                  <input
-                    type="time"
-                    name="endTime"
-                    value={leave.endTime}
-                    onChange={handleChange}
-                    className="border border-blue-300 p-2 w-full rounded"
-                    required
-                  />
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
@@ -313,10 +310,19 @@ function LeaveEdit() {
             </div>
             <div>
               <label className="block text-sm font-medium pb-4">Attachment:</label>
-              <input
+              {leave.attachment && (
+                <div>
+                  <img
+                    src={leave.attachment}
+                    alt="Attachment"
+                    className="w-32 h-32 object-cover rounded mb-4"
+                  />
+                </div>
+              )}
+               <input
                 type="file"
                 name="attachment"
-                onChange={handleChange}
+                onChange={handleFileChange}  // Using handleFileChange here
                 className="border border-blue-300 p-2 w-full rounded"
               />
             </div>
@@ -353,3 +359,4 @@ function LeaveEdit() {
 }
 
 export default LeaveEdit;
+

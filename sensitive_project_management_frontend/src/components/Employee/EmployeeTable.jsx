@@ -106,13 +106,12 @@ const EmployeeTable = () => {
   const [endDate, setEndDate] = useState("");
   const navigate = useNavigate();
 
-  // Fetch employee data from API
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
         setLoading(true);
         const response = await axios.get("https://sensitivetechcrm.onrender.com/getallemployees");
-        console.log(response.data);  // Debugging - Check if createdAt exists
+        console.log(response.data);
         setEmployees(response.data);
       } catch (err) {
         setError(err.message);

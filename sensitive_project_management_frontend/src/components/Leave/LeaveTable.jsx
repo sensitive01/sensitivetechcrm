@@ -17,7 +17,8 @@ const LeaveTable = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [startDate, setStartDate] = useState("");
-        const [endDate, setEndDate] = useState("");
+    const [endDate, setEndDate] = useState("");
+    const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -97,19 +98,19 @@ const LeaveTable = () => {
             alert('Please select both start and end dates.');
             return;
         }
-    
+
         // Convert dates to Date objects for comparison
         const start = new Date(startDate);
         const end = new Date(endDate);
-    
+
         const filteredLeaves = leaves.filter((leave) => {
             const leaveDate = new Date(leave.leaveAppliedOn); // Or another date property
             return leaveDate >= start && leaveDate <= end;
         });
-    
+
         setLeaves(filteredLeaves); // Update the leaves state with the filtered results
     };
-    
+
 
     const columns = useMemo(() => [
         {
@@ -118,7 +119,8 @@ const LeaveTable = () => {
         },
         {
             Header: 'Leave ID',
-            accessor: 'leaveId',
+            accessor: row => row._id, // ✅ Use a function instead of direct property
+            id: 'leaveIdColumn',
         },
         {
             Header: 'Name',
@@ -129,16 +131,51 @@ const LeaveTable = () => {
             accessor: 'runningProjects',
         },
         {
-            Header: 'Leave Dates',
-            accessor: 'leaveDates',
+            Header: 'Leave Start Dates',
+            accessor: (row) => row.startDate
+                ? new Date(row.startDate).toLocaleDateString('en-GB')  // Converts to DD/MM/YY format
+                : 'N/A',
+        },
+        {
+            Header: 'Leave End Dates',
+            accessor: (row) => row.endDate
+                ? new Date(row.endDate).toLocaleDateString('en-GB')
+                : 'N/A',
+        },
+        {
+            Header: 'Permission Date',
+            accessor: (row) => row.permissionDate
+                ? new Date(row.permissionDate).toLocaleDateString('en-GB')
+                : 'N/A',
+        },
+        {
+            Header: 'Start Time',
+            accessor: (row) => row.startTime
+                ? new Date(`1970-01-01T${row.startTime}`).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+                : 'N/A',
+        },
+        {
+            Header: 'End Time',
+            accessor: (row) => row.endTime
+                ? new Date(`1970-01-01T${row.endTime}`).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+                : 'N/A',
         },
         {
             Header: 'Notes',
-            accessor: 'notes',
+            accessor: 'remarks',
         },
         {
             Header: 'Attachment',
             accessor: 'attachment',
+            Cell: ({ value }) => (
+                <div>
+                    {value ? (
+                        <img src={value} alt="Attachment" className="w-20 h-20 object-cover rounded" />
+                    ) : (
+                        <span>No attachment</span>
+                    )}
+                </div>
+            ),
         },
         {
             Header: 'Status',
@@ -146,7 +183,8 @@ const LeaveTable = () => {
             Cell: ({ row }) => (
                 <select
                     value={row.original.status}
-                    onChange={(e) => handleStatusChange(row.original._id, e.target.value)}
+                    onChange={(e) => role === "Superadmin" && handleStatusChange(row.original._id, e.target.value)}
+                    disabled={role !== "Superadmin"}
                     className={`
                         px-3 py-1 rounded text-sm border
                         ${row.original.status === 'Approved' ? 'bg-green-100 text-green-800 border-green-200' :
@@ -160,17 +198,27 @@ const LeaveTable = () => {
                 </select>
             )
         },
+
         {
             Header: 'Approved By',
             accessor: 'approvedBy',
         },
         {
             Header: 'Status Change Date',
-            accessor: 'statusChangeDate',
+            accessor: (row) => row.statusChangeDate
+                ? new Date(row.statusChangeDate).toLocaleString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                })
+                : 'N/A',
         },
         {
             Header: 'Leave Applied On',
-            accessor: 'leaveAppliedOn',
+            accessor: 'leaveType',
         },
         {
             Header: 'Actions',
@@ -181,6 +229,7 @@ const LeaveTable = () => {
                         className="text-green-500 hover:bg-green-100 p-2 rounded-full transition-colors"
                         title="Edit Leave"
                         onClick={() => handleEdit(row.original._id)}
+                        disabled={role !== "Superadmin"}  // Disable for non-Superadmins
                     >
                         <Edit size={20} />
                     </button>
@@ -188,6 +237,7 @@ const LeaveTable = () => {
                         className="text-red-500 hover:bg-red-100 p-2 rounded-full transition-colors"
                         title="Delete Leave"
                         onClick={() => handleDelete(row.original._id)}
+                        disabled={role !== "Superadmin"} 
                     >
                         <Trash2 size={20} />
                     </button>
@@ -256,34 +306,34 @@ const LeaveTable = () => {
                     </div>
 
                     <div className="flex space-x-4 items-center -mt-6">
-                    <div>
-                        <label htmlFor="startDate" className="block">Start Date</label>
-                        <input
-                            type="date"
-                            id="startDate"
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                            className="border border-blue-500 p-2 rounded w-32"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="endDate" className="block">End Date</label>
-                        <input
-                            type="date"
-                            id="endDate"
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                            className="border border-blue-500 p-2 rounded w-32"
-                        />
-                    </div>
-                    <button
+                        <div>
+                            <label htmlFor="startDate" className="block">Start Date</label>
+                            <input
+                                type="date"
+                                id="startDate"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                className="border border-blue-500 p-2 rounded w-32"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="endDate" className="block">End Date</label>
+                            <input
+                                type="date"
+                                id="endDate"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                className="border border-blue-500 p-2 rounded w-32"
+                            />
+                        </div>
+                        <button
 
-                        onClick={applyDateFilter}
-                        className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
-                    >
-                        Apply Filter
-                    </button>
-                </div>
+                            onClick={applyDateFilter}
+                            className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
+                        >
+                            Apply Filter
+                        </button>
+                    </div>
                 </div>
 
                 <div className="flex space-x-4">

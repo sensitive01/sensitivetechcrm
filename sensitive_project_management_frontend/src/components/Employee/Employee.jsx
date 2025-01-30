@@ -85,7 +85,7 @@ const EmployeeForm = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.get(`http://localhost:3000/getaddressbypincode/${pincode}`);
+      const response = await axios.get(`https://sensitivetechcrm.onrender.com/getaddressbypincode/${pincode}`);
       console.log('API Response:', response.data);
 
       if (response.data.success && response.data.address) {
@@ -148,7 +148,7 @@ const EmployeeForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent page reload on form submission
-
+  
     console.log(formData);
     try {
       const response = await axios.post(
@@ -157,12 +157,19 @@ const EmployeeForm = () => {
       );
       console.log("Response:", response.data);
       alert("Form submitted successfully!");
+  
+      // Store user details in localStorage (for the purpose of displaying in the Topbar)
+      localStorage.setItem("empName", formData.name);
+      localStorage.setItem("empEmail", formData.email);
+      localStorage.setItem("empPassword", formData.password);
+      localStorage.setItem("role", formData.role);  // Optional: Store role if needed
+  
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to submit the form.");
     }
   };
-
+  
   return (
     <div className="container mx-auto p-6 mt-20">
       <h2 className="text-4xl font-bold mb-8 text-center">Employee Form</h2>
