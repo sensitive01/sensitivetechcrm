@@ -1,10 +1,16 @@
 const leaveModel = require("../models/leaveModel");
+const { uploadImage } = require("../config/cloudinary");
 
 // Create a new leave request
 exports.createLeaveRequest = async (req, res) => {
   try {
-    console.log("CREATE LEAVE REQUEST", req.body);
-    const leaveRequest = new leaveModel(req.body);
+    const leaveData =  req.body;
+    console.log("CREATE LEAVE REQUEST", leaveData);
+    if (req.file) {
+      leaveData.attachment = await uploadImage(req.file.buffer); // Correct file handling for a single file
+  }
+
+    const leaveRequest = new leaveModel(leaveData);
     await leaveRequest.save();
     res.status(201).json({ message: 'Leave request created successfully', leaveRequest });
   } catch (error) {
@@ -41,22 +47,45 @@ exports.getLeaveRequestById = async (req, res) => {
 };
 
 // Update a leave request by ID
+// exports.updateLeaveRequestById = async (req, res) => {
+//   try {
+//     const leaveRequest = await leaveModel.findByIdAndUpdate(
+//       req.params.id,
+//       req.body,
+//       { new: true, runValidators: true } // Return the updated document
+//     );
+//     if (!leaveRequest) {
+//       return res.status(404).json({ message: 'Leave request not found' });
+//     }
+//     res.status(200).json({ message: 'Leave request updated successfully', leaveRequest });
+//   } catch (error) {
+//     console.error('Error updating leave request:', error);
+//     res.status(400).json({ message: error.message });
+//   }
+// };
+
 exports.updateLeaveRequestById = async (req, res) => {
   try {
-    const leaveRequest = await leaveModel.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true } // Return the updated document
-    );
-    if (!leaveRequest) {
-      return res.status(404).json({ message: 'Leave request not found' });
-    }
-    res.status(200).json({ message: 'Leave request updated successfully', leaveRequest });
-  } catch (error) {
-    console.error('Error updating leave request:', error);
-    res.status(400).json({ message: error.message });
+    const { id } = req.params;
+    const updateData = req.body;
+    if (req.file) {
+      updateData.attachment = await uploadImage(req.file.buffer); // Process file upload
   }
+
+  // Find and update the expense
+  const leaveRequest = await leaveModel.findByIdAndUpdate(id, updateData, { new: true });
+
+  if (!leaveRequest) {
+      return res.status(404).json({ error: "Leave not found." });
+  }
+
+  res.status(200).json({ message: "Leave updated successfully.", leave: leaveRequest });
+} catch (error) {
+  console.error("Error updating Leave:", error);
+  res.status(500).json({ error: "Failed to update Leave." });
+}
 };
+
 
 // Delete a leave request by ID
 exports.deleteLeaveRequestById = async (req, res) => {
