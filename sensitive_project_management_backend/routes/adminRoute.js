@@ -67,6 +67,8 @@ employeeRouter.get("/getaddressbypincode/:pincode", async (req, res) => {
   }
 });
 
+employeeRouter.get("/employeedetails/:id", Employee.getEmployeeDetailsById);
+
 
 
 

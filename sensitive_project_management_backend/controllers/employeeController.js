@@ -182,6 +182,20 @@ const fetchAddressDetailsByPincode = async (pincode) => {
   }
 };
 
+const getEmployeeDetailsById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const employee = await Employee.findById(id, 'name email password empId'); // Fields to fetch
+
+    if (!employee) {
+      return res.status(404).json({ error: "Employee not found" });
+    }
+
+    res.status(200).json(employee);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 
 
@@ -195,4 +209,5 @@ module.exports = {
   getEmployeeNames,
   getTotalEmployees,
   fetchAddressDetailsByPincode,
+  getEmployeeDetailsById,
 };
