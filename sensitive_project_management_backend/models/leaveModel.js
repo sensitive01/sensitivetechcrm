@@ -13,7 +13,8 @@ const leaveSchema = new mongoose.Schema({
   attachment: { type: String },    
   status: { type: String },         
   startTime: { type: String },      
-  endTime: { type: String },        
+  endTime: { type: String }, 
+  statusChangeDate: { type: String },        
 }, { timestamps: true });           
 
 module.exports = mongoose.model('LeaveModel', leaveSchema);

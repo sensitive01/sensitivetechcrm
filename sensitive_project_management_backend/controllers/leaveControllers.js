@@ -113,18 +113,28 @@ exports.updateLeaveRequestStatus = async (req, res) => {
   try {
     const leaveRequest = await leaveModel.findByIdAndUpdate(
       id,
-      { status },
-      { new: true } // Return the updated document
+      { 
+        status,
+        statusChangeDate: new Date() // ✅ Store the current timestamp
+      },
+      { new: true } // ✅ Return the updated document
     );
+
     if (!leaveRequest) {
       return res.status(404).json({ message: 'Leave request not found' });
     }
-    res.status(200).json({ message: 'Leave request status updated successfully', leaveRequest });
+
+    res.status(200).json({ 
+      message: 'Leave request status updated successfully', 
+      leaveRequest 
+    });
+
   } catch (error) {
     console.error('Error updating leave request status:', error);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // Get total leave requests count
 exports.getTotalLeaveRequests = async (req, res) => {
