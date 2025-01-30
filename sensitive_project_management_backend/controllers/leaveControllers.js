@@ -102,9 +102,48 @@ exports.deleteLeaveRequestById = async (req, res) => {
 };
 
 // Update the status of a leave request by ID
+// exports.updateLeaveRequestStatus = async (req, res) => {
+//   const { id } = req.params;
+//   const { status } = req.body;
+
+//   if (!status) {
+//     return res.status(400).json({ message: 'Status is required' });
+//   }
+
+//   try {
+//     const leaveRequest = await leaveModel.findByIdAndUpdate(
+//       id,
+//       { 
+//         status,
+//         statusChangeDate: new Date() // ✅ Store the current timestamp
+//       },
+//       { new: true } // ✅ Return the updated document
+//     );
+
+//     if (!leaveRequest) {
+//       return res.status(404).json({ message: 'Leave request not found' });
+//     }
+
+//     res.status(200).json({ 
+//       message: 'Leave request status updated successfully', 
+//       leaveRequest 
+//     });
+
+//   } catch (error) {
+//     console.error('Error updating leave request status:', error);
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+// Update the status of a leave request by ID (with role check)
 exports.updateLeaveRequestStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
+  const userRole = req.user.role; // Assuming you're using authentication middleware
+
+  if (userRole !== "Superadmin") {
+    return res.status(403).json({ message: "You don't have permission to change the status" });
+  }
 
   if (!status) {
     return res.status(400).json({ message: 'Status is required' });
@@ -113,27 +152,19 @@ exports.updateLeaveRequestStatus = async (req, res) => {
   try {
     const leaveRequest = await leaveModel.findByIdAndUpdate(
       id,
-      { 
-        status,
-        statusChangeDate: new Date() // ✅ Store the current timestamp
-      },
-      { new: true } // ✅ Return the updated document
+      { status },
+      { new: true }
     );
-
     if (!leaveRequest) {
       return res.status(404).json({ message: 'Leave request not found' });
     }
-
-    res.status(200).json({ 
-      message: 'Leave request status updated successfully', 
-      leaveRequest 
-    });
-
+    res.status(200).json({ message: 'Leave request status updated successfully', leaveRequest });
   } catch (error) {
     console.error('Error updating leave request status:', error);
     res.status(500).json({ message: error.message });
   }
 };
+
 
 
 // Get total leave requests count
