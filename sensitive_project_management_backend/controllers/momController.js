@@ -1,16 +1,30 @@
 // controllers/meetingController.js
 const Meeting = require('../models/momSchema');
+const { uploadImage } = require("../config/cloudinary");
 
 // Create a new meeting
 exports.createMeeting = async (req, res) => {
   try {
-    const newMeeting = new Meeting(req.body);
+    const MeetingData = req.body;
+    if (req.files) {
+      if (req.files.agendaFile) {
+        MeetingData.agendaFile = await uploadImage(req.files.agendaFile[0].buffer);
+      }
+      if (req.files.discussionFile) {
+        MeetingData.discussionFile = await uploadImage(req.files.discussionFile[0].buffer);
+      }
+      if (req.files.actionFile) {
+        MeetingData.actionFile = await uploadImage(req.files.actionFile[0].buffer);
+      }
+    }
+    const newMeeting = new Meeting(MeetingData);
     await newMeeting.save();
-    res.status(201).json(newMeeting);
-  } catch (err) {
-    res.status(500).json({ message: 'Error creating meeting', error: err });
+    res.status(201).json({ message: "Meeting created successfully", meeting: newMeeting });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
+
 
 // Get all meetings
 exports.getAllMeetings = async (req, res) => {
@@ -38,7 +52,20 @@ exports.getMeetingById = async (req, res) => {
 // Update meeting by ID
 exports.updateMeetingById = async (req, res) => {
   try {
-    const updatedMeeting = await Meeting.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const { id } = req.params;
+    const updatedData = req.body;
+    if (req.files) {
+      if (req.files.agendaFile) {
+        updatedData.agendaFile = await uploadImage(req.files.agendaFile[0].buffer);
+      }
+      if (req.files.discussionFile) {
+        updatedData.discussionFile = await uploadImage(req.files.discussionFile[0].buffer);
+      }
+      if (req.files.actionFile) {
+        updatedData.actionFile = await uploadImage(req.files.actionFile[0].buffer);
+      }
+    }
+    const updatedMeeting = await Meeting.findByIdAndUpdate(id, updatedData, { new: true });
     if (!updatedMeeting) {
       return res.status(404).json({ message: 'Meeting not found' });
     }
