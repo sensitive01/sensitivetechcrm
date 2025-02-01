@@ -446,7 +446,7 @@ const Topbar = () => {
       icon: CreditCard,
       roles: ["Superadmin"], // Visible only to Superadmin
     },
-    { label: "MoM", path: "/mom", icon: FileText },
+    { label: "MoM", path: "/momdetails", icon: FileText },
   ];
 
   useEffect(() => {

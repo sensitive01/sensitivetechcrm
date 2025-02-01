@@ -36,6 +36,8 @@ import AdjustmentTable from "./components/Adjustment/AdjustmentTable";
 import Adjustment from "./components/Adjustment/Adjustment";
 import AdjustmentEdit from "./components/Adjustment/AdjustmentEdit";
 import MoM from "./components/MoM/MoM";
+import BlogPage from "./components/MoM/BlogPage";
+import MoMEdit from "./components/MoM/MoMEdit";
 // import DispositionForm from "./components/UpdateLog/UpdateLog";
 
 // Route Transition Component
@@ -164,6 +166,8 @@ const RoutesWithPreloader = ({ role }) => {
                   <Route path="/expense-table" element={<ExpenseTable />} />
                   <Route path="/expense-edit/:id" element={<ExpensesEdit />} />
                   <Route path="/mom" element={<MoM />} />
+                  <Route path="/momdetails" element={<BlogPage />} />
+                  <Route path="/mom-edit/:id" element={<MoMEdit />} />
                   {/* <Route path="/updatelog" element={<DispositionForm />} /> */}
                 </Routes>
               </AdminLayout>

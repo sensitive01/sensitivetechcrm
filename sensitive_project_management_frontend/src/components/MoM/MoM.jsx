@@ -38,9 +38,24 @@ const MoM = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+  
+    // Create a FormData instance
+    const formData = new FormData();
+  
+    // Append all meeting details to formData
+    for (const key in meetingDetails) {
+      if (key !== 'agendaFile' && key !== 'discussionFile' && key !== 'actionFile') {
+        formData.append(key, meetingDetails[key]);
+      }
+    }
+  
+    // Append the files
+    if (meetingDetails.agendaFile) formData.append('agendaFile', meetingDetails.agendaFile);
+    if (meetingDetails.discussionFile) formData.append('discussionFile', meetingDetails.discussionFile);
+    if (meetingDetails.actionFile) formData.append('actionFile', meetingDetails.actionFile);
+  
     try {
-      const response = await createMoM(meetingDetails);
+      const response = await createMoM(formData);  // Update the API to accept FormData
       console.log('Meeting saved:', response.data);
       alert('Meeting saved successfully!');
     } catch (error) {
@@ -48,6 +63,7 @@ const MoM = () => {
       alert('Failed to save meeting.');
     }
   };
+  
 
   return (
     <div className="mt-28 mb-12 container mx-auto">
@@ -161,11 +177,11 @@ const MoM = () => {
               placeholder="Enter meeting discussion points..."
               style={{ height: '300px', width: '100%' }} 
             />
-            <label className="flex items-center gap-2 mt-2">
+          </div>
+          <label className="flex items-center gap-2 mt-12">
               <Paperclip className="w-5 h-5 text-blue-500" />
               <input type="file" onChange={(e) => handleFileChange(e, 'discussionFile')} />
             </label>
-          </div>
 
           {/* Action Items Section */}
           <div className="mb-8">
@@ -176,10 +192,10 @@ const MoM = () => {
               className="w-full p-2 border-2 border-blue-500 rounded-md"
               placeholder="Enter action items with assignees and deadlines..."
             />
-            <label className="flex items-center gap-2 mt-4">
+           <label className="flex items-center gap-2 mt-4">
               <Paperclip className="w-5 h-5 text-blue-500" />
               <input type="file" onChange={(e) => handleFileChange(e, 'actionFile')} />
-            </label>
+            </label> 
           </div>
 
           {/* Save Button */}
@@ -191,6 +207,7 @@ const MoM = () => {
         </form>
       </div>
     </div>
+  
   );
 };
 

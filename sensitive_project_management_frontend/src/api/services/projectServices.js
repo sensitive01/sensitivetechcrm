@@ -389,6 +389,50 @@ export const createMoM = async (formData) => {
   }
 };
 
+export const getMoM = async () => {
+  try {
+    const response = await projectServices.get(`/mom/getallmom`);
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
 
+
+
+export const getMoMById = async (id) => {
+  if (!id || id === "undefined") {
+    console.error("Invalid ID for getMoMById:", id);
+    return { error: "Invalid ID provided" };
+  }
+
+  try {
+    const response = await projectServices.get(`/mom/getmombyid/${id}`);
+    return response;
+  } catch (err) {
+    console.error("Error in getMoMById:", err);
+    return err;
+  }
+};
+
+export const updateMoM = async (id, formData) => {
+  try {
+    const response = await projectServices.put(`/mom/updatemom/${id}`, formData);
+    return response;
+  } catch (err) {
+    console.error("Error in updateExpenseById:", err);
+    throw err;
+  }
+};
+
+export const deleteMoM = async (id) => {
+  try {
+      const response = await projectServices.delete(`/mom/deletemom/${id}`); // Update with the correct API endpoint
+      return response.data;
+  } catch (err) {
+      console.error('Error deleting MoM:', err);
+      throw err;
+  }
+};
 
 
