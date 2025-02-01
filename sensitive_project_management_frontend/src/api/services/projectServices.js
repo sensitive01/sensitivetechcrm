@@ -376,6 +376,19 @@ export const getExpenseById = async (expenseId) => {
   }
 };
 
+export const createMoM = async (formData) => {
+  try {
+    const response = await projectServices.post(`/mom/mompage`, formData, {
+      headers: { 
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Error in createPayment API:", error);
+    throw error;
+  }
+};
+
 
 
 

@@ -35,6 +35,7 @@ import PaymentEdit from "./components/Payments/PaymentEdit";
 import AdjustmentTable from "./components/Adjustment/AdjustmentTable";
 import Adjustment from "./components/Adjustment/Adjustment";
 import AdjustmentEdit from "./components/Adjustment/AdjustmentEdit";
+import MoM from "./components/MoM/MoM";
 // import DispositionForm from "./components/UpdateLog/UpdateLog";
 
 // Route Transition Component
@@ -124,6 +125,7 @@ const RoutesWithPreloader = ({ role }) => {
                   <Route path="/project" element={<ProjectManager />} />
                   <Route path="/add-project" element={<ProjectForm />} />
                   <Route path="/edit-project/:projectId" element={<ProjectEdit />} />
+                  <Route path="/mom" element={<MoM />} />
                 </Routes>
               </AdminLayout>
             ) : (
@@ -161,6 +163,7 @@ const RoutesWithPreloader = ({ role }) => {
                   <Route path="/expense-form" element={<Expenses />} />
                   <Route path="/expense-table" element={<ExpenseTable />} />
                   <Route path="/expense-edit/:id" element={<ExpensesEdit />} />
+                  <Route path="/mom" element={<MoM />} />
                   {/* <Route path="/updatelog" element={<DispositionForm />} /> */}
                 </Routes>
               </AdminLayout>
