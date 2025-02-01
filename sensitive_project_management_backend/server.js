@@ -19,6 +19,7 @@ const payrollRoutes = require('./routes/payrollRoute');
 const updateLogRoutes = require('./routes/updatelogRoute');
 const paymentRoutes =  require('./routes/paymentRoute');
 const expenseRoutes =  require('./routes/expenseRoute');
+const momRoutes =  require('./routes/momRoute');
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ app.use('/payroll',payrollRoutes);
 app.use('/updatelog',updateLogRoutes);
 app.use('/payments', paymentRoutes);
 app.use('/expense', expenseRoutes);
+app.use('/mom', momRoutes);
 
 // Connect to database
 db(); // MongoDB connection setup
