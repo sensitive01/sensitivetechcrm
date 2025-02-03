@@ -24,8 +24,14 @@ const LeaveTable = () => {
     useEffect(() => {
         const fetchLeaves = async () => {
             try {
-                const response = await axios.get('https://sensitivetechcrm.onrender.com/leaves/get-all');
-                console.log(response)
+                const today = new Date();
+                const firstDayOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                const firstDayOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                const formattedStartDate = firstDayOfLastMonth.toISOString().split('T')[0];
+                const formattedEndDate = today.toISOString().split('T')[0];
+    
+                const response = await axios.get(`https://sensitivetechcrm.onrender.com/leaves/get-all?startDate=${formattedStartDate}&endDate=${formattedEndDate}`);
+                
                 setLeaves(response.data);
             } catch (err) {
                 setError("Failed to load leave data");
@@ -33,7 +39,7 @@ const LeaveTable = () => {
                 setLoading(false);
             }
         };
-
+    
         fetchLeaves();
     }, []);
 
@@ -329,7 +335,7 @@ const LeaveTable = () => {
                                         id="startDate"
                                         value={startDate}
                                         onChange={(e) => setStartDate(e.target.value)}
-                                       
+                                        min={new Date().toISOString().split('T')[0]}
                                         className="border border-blue-500 p-2 rounded w-32"
                                     />
                                 </div>
@@ -340,7 +346,7 @@ const LeaveTable = () => {
                                         id="endDate"
                                         value={endDate}
                                         onChange={(e) => setEndDate(e.target.value)}
-                                       
+                                        min={new Date().toISOString().split('T')[0]}
                                         className="border border-blue-500 p-2 rounded w-32"
                                     />
                                 </div>

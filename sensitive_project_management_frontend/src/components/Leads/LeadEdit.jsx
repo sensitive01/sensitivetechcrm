@@ -11,6 +11,7 @@ const LeadEdit = () => {
   const [error, setError] = useState(null);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
   const [lead, setLead] = useState({
     disposition: "",
     notes: "",
@@ -24,26 +25,36 @@ const LeadEdit = () => {
   ];
 
   // Fetch lead data
-  useEffect(() => {
-    const fetchLeadData = async () => {
-      try {
-        const response = await axios.get(
-          "https://sensitivetechcrm.onrender.com/updatelog/getdispositions"
-        );
-        if (response.status === 200) {
-          setLeads(response.data);
-        } else {
-          console.error("Failed to fetch lead details:", response.status);
+  // Fetch lead data
+useEffect(() => {
+  const fetchLeadData = async () => {
+    try {
+      const response = await axios.get(
+        "https://sensitivetechcrm.onrender.com/updatelog/getdispositions"
+      );
+      if (response.status === 200) {
+        let data = response.data;
+
+        if (role === "Lead") {
+          const today = new Date().toISOString().split("T")[0]; // Get today's date (YYYY-MM-DD)
+          data = data.filter(lead => lead.createdAt.split("T")[0] === today);
         }
-      } catch (error) {
-        console.error("Error fetching lead details:", error);
-        setError('Failed to load lead data');
-      } finally {
-        setLoading(false);
+
+        setLeads(data);
+      } else {
+        console.error("Failed to fetch lead details:", response.status);
       }
-    };
-    fetchLeadData();
-  }, []);
+    } catch (error) {
+      console.error("Error fetching lead details:", error);
+      setError("Failed to load lead data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchLeadData();
+}, [role]); // Depend on role to refetch if it changes
+
 
   // Handle input changes
   const handleChange = (e) => {
@@ -91,20 +102,31 @@ const LeadEdit = () => {
 
   const applyDateFilter = () => {
     if (!startDate || !endDate) {
-      alert('Please select both start and end dates.');
+      alert("Please select both start and end dates.");
       return;
     }
-
+  
     const start = new Date(startDate);
     const end = new Date(endDate);
-
+  
+    console.log("Start Date:", start);
+    console.log("End Date:", end);
+  
     const filteredData = leads.filter((lead) => {
       const leadDate = new Date(lead.createdAt);
-      return leadDate >= start && leadDate <= end;
+      const isWithinRange = leadDate >= start && leadDate <= end;
+      
+      console.log(`Checking lead: ${lead.createdAt} -> Parsed Date: ${leadDate}, In Range: ${isWithinRange}`);
+  
+      return isWithinRange;
     });
-
+  
+    console.log("Filtered Leads:", filteredData);
+  
     setFilteredLeads(filteredData);
   };
+  
+  
 
 
   // Define columns for react-table
@@ -128,8 +150,8 @@ const LeadEdit = () => {
 
 
 
+  const tableData = filteredLeads.length > 0 ? filteredLeads : leads
 
-  // Initialize react-table
   const {
     getTableProps,
     getTableBodyProps,
@@ -142,12 +164,12 @@ const LeadEdit = () => {
     previousPage,
     canNextPage,
     canPreviousPage,
-    pageOptions
+    pageOptions,
   } = useTable(
     {
       columns,
-      data: leads,
-      initialState: { pageSize: 10 }
+      data: tableData,  // Use filteredLeads if available
+      initialState: { pageSize: 10 },
     },
     useGlobalFilter,
     useSortBy,

@@ -11,6 +11,7 @@ import * as XLSX from "xlsx";
 
 const AttendanceTable = () => {
     const employeeId = localStorage.getItem("empId");
+    const [allAttendanceRecords, setAllAttendanceRecords] = useState([]);
     const [attendanceRecords, setAttendanceRecords] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -26,17 +27,33 @@ const AttendanceTable = () => {
                     throw new Error("Failed to fetch attendance data.");
                 }
                 const data = await response.json();
+                
+                // Sort data by date (descending)
                 data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                setAttendanceRecords(data);
+    
+                setAllAttendanceRecords(data); // Store full dataset
+    
+                const today = new Date().toISOString().split("T")[0];
+    
+                if (role === "Superadmin") {
+                    setAttendanceRecords(data.filter(record => 
+                        new Date(record.createdAt).toISOString().split("T")[0] === today
+                    ));
+                } else {
+                    setAttendanceRecords(data.filter(record => 
+                        new Date(record.createdAt).toISOString().split("T")[0] === today
+                    ));
+                }
             } catch (err) {
                 setError(err.message);
             } finally {
                 setLoading(false);
             }
         };
-
+    
         fetchAttendance();
-    }, []);
+    }, [role, employeeId]);
+
 
     const handleLogoutTimeUpdate = async (recordId) => {
         const record = attendanceRecords.find((rec) => String(rec._id) === String(recordId));
@@ -102,21 +119,30 @@ const AttendanceTable = () => {
         XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance Records");
         XLSX.writeFile(workbook, `Attendance_Records_${new Date().toISOString().split("T")[0]}.xlsx`);
     };
-
     const handleDateFilterChange = () => {
-        const filteredData = attendanceRecords.filter((record) => {
-            const recordDate = new Date(record.createdAt);
-            const start = startDate ? new Date(startDate) : null;
-            const end = endDate ? new Date(endDate) : null;
-
+        if (role !== "Superadmin") return;
+    
+        const filteredData = allAttendanceRecords.filter((record) => {
+            const recordDate = new Date(record.createdAt).toISOString().split("T")[0];
+            const start = startDate ? new Date(startDate).toISOString().split("T")[0] : null;
+            const end = endDate ? new Date(endDate).toISOString().split("T")[0] : null;
+    
             if (start && recordDate < start) return false;
             if (end && recordDate > end) return false;
-
+    
             return true;
         });
-
+    
         setAttendanceRecords(filteredData);
     };
+    
+    
+    const handleSearch = (searchValue) => {
+        if (role !== "Superadmin") return; 
+
+        setGlobalFilter(searchValue);
+    };
+
 
     const columns = useMemo(
         () => [
@@ -226,10 +252,11 @@ const AttendanceTable = () => {
                     <input
                         type="text"
                         value={globalFilter || ''}
-                        onChange={(e) => setGlobalFilter(e.target.value)}
+                        onChange={(e) => handleSearch(e.target.value)} // Use modified search function
                         placeholder="Search records..."
                         className="border border-blue-500 p-2 rounded w-64 pl-8"
                     />
+
                     <FaFilter className="absolute left-2 top-3 text-blue-500" />
                 </div>
                 <div className="flex space-x-4 items-center -mt-6">
@@ -242,7 +269,7 @@ const AttendanceTable = () => {
                                     id="startDate"
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
-                                   
+
                                     className="border border-blue-500 p-2 rounded w-32"
                                 />
                             </div>
@@ -253,7 +280,7 @@ const AttendanceTable = () => {
                                     id="endDate"
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
-                                   
+
                                     className="border border-blue-500 p-2 rounded w-32"
                                 />
                             </div>
@@ -269,15 +296,15 @@ const AttendanceTable = () => {
 
 
                 <div className="flex space-x-4">
-                {role === "Superadmin" && (
-                    <button
-                        onClick={exportToExcel}
-                        className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 flex items-center w-auto sm:px-4 sm:py-2 sm:w-auto text-xs sm:text-base flex-shrink-0"
-                    >
-                        <FaFileDownload className="mr-1" />
-                        Export
-                    </button>
-                )}
+                    {role === "Superadmin" && (
+                        <button
+                            onClick={exportToExcel}
+                            className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600 flex items-center w-auto sm:px-4 sm:py-2 sm:w-auto text-xs sm:text-base flex-shrink-0"
+                        >
+                            <FaFileDownload className="mr-1" />
+                            Export
+                        </button>
+                    )}
 
                     <Link
                         to="/attendance-form"

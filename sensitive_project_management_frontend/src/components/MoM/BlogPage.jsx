@@ -122,7 +122,7 @@ const BlogPage = () => {
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold text-gray-800">Meeting Minutes</h1>
                 <div className="flex space-x-4 items-center -mt-6">
-                    {role === "Superadmin" && (
+                   
                         <>
                             <div>
                                 <label htmlFor="startDate" className="block">Start Date</label>
@@ -153,7 +153,7 @@ const BlogPage = () => {
                                 Apply Filter
                             </button>
                         </>
-                    )}
+                  
                 </div>
                 <div className="flex gap-4">
                     <button

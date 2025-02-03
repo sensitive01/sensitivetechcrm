@@ -21,13 +21,13 @@ const TaskList = () => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
+    const [searchTerm, setSearchTerm] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchTasks = async () => {
             try {
                 const response = await axios.get('https://sensitivetechcrm.onrender.com/task/getalltask');
-                console.log(response)
                 const updatedTasks = response.data.tasks.map(task => {
                     if (task.date) {
                         const dateObj = new Date(task.date);
@@ -41,7 +41,14 @@ const TaskList = () => {
                     }
                     return task;
                 });
-                setTasks(updatedTasks);
+
+                // Apply filtering based on role
+                let filteredTasks = updatedTasks;
+                if (role !== "Superadmin") {
+                    filteredTasks = updatedTasks.filter(task => task.status === "Pending");
+                }
+
+                setTasks(filteredTasks);
             } catch (err) {
                 setError("Failed to load task data");
             } finally {
@@ -50,7 +57,8 @@ const TaskList = () => {
         };
 
         fetchTasks();
-    }, []);
+    }, [role]);
+
 
     const handleDelete = async (taskId) => {
         if (window.confirm('Are you sure you want to delete this task?')) {
@@ -97,6 +105,14 @@ const TaskList = () => {
         XLSX.utils.book_append_sheet(workbook, worksheet, "Task Records");
         XLSX.writeFile(workbook, `Task_Records_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
+
+    const filteredTasks = useMemo(() => {
+        return tasks.filter(task => 
+            role === "Superadmin" ||
+            task.status.toLowerCase().includes(searchTerm.toLowerCase()) || 
+            task.task.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [tasks, searchTerm, role]);
 
     const applyDateFilter = () => {
         if (!startDate || !endDate) {
@@ -255,7 +271,7 @@ const TaskList = () => {
     } = useTable(
         {
             columns,
-            data: tasks,
+            data: filteredTasks,
             initialState: { pageSize: 10 }
         },
         useGlobalFilter,
@@ -306,7 +322,6 @@ const TaskList = () => {
                                     id="startDate"
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
-                                   
                                     className="border border-blue-500 p-2 rounded w-32"
                                 />
                             </div>
@@ -317,7 +332,6 @@ const TaskList = () => {
                                     id="endDate"
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
-                                   
                                     className="border border-blue-500 p-2 rounded w-32"
                                 />
                             </div>
