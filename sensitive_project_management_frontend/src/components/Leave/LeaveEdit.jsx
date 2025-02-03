@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams,useNavigate } from "react-router-dom";
 import { employeename, getLeaveById } from "../../api/services/projectServices";
 
 function LeaveEdit() {
@@ -19,12 +19,14 @@ function LeaveEdit() {
     startTime: "",
     endTime: "",
   });
+   const [currentDate, setCurrentDate] = useState("");
 
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const { id } = useParams();
+    const navigate = useNavigate();  
 
   // Define the leave types here
   const leaveTypes = ["Sick Leave", "Casual Leave", "Emergency Leave", "Others"];
@@ -58,7 +60,11 @@ function LeaveEdit() {
     };
 
     fetchEmployees();
+    setCurrentDate(new Date().toISOString().split("T")[0]); 
   }, []);
+
+
+
 
   useEffect(() => {
     if (!id) return;
@@ -94,29 +100,54 @@ function LeaveEdit() {
     setLeave((prev) => ({ ...prev, [name]: files[0] }));
   };
 
+  const handleStatusChange = async (leaveId, newStatus) => {
+    try {
+      const response = await axios.put(
+        `https://sensitivetechcrm.onrender.com/leaves/update-status/${leaveId}`,
+        {
+          status: newStatus,
+          statusChangeDate: new Date().toISOString(),
+        }
+      );
+
+      if (response.status === 200) {
+        setLeave((prev) => ({
+          ...prev,
+          status: newStatus,
+          statusChangeDate: new Date().toISOString(),
+        }));
+        alert("Status updated successfully!");
+      }
+    } catch (err) {
+      console.error("Failed to update status:", err);
+      alert("Failed to update status.");
+    }
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const formData = new FormData();
-  
+
     // Append other fields to formData
     Object.keys(leave).forEach((key) => {
       formData.append(key, leave[key]);
     });
-  
+
     try {
       const response = id
         ? await axios.put(`https://sensitivetechcrm.onrender.com/leaves/update/${id}`, formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }) // Update leave
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }) // Update leave
         : await axios.post(`https://sensitivetechcrm.onrender.com/leaves/create`, formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }); // Create leave
-  
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }); // Create leave
+
       if (response.status === 200 || response.status === 201) {
         alert("Leave data submitted successfully!");
         setLeave({
@@ -134,6 +165,7 @@ function LeaveEdit() {
           startTime: "",
           endTime: "",
         });
+        navigate("/leave-table"); 
       } else {
         alert(`Error: ${response.statusText}`);
       }
@@ -142,7 +174,7 @@ function LeaveEdit() {
       alert(`Submission failed: ${error.message}`);
     }
   };
-  
+
 
   if (loading) {
     return (
@@ -263,6 +295,7 @@ function LeaveEdit() {
                     onChange={handleChange}
                     className="border border-blue-300 p-2 w-full rounded"
                     required
+                    min={currentDate} 
                   />
                   <span className="pt-2">to</span>
                   <input
@@ -272,6 +305,7 @@ function LeaveEdit() {
                     onChange={handleChange}
                     className="border border-blue-300 p-2 w-full rounded"
                     required
+                    min={currentDate} 
                   />
                 </div>
               </div>
@@ -288,6 +322,7 @@ function LeaveEdit() {
                   onChange={handleChange}
                   className="border border-blue-300 p-2 w-full rounded"
                   required
+                  min={currentDate} 
                 />
               </div>
             )}
@@ -319,7 +354,7 @@ function LeaveEdit() {
                   />
                 </div>
               )}
-               <input
+              <input
                 type="file"
                 name="attachment"
                 onChange={handleFileChange}  // Using handleFileChange here
@@ -331,7 +366,7 @@ function LeaveEdit() {
               <select
                 name="status"
                 value={leave.status}
-                onChange={handleChange}
+                onChange={(e) => handleStatusChange(id, e.target.value)}
                 required
                 className="border border-blue-300 p-2 w-full rounded"
               >

@@ -221,6 +221,20 @@ const LeaveTable = () => {
             accessor: 'leaveType',
         },
         {
+            Header: 'Created Date & Time',
+            accessor: (row) => row.createdAt
+                ? new Date(row.createdAt).toLocaleString('en-GB', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                })
+                : 'N/A',
+        },
+        {
             Header: 'Actions',
             accessor: '_id',
             Cell: ({ row }) => (
@@ -237,7 +251,7 @@ const LeaveTable = () => {
                         className="text-red-500 hover:bg-red-100 p-2 rounded-full transition-colors"
                         title="Delete Leave"
                         onClick={() => handleDelete(row.original._id)}
-                        disabled={role !== "Superadmin"} 
+                        disabled={role !== "Superadmin"}
                     >
                         <Trash2 size={20} />
                     </button>
@@ -294,16 +308,18 @@ const LeaveTable = () => {
 
             <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center space-x-4">
-                    <div className="relative">
-                        <input
-                            type="text"
-                            value={globalFilter || ''}
-                            onChange={(e) => setGlobalFilter(e.target.value)}
-                            placeholder="Search records..."
-                            className="border border-blue-500 p-2 rounded w-64 pl-8"
-                        />
-                        <FaFilter className="absolute left-2 top-3 text-blue-500" />
-                    </div>
+                    {role === "Superadmin" && (
+                        <div className="relative">
+                            <input
+                                type="text"
+                                value={globalFilter || ''}
+                                onChange={(e) => setGlobalFilter(e.target.value)}
+                                placeholder="Search records..."
+                                className="border border-blue-500 p-2 rounded w-64 pl-8"
+                            />
+                            <FaFilter className="absolute left-2 top-3 text-blue-500" />
+                        </div>
+                    )}
 
                     <div className="flex space-x-4 items-center -mt-6">
                         <div>
@@ -313,6 +329,7 @@ const LeaveTable = () => {
                                 id="startDate"
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
+                                min={new Date().toISOString().split('T')[0]}
                                 className="border border-blue-500 p-2 rounded w-32"
                             />
                         </div>
@@ -323,6 +340,7 @@ const LeaveTable = () => {
                                 id="endDate"
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}
+                                min={new Date().toISOString().split('T')[0]}
                                 className="border border-blue-500 p-2 rounded w-32"
                             />
                         </div>
@@ -337,13 +355,15 @@ const LeaveTable = () => {
                 </div>
 
                 <div className="flex space-x-4">
-                    <button
-                        onClick={exportToExcel}
-                        className="bg-green-500 text-white px-6 py-2 rounded flex items-center hover:bg-green-600"
-                    >
-                        <FaFileDownload className="mr-2" />
-                        Export Data
-                    </button>
+                    {role === "Superadmin" && (
+                        <button
+                            onClick={exportToExcel}
+                            className="bg-green-500 text-white px-6 py-2 rounded flex items-center hover:bg-green-600"
+                        >
+                            <FaFileDownload className="mr-2" />
+                            Export Data
+                        </button>
+                    )}
 
                     <Link
                         to="/leave"

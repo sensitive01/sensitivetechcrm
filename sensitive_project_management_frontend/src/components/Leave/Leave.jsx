@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";  // Import axios for HTTP requests
 import { employeename } from "../../api/services/projectServices";
+import { useNavigate } from "react-router-dom";
 
 function Leave() {
   const [employees, setEmployees] = useState([]);
@@ -20,6 +21,9 @@ function Leave() {
     startTime: "",
     endTime: "",
   });
+
+  const [currentDate, setCurrentDate] = useState("");
+  const navigate = useNavigate();  
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -44,6 +48,7 @@ function Leave() {
     };
 
     fetchEmployees();
+    setCurrentDate(new Date().toISOString().split("T")[0]); 
   }, []);
 
   const leaveTypes = ["Sick Leave", "Casual Leave", "Emergency Leave", "Others"];
@@ -63,15 +68,12 @@ function Leave() {
     e.preventDefault();
 
     const formData = new FormData();
-
-    // Append form fields (except attachment)
     Object.keys(leave).forEach((key) => {
       if (key !== 'attachment') {
         formData.append(key, leave[key]);
       }
     });
 
-    // Append the attachment file
     if (leave.attachment) {
       formData.append('attachment', leave.attachment);
     }
@@ -79,10 +81,10 @@ function Leave() {
     try {
       const response = await axios.post(
         "https://sensitivetechcrm.onrender.com/leaves/create",
-        formData,  // Send formData instead of JSON
+        formData,  
         {
           headers: {
-            "Content-Type": "multipart/form-data", // Correct content type for file upload
+            "Content-Type": "multipart/form-data", 
           },
         }
       );
@@ -104,6 +106,7 @@ function Leave() {
           startTime: "",
           endTime: "",
         });
+        navigate("/leave-table");
       }
     } catch (error) {
       console.error("Error submitting data:", error);
@@ -230,6 +233,7 @@ function Leave() {
                     onChange={handleChange}
                     className="border border-blue-300 p-2 w-full rounded"
                     required
+                    min={currentDate} 
                   />
                   <span className="pt-2">to</span>
                   <input
@@ -239,6 +243,7 @@ function Leave() {
                     onChange={handleChange}
                     className="border border-blue-300 p-2 w-full rounded"
                     required
+                    min={currentDate} 
                   />
                 </div>
               </div>
@@ -255,6 +260,7 @@ function Leave() {
                   onChange={handleChange}
                   className="border border-blue-300 p-2 w-full rounded"
                   required
+                  min={currentDate} 
                 />
               </div>
             )}
@@ -268,7 +274,7 @@ function Leave() {
                     type="time"
                     name="startTime"
                     value={leave.startTime}
-                    onChange={handleChange}
+                    onChange={handleChange} 
                     className="border border-blue-300 p-2 w-full rounded"
                     required
                   />
