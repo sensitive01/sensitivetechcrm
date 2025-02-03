@@ -128,6 +128,8 @@ const RoutesWithPreloader = ({ role }) => {
                   <Route path="/add-project" element={<ProjectForm />} />
                   <Route path="/edit-project/:projectId" element={<ProjectEdit />} />
                   <Route path="/mom" element={<MoM />} />
+                  <Route path="/momdetails" element={<BlogPage />} />
+                  <Route path="/mom-edit/:id" element={<MoMEdit />} />
                 </Routes>
               </AdminLayout>
             ) : (

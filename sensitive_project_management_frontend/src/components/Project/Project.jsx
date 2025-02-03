@@ -3,7 +3,7 @@ import { Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { deletetheProject, getAllProject } from "../../api/services/projectServices";
 
-const ProjectDetailsModal = ({ project, onClose,onEdit }) => {
+const ProjectDetailsModal = ({ project, onClose, onEdit }) => {
   const renderArrayData = (array, field) => {
     if (!array || array.length === 0) return "N/A";
     return array.map((item, index) => item[field]).filter(Boolean).join(", ");
@@ -13,7 +13,7 @@ const ProjectDetailsModal = ({ project, onClose,onEdit }) => {
     <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white rounded-lg p-4 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">Project Details</h2>
-        
+
         <div className="space-y-4">
           <section>
             <h3 className="text-lg font-semibold mb-2">Project Information:</h3>
@@ -48,7 +48,7 @@ const ProjectDetailsModal = ({ project, onClose,onEdit }) => {
           <section>
             <h3 className="text-lg font-semibold mb-2">Additional Information:</h3>
             <div className="grid grid-cols-2 gap-4">
-            <p><strong>ProjectDocument:</strong> {renderArrayData(project.additionalDetails, 'projectDocument')}</p>
+              <p><strong>ProjectDocument:</strong> {renderArrayData(project.additionalDetails, 'projectDocument')}</p>
               <p><strong>Assigned To:</strong> {renderArrayData(project.additionalDetails, 'assignedTo')}</p>
               <p><strong>Status:</strong> {renderArrayData(project.additionalDetails, 'status')}</p>
               <p><strong>NDA:</strong> {renderArrayData(project.additionalDetails, 'nda')}</p>
@@ -63,7 +63,7 @@ const ProjectDetailsModal = ({ project, onClose,onEdit }) => {
         </div>
 
         <div className="mt-6 flex justify-end space-x-4">
-        <button
+          <button
             onClick={() => onEdit(project)}
             className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
           >
@@ -91,6 +91,9 @@ const ProjectManager = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
   const ITEMS_PER_PAGE = 5;
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -99,8 +102,8 @@ const ProjectManager = () => {
         // const response = await fetch("https://sensitivetechcrm.onrender.com/project/getallprojects");
         const response = await getAllProject()
         console.log(response)
-        if (response.status===200) {
-       
+        if (response.status === 200) {
+
           setProjects(response.data);
         } else {
           throw new Error("Failed to fetch projects");
@@ -147,31 +150,31 @@ const ProjectManager = () => {
 
   const handleDelete = async (projectId) => {
     if (!projectId) {
-        alert("Invalid project ID. Unable to delete.");
-        return;
+      alert("Invalid project ID. Unable to delete.");
+      return;
     }
 
     if (window.confirm("Are you sure you want to delete this project?")) {
-        try {
-            const response = await deletetheProject(projectId);
+      try {
+        const response = await deletetheProject(projectId);
 
-            if (response?.status === 200) {
-                setProjects((prevProjects) =>
-                    prevProjects.filter((project) => project._id !== projectId)
-                );
-                alert("Project deleted successfully!");
-            } else {
-                alert("Failed to delete project. Please try again.");
-            }
-        } catch (error) {
-            console.error("Error deleting project:", error);
-            alert(
-                error.response?.data?.message ||
-                "An error occurred while deleting the project."
-            );
+        if (response?.status === 200) {
+          setProjects((prevProjects) =>
+            prevProjects.filter((project) => project._id !== projectId)
+          );
+          alert("Project deleted successfully!");
+        } else {
+          alert("Failed to delete project. Please try again.");
         }
+      } catch (error) {
+        console.error("Error deleting project:", error);
+        alert(
+          error.response?.data?.message ||
+          "An error occurred while deleting the project."
+        );
+      }
     }
-};
+  };
 
 
   const handleExportData = () => {
@@ -212,6 +215,25 @@ const ProjectManager = () => {
     document.body.removeChild(link);
   };
 
+  const applyDateFilter = () => {
+    if (!startDate || !endDate) {
+      alert('Please select both start and end dates.');
+      return;
+    }
+
+    // Convert dates to Date objects for comparison
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const filteredProjects = projects.filter((project) => {
+      const projectDate = new Date(project.additionalDetails?.[0]?.createdDate); // Or another date property
+      return projectDate >= start && projectDate <= end;
+    });
+
+    setProjects(filteredProjects); // Update the projects state with the filtered results
+  };
+
+
   const handleView = (project) => {
     setSelectedProject(project);
     setIsModalOpen(true);
@@ -236,7 +258,7 @@ const ProjectManager = () => {
 
   const filteredAndSortedProjects = useMemo(() => {
     let filtered = [...processedProjects];
-    
+
     if (searchTerm) {
       filtered = filtered.filter((project) => {
         const searchString = searchTerm.toLowerCase();
@@ -253,13 +275,13 @@ const ProjectManager = () => {
       filtered.sort((a, b) => {
         const aValue = a.displayData[sortConfig.key] || '';
         const bValue = b.displayData[sortConfig.key] || '';
-        
+
         if (sortConfig.key === 'createdDate') {
-          return sortConfig.direction === 'asc' 
+          return sortConfig.direction === 'asc'
             ? new Date(aValue) - new Date(bValue)
             : new Date(bValue) - new Date(aValue);
         }
-        
+
         return sortConfig.direction === 'asc'
           ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue);
@@ -285,6 +307,7 @@ const ProjectManager = () => {
           <span className="px-2 text-gray-500">
             <Filter className="h-5 w-5" />
           </span>
+
           <input
             type="text"
             value={searchTerm}
@@ -293,13 +316,51 @@ const ProjectManager = () => {
             className="p-2 rounded w-full outline-none"
           />
         </div>
+
+        <div className="flex space-x-4 items-center -mt-6">
+          {role === "Superadmin" && (
+            <>
+              <div>
+                <label htmlFor="startDate" className="block">Start Date</label>
+                <input
+                  type="date"
+                  id="startDate"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                 
+                  className="border border-blue-500 p-2 rounded w-32"
+                />
+              </div>
+              <div>
+                <label htmlFor="endDate" className="block">End Date</label>
+                <input
+                  type="date"
+                  id="endDate"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                 
+                  className="border border-blue-500 p-2 rounded w-32"
+                />
+              </div>
+              <button
+                onClick={applyDateFilter}
+                className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
+              >
+                Apply Filter
+              </button>
+            </>
+          )}
+        </div>
+
         <div className="flex justify-end items-center space-x-4 mb-4">
-          <button
-            onClick={handleExportData}
-            className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-700 flex items-center"
-          >
-            Export Data
-          </button>
+          {role === "Superadmin" && (
+            <button
+              onClick={handleExportData}
+              className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-700 flex items-center"
+            >
+              Export Data
+            </button>
+          )}
           <button
             onClick={handleAddProject}
             className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700 flex items-center"
@@ -318,33 +379,33 @@ const ProjectManager = () => {
           <table className="w-full">
             <thead className="bg-[#2563eb] text-white border-b">
               <tr>
-                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200" 
-                    onClick={() => handleSort('projectName')}>
+                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200"
+                  onClick={() => handleSort('projectName')}>
                   Project Name
                 </th>
-                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200" 
-                    onClick={() => handleSort('techStack')}>
+                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200"
+                  onClick={() => handleSort('techStack')}>
                   Tech Stack
                 </th>
-                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200" 
-                    onClick={() => handleSort('companyName')}>
+                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200"
+                  onClick={() => handleSort('companyName')}>
                   Client Company
                 </th>
-                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200" 
-                    onClick={() => handleSort('assignedTo')}>
+                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200"
+                  onClick={() => handleSort('assignedTo')}>
                   Assigned To
                 </th>
-                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200" 
-                    onClick={() => handleSort('duration')}>
+                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200"
+                  onClick={() => handleSort('duration')}>
                   Duration
                 </th>
                 <th className="px-4 py-2 border border-gray-300">Tasks</th>
-                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200" 
-                    onClick={() => handleSort('status')}>
+                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200"
+                  onClick={() => handleSort('status')}>
                   Status
                 </th>
-                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200" 
-                    onClick={() => handleSort('createdDate')}>
+                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200"
+                  onClick={() => handleSort('createdDate')}>
                   Created Date
                 </th>
                 <th className="px-4 py-2 border border-gray-300">Actions</th>

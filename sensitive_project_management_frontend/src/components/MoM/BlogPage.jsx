@@ -10,6 +10,9 @@ const BlogPage = () => {
     const [error, setError] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedMeeting, setSelectedMeeting] = useState(null);
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
 
     useEffect(() => {
         const fetchMeetingData = async () => {
@@ -44,6 +47,26 @@ const BlogPage = () => {
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Meeting Minutes');
         XLSX.writeFile(workbook, 'meeting-minutes.xlsx');
+    };
+
+    const applyDateFilter = () => {
+        if (!startDate || !endDate) {
+            alert('Please select both start and end dates.');
+            return;
+        }
+
+        // Convert dates to Date objects for comparison
+        const start = new Date(startDate.split('/').reverse().join('/'));
+        const end = new Date(endDate.split('/').reverse().join('/'));
+
+        const filteredMeetings = meetingData.filter((meeting) => {
+            const meetingDateParts = meeting.date.split('/');
+            const meetingDate = new Date(`20${meetingDateParts[2]}-${meetingDateParts[1]}-${meetingDateParts[0]}`);
+
+            return meetingDate >= start && meetingDate <= end;
+        });
+
+        setMeetingData(filteredMeetings);
     };
 
     const handleAddMoM = () => {
@@ -98,6 +121,40 @@ const BlogPage = () => {
         <div className="container mx-auto px-4 py-8 mt-28">
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold text-gray-800">Meeting Minutes</h1>
+                <div className="flex space-x-4 items-center -mt-6">
+                    {role === "Superadmin" && (
+                        <>
+                            <div>
+                                <label htmlFor="startDate" className="block">Start Date</label>
+                                <input
+                                    type="date"
+                                    id="startDate"
+                                    value={startDate}
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                   
+                                    className="border border-blue-500 p-2 rounded w-32"
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="endDate" className="block">End Date</label>
+                                <input
+                                    type="date"
+                                    id="endDate"
+                                    value={endDate}
+                                    onChange={(e) => setEndDate(e.target.value)}
+                                   
+                                    className="border border-blue-500 p-2 rounded w-32"
+                                />
+                            </div>
+                            <button
+                                onClick={applyDateFilter}
+                                className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
+                            >
+                                Apply Filter
+                            </button>
+                        </>
+                    )}
+                </div>
                 <div className="flex gap-4">
                     <button
                         onClick={handleAddMoM}
@@ -106,13 +163,15 @@ const BlogPage = () => {
                         <Plus size={16} />
                         Add MoM
                     </button>
-                    <button
-                        onClick={handleExportData}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                    >
-                        <Download size={16} />
-                        Export Data
-                    </button>
+                    {role === "Superadmin" && (
+                        <button
+                            onClick={handleExportData}
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                        >
+                            <Download size={16} />
+                            Export Data
+                        </button>
+                    )}
                 </div>
             </div>
 

@@ -11,6 +11,9 @@ const LeadTable = () => {
     const [leads, setLeads] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+      const [startDate, setStartDate] = useState('');
+        const [endDate, setEndDate] = useState('');
+        const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -64,6 +67,27 @@ const LeadTable = () => {
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Lead Records');
         XLSX.writeFile(workbook, `Lead_Records_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
+
+    const applyDateFilter = () => {
+        if (!startDate || !endDate) {
+            alert('Please select both start and end dates.');
+            return;
+        }
+    
+        // Convert dates to Date objects for comparison
+        const start = new Date(startDate.split('/').reverse().join('/'));
+        const end = new Date(endDate.split('/').reverse().join('/'));
+    
+        const filteredLeads = leads.filter((lead) => {
+            const leadDateParts = lead.createdAt.split('/');
+            const leadDate = new Date(`20${leadDateParts[2]}-${leadDateParts[1]}-${leadDateParts[0]}`);
+    
+            return leadDate >= start && leadDate <= end;
+        });
+    
+        setLeads(filteredLeads);
+    };
+    
     const columns = useMemo(() => [
         { Header: 'S.No', accessor: (row, index) => index + 1 },
         { Header: 'Name', accessor: 'name' },
@@ -152,10 +176,47 @@ const LeadTable = () => {
                     />
                     <FaFilter className="absolute left-2 top-3 text-blue-500" />
                 </div>
+
+                <div className="flex space-x-4 items-center -mt-6">
+                    {role === "Superadmin" && (
+                        <>
+                            <div>
+                                <label htmlFor="startDate" className="block">Start Date</label>
+                                <input
+                                    type="date"
+                                    id="startDate"
+                                    value={startDate}
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                   
+                                    className="border border-blue-500 p-2 rounded w-32"
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="endDate" className="block">End Date</label>
+                                <input
+                                    type="date"
+                                    id="endDate"
+                                    value={endDate}
+                                    onChange={(e) => setEndDate(e.target.value)}
+                                   
+                                    className="border border-blue-500 p-2 rounded w-32"
+                                />
+                            </div>
+                            <button
+                                onClick={applyDateFilter}
+                                className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
+                            >
+                                Apply Filter
+                            </button>
+                        </>
+                    )}
+                </div>
                 <div className="flex space-x-4">
+                {role === "Superadmin" && (
                     <button onClick={exportToExcel} className="bg-green-500 text-white px-6 py-2 rounded flex items-center hover:bg-green-600">
                         <FaFileDownload className="mr-2" /> Export Data
                     </button>
+                )}
                     <Link to="/lead-form" className="bg-blue-500 text-white px-6 py-2 rounded flex items-center hover:bg-blue-600">
                         <FaPlus className="mr-2" /> Add Lead
                     </Link>

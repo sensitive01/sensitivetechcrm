@@ -308,49 +308,50 @@ const LeaveTable = () => {
 
             <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center space-x-4">
-                    {role === "Superadmin" && (
-                        <div className="relative">
-                            <input
-                                type="text"
-                                value={globalFilter || ''}
-                                onChange={(e) => setGlobalFilter(e.target.value)}
-                                placeholder="Search records..."
-                                className="border border-blue-500 p-2 rounded w-64 pl-8"
-                            />
-                            <FaFilter className="absolute left-2 top-3 text-blue-500" />
-                        </div>
-                    )}
+                    <div className="relative">
+                        <input
+                            type="text"
+                            value={globalFilter || ''}
+                            onChange={(e) => setGlobalFilter(e.target.value)}
+                            placeholder="Search records..."
+                            className="border border-blue-500 p-2 rounded w-64 pl-8"
+                        />
+                        <FaFilter className="absolute left-2 top-3 text-blue-500" />
+                    </div>
 
                     <div className="flex space-x-4 items-center -mt-6">
-                        <div>
-                            <label htmlFor="startDate" className="block">Start Date</label>
-                            <input
-                                type="date"
-                                id="startDate"
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
-                                min={new Date().toISOString().split('T')[0]}
-                                className="border border-blue-500 p-2 rounded w-32"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="endDate" className="block">End Date</label>
-                            <input
-                                type="date"
-                                id="endDate"
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                                min={new Date().toISOString().split('T')[0]}
-                                className="border border-blue-500 p-2 rounded w-32"
-                            />
-                        </div>
-                        <button
-
-                            onClick={applyDateFilter}
-                            className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
-                        >
-                            Apply Filter
-                        </button>
+                        {role === "Superadmin" && (
+                            <>
+                                <div>
+                                    <label htmlFor="startDate" className="block">Start Date</label>
+                                    <input
+                                        type="date"
+                                        id="startDate"
+                                        value={startDate}
+                                        onChange={(e) => setStartDate(e.target.value)}
+                                       
+                                        className="border border-blue-500 p-2 rounded w-32"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="endDate" className="block">End Date</label>
+                                    <input
+                                        type="date"
+                                        id="endDate"
+                                        value={endDate}
+                                        onChange={(e) => setEndDate(e.target.value)}
+                                       
+                                        className="border border-blue-500 p-2 rounded w-32"
+                                    />
+                                </div>
+                                <button
+                                    onClick={applyDateFilter}
+                                    className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
+                                >
+                                    Apply Filter
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
 

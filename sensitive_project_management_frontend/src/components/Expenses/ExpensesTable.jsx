@@ -226,6 +226,7 @@ const ExpenseTable = () => {
                             id="startDate"
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
+                           
                             className="border border-blue-500 p-2 rounded w-32"
                         />
                     </div>
@@ -236,6 +237,7 @@ const ExpenseTable = () => {
                             id="endDate"
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
+                           
                             className="border border-blue-500 p-2 rounded w-32"
                         />
                     </div>
