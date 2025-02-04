@@ -24,14 +24,14 @@ export const verifyLogin = async (formData) => {
 // };
 
 
-export const getAllProject=async() => {
-    try {
-      const response = await projectServices.get(`/project/getallprojects` );
-      return response;
-    } catch (err) {
-      return err;
-    }
-  };
+// export const  getAllProject = async (_id) => {
+//   try {
+//       const response = await projectServices.get(`/project/getallprojects/${_id}`);
+//       return response;
+//   } catch (err) {
+//       return err;
+//   }
+// };
 
 
   export const getTheProject=async(projectId) => {

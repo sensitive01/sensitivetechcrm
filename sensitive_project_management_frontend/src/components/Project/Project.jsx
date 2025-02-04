@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { deletetheProject, getAllProject } from "../../api/services/projectServices";
+import { deletetheProject } from "../../api/services/projectServices";
 
 const ProjectDetailsModal = ({ project, onClose, onEdit }) => {
   const renderArrayData = (array, field) => {
-    if (!array || array.length === 0) return "N/A";
+    if (!array || !Array.isArray(array) || array.length === 0) return "N/A";
     return array.map((item, index) => item[field]).filter(Boolean).join(", ");
   };
 
@@ -94,17 +94,17 @@ const ProjectManager = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
+  const _id = localStorage.getItem("empId");
   const navigate = useNavigate();
+  
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        // const response = await fetch("https://sensitivetechcrm.onrender.com/project/getallprojects");
-        const response = await getAllProject()
-        console.log(response)
+        const response = await fetch(`https://sensitivetechcrm.onrender.com/project/getallprojects/${_id}`);
+        const data = await response.json(); // Ensure you're getting the correct data
         if (response.status === 200) {
-
-          setProjects(response.data);
+          setProjects(data); // Set the projects from the response data
         } else {
           throw new Error("Failed to fetch projects");
         }
@@ -114,20 +114,20 @@ const ProjectManager = () => {
         setLoading(false);
       }
     };
+    
 
     fetchProjects();
-  }, []);
+  }, [_id]);
 
   // Helper function to get the latest or most relevant value from an array of objects
   const getLatestValue = (array, field) => {
-    if (!array || array.length === 0) return "N/A";
-    // Join all unique values
+    if (!array || !Array.isArray(array) || array.length === 0) return "N/A";
     const uniqueValues = [...new Set(array.map(item => item[field]).filter(Boolean))];
     return uniqueValues.join(", ") || "N/A";
   };
 
   const processedProjects = useMemo(() => {
-    return projects.map(project => ({
+    return projects?.map(project => ({
       ...project,
       displayData: {
         projectName: getLatestValue(project.projectDetails, 'projectName'),
@@ -141,8 +141,13 @@ const ProjectManager = () => {
           ? new Date(project.additionalDetails[0].createdDate).toLocaleDateString()
           : "N/A"
       }
-    }));
-  }, [projects]);
+    }))
+    .filter(project => 
+      role === "Superadmin" || project.displayData.status.toLowerCase() === "pending"
+    );
+  }, [projects, role]);
+  
+  
 
   const handleAddProject = () => {
     window.location.href = '/add-project';

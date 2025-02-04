@@ -11,7 +11,7 @@ const ProjectForm = () => {
 
 
  
-  const statuses = ["Not Started", "In Progress", "Completed", "On Hold"];
+  const statuses = ["Pending", "In Progress", "Completed", "On Hold"];
 
   const [projects, setProjects] = useState([]);
   const [projectDetails, setProjectDetails] = useState([
