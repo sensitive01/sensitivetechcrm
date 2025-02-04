@@ -6,7 +6,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 projectRouter.post("/createproject",upload.single("projectDocument"), projectController.createProject);
-projectRouter.get("/getallprojects", projectController.getAllProjects);
+projectRouter.get("/getallprojects/:id", projectController.getAllProjects);
 projectRouter.get("/getprojectbyid/:id", projectController.getProjectById);
 projectRouter.put("/updateprojectby/:id",upload.single("projectDocument"), projectController.updateProjectById);
 projectRouter.delete("/deleteproject/:id", projectController.deleteProjectById);
