@@ -1,5 +1,6 @@
 const leaveModel = require("../models/leaveModel");
 const { uploadImage } = require("../config/cloudinary");
+const employeeSchema = require("../models/employeeSchema");
 // const employeeSchema = require("../models/employeeSchema");
 
 // Create a new leave request
@@ -21,52 +22,41 @@ exports.createLeaveRequest = async (req, res) => {
 };
 
 // Get all leave requests
-exports.getAllLeaveRequests = async (req, res) => {
-  try {
-    const leaveRequests = await leaveModel.find();
-    console.log("All leave requests:", leaveRequests);
-    res.status(200).json(leaveRequests);
-  } catch (error) {
-    console.error('Error fetching leave requests:', error);
-    res.status(500).json({ message: error.message });
-  }
-};
 // exports.getAllLeaveRequests = async (req, res) => {
 //   try {
-//     const { id } = req.params; // Extract employee ID from request parameters
-//     console.log("Employee ID:", id);
-    
-//     // Fetch employee data based on the provided ID
-//     const empdata = await employeeSchema.findOne({ _id: id }, { role: 1, empId: 1, name: 1 });
-        
-//     // Check if employee data was found
-//     if (!empdata) {
-//       return res.status(404).json({ message: "Employee not found" });
-//     }
-
-//     console.log("Employee Data:", empdata);
-
-//     let leaveRequests;
-//     // Check if the ID is the specific one to return all leave requests
-//     if (id === "6779360b3fb6809073b96ef4") {
-//       leaveRequests = await leaveModel.find(); // Fetch all leave requests for this ID
-//     } else {
-//       // For other IDs, fetch only the leave requests specific to that employee
-//       console.log("Searching for leave requests for employee:", empdata.name);
-//       leaveRequests = await leaveModel.find({ 
-//         "employee": empdata.name // Match leave requests by employee name
-//       });
-//     }
-    
-//     console.log("Leave requests:", leaveRequests);
-//     res.status(200).json(leaveRequests); // Return the leave requests
+//     const leaveRequests = await leaveModel.find();
+//     console.log("All leave requests:", leaveRequests);
+//     res.status(200).json(leaveRequests);
 //   } catch (error) {
 //     console.error('Error fetching leave requests:', error);
-//     res.status(500).json({ message: error.message }); // Handle errors
+//     res.status(500).json({ message: error.message });
 //   }
 // };
 
-// Get a leave request by ID
+exports.getAllLeaveRequests = async (req, res) => {
+  try{
+    const {id} = req.params;
+    console.log("User ID", id);
+    const empdata = await employeeSchema.findOne({_id: id}, {role:1, empId:1, name:1});
+    if(!empdata){
+      return res.status(404).json({message: "Employee not found"});
+    }
+    console.log("Employee Data:", empdata);
+    let leaves;
+    if(empdata.role ==="Superadmin"){
+      leaves = await leaveModel.find()
+    }else{
+      leaves = await leaveModel.find({
+        "employee":empdata.name
+      });
+    }
+    console.log("Leave:", leaves);
+    res.status(200).json(leaves);
+  } catch (error){
+    console.error("Error fetching Leaves:", error);
+    res.status(500).json({message: "Error fetching Leaves"});
+  }
+}
 
 exports.getLeaveRequestById = async (req, res) => {
   try {

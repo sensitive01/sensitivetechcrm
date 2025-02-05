@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+  const mongoose = require('mongoose');
 
 
 const leaveSchema = new mongoose.Schema({

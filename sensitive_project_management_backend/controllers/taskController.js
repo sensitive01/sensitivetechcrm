@@ -66,7 +66,7 @@ const getAllTasks = async (req, res) => {
     console.log("Task:", tasks);
     res.status(200).json(tasks);
   } catch (error) {
-    console.error("Error fetching projects:", error);
+    console.error("Error fetching Tasks:", error);
     res.status(500).json({ message: "Error fetching projects" });
   }
 };
