@@ -39,7 +39,7 @@ employeeRouter.patch(
     Employee.updateEmployee
   );
 employeeRouter.delete("/deleteemployee/:id", Employee.deleteEmployee)
-employeeRouter.get("/employename/:id",Employee.getEmployeeNames)
+employeeRouter.get("/employename",Employee.getEmployeeNames)
 employeeRouter.get("/totalemployee", Employee.getTotalEmployees);
 
 employeeRouter.get("/getaddressbypincode/:pincode", async (req, res) => {

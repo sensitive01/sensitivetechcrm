@@ -134,41 +134,41 @@ const deleteEmployee = async (req, res) => {
 };
 
 
-// const getEmployeeNames = async (req, res) => {
-//   try {
-//     const employees = await Employee.find({ role: "employee" }).select("name");
-//     res.json(employees);
-//   } catch (error) {
-//     res.status(500).json({ message: "Error fetching employees" });
-//   }
-// };
-
 const getEmployeeNames = async (req, res) => {
   try {
-    const { id } = req.params;
-    console.log("User ID", id);
-    const empdata = await Employee.findOne({ _id: id }, { role: 1, empId: 1, name: 1 });
-    if (!empdata) {
-      return res.status(404).json({ message: "Employee not found" });
-
-    }
-    console.log("Employee Data:", empdata);
-    let employees;
-    if (empdata.role === "Superadmin") {
-      employees = await Employee.find()
-
-    } else {
-      leaves = await leaveModel.find({
-        "employee": empdata.name
-      });
-    }
-    console.log("Employees:", leaves);
-    res.status(200).json(leaves);
+    const employees = await Employee.find({ role: "employee" }).select("name");
+    res.json(employees);
   } catch (error) {
-    console.error("Error fetching Employees:", error);
-    res.status(500).json({ message: "Error fetching Employees" });
+    res.status(500).json({ message: "Error fetching employees" });
   }
 };
+
+// const getEmployeeNames = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     console.log("User ID", id);
+//     const empdata = await Employee.findOne({ _id: id }, { role: 1, empId: 1, name: 1 });
+//     if (!empdata) {
+//       return res.status(404).json({ message: "Employee not found" });
+
+//     }
+//     console.log("Employee Data:", empdata);
+//     let employees;
+//     if (empdata.role === "Superadmin") {
+//       employees = await Employee.find()
+
+//     } else {
+//       leaves = await leaveModel.find({
+//         "employee": empdata.name
+//       });
+//     }
+//     console.log("Employees:", leaves);
+//     res.status(200).json(leaves);
+//   } catch (error) {
+//     console.error("Error fetching Employees:", error);
+//     res.status(500).json({ message: "Error fetching Employees" });
+//   }
+// };
 
 
 const getTotalEmployees = async (req, res) => {
