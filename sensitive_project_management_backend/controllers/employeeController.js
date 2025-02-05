@@ -1,11 +1,12 @@
 const Employee = require("../models/employeeSchema");
+const leaveModel = require("../models/leaveModel");
 const { uploadImage } = require("../config/cloudinary");
 const axios = require('axios');
 
 const createEmployee = async (req, res) => {
   try {
     console.log("Creating employee", req.body);
-    
+
     const employeeData = req.body;
 
     // Process uploaded files
@@ -59,7 +60,7 @@ const getAllEmployees = async (req, res) => {
 const getEmployeeById = async (req, res) => {
   try {
     const { id } = req.params;
-    const employee = await Employee.findById({_id:id});
+    const employee = await Employee.findById({ _id: id });
     if (!employee) {
       return res.status(404).json({ error: "Employee not found" });
     }
@@ -74,10 +75,10 @@ const getEmployeeById = async (req, res) => {
 //   try {
 //     const { id } = req.params;
 //     const updatedData = req.body;
-    // const updatedEmployee = await Employee.findByIdAndUpdate({_id:id}, updatedData, { new: true });
-    // if (!updatedEmployee) {
-    //   return res.status(404).json({ error: "Employee not found" });
-    // }
+// const updatedEmployee = await Employee.findByIdAndUpdate({_id:id}, updatedData, { new: true });
+// if (!updatedEmployee) {
+//   return res.status(404).json({ error: "Employee not found" });
+// }
 //     res.status(200).json({ message: "Employee updated successfully", employee: updatedEmployee });
 //   } catch (error) {
 //     res.status(500).json({ error: error.message });
@@ -122,7 +123,7 @@ const updateEmployee = async (req, res) => {
 const deleteEmployee = async (req, res) => {
   try {
     const { id } = req.params;
-    const deletedEmployee = await Employee.findByIdAndDelete({_id:id});
+    const deletedEmployee = await Employee.findByIdAndDelete({ _id: id });
     if (!deletedEmployee) {
       return res.status(404).json({ error: "Employee not found" });
     }
@@ -132,25 +133,42 @@ const deleteEmployee = async (req, res) => {
   }
 };
 
+
 // const getEmployeeNames = async (req, res) => {
 //   try {
-//     const employees = await Employee.find({role:"employee"});
+//     const employees = await Employee.find({ role: "employee" }).select("name");
 //     res.json(employees);
-//   }catch (error) {
-//     res.status(500).json({message: "Error fetching employees"});
+//   } catch (error) {
+//     res.status(500).json({ message: "Error fetching employees" });
 //   }
 // };
 
 const getEmployeeNames = async (req, res) => {
   try {
-    const employees = await Employee.find({ role: "employee" }).select("name");
-    res.json(employees);
+    const { id } = req.params;
+    console.log("User ID", id);
+    const empdata = await Employee.findOne({ _id: id }, { role: 1, empId: 1, name: 1 });
+    if (!empdata) {
+      return res.status(404).json({ message: "Employee not found" });
+
+    }
+    console.log("Employee Data:", empdata);
+    let employees;
+    if (empdata.role === "Superadmin") {
+      employees = await Employee.find()
+
+    } else {
+      leaves = await leaveModel.find({
+        "employee": empdata.name
+      });
+    }
+    console.log("Employees:", leaves);
+    res.status(200).json(leaves);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching employees" });
+    console.error("Error fetching Employees:", error);
+    res.status(500).json({ message: "Error fetching Employees" });
   }
 };
-
-
 
 
 const getTotalEmployees = async (req, res) => {
