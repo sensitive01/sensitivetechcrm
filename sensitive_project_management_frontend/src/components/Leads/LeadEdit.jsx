@@ -26,34 +26,34 @@ const LeadEdit = () => {
 
   // Fetch lead data
   // Fetch lead data
-useEffect(() => {
-  const fetchLeadData = async () => {
-    try {
-      const response = await axios.get(
-        "https://sensitivetechcrm.onrender.com/updatelog/getdispositions"
-      );
-      if (response.status === 200) {
-        let data = response.data;
+  useEffect(() => {
+    const fetchLeadData = async () => {
+      try {
+        const response = await axios.get(
+          "https://sensitivetechcrm.onrender.com/updatelog/getdispositions"
+        );
+        if (response.status === 200) {
+          let data = response.data;
 
-        if (role === "Lead") {
-          const today = new Date().toISOString().split("T")[0]; // Get today's date (YYYY-MM-DD)
-          data = data.filter(lead => lead.createdAt.split("T")[0] === today);
+          if (role === "Lead") {
+            const today = new Date().toISOString().split("T")[0]; // Get today's date (YYYY-MM-DD)
+            data = data.filter(lead => lead.createdAt.split("T")[0] === today);
+          }
+
+          setLeads(data);
+        } else {
+          console.error("Failed to fetch lead details:", response.status);
         }
-
-        setLeads(data);
-      } else {
-        console.error("Failed to fetch lead details:", response.status);
+      } catch (error) {
+        console.error("Error fetching lead details:", error);
+        setError("Failed to load lead data");
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching lead details:", error);
-      setError("Failed to load lead data");
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchLeadData();
-}, [role]); // Depend on role to refetch if it changes
+    fetchLeadData();
+  }, [role]); // Depend on role to refetch if it changes
 
 
   // Handle input changes
@@ -105,28 +105,28 @@ useEffect(() => {
       alert("Please select both start and end dates.");
       return;
     }
-  
+
     const start = new Date(startDate);
     const end = new Date(endDate);
-  
+
     console.log("Start Date:", start);
     console.log("End Date:", end);
-  
+
     const filteredData = leads.filter((lead) => {
       const leadDate = new Date(lead.createdAt);
       const isWithinRange = leadDate >= start && leadDate <= end;
-      
+
       console.log(`Checking lead: ${lead.createdAt} -> Parsed Date: ${leadDate}, In Range: ${isWithinRange}`);
-  
+
       return isWithinRange;
     });
-  
+
     console.log("Filtered Leads:", filteredData);
-  
+
     setFilteredLeads(filteredData);
   };
-  
-  
+
+
 
 
   // Define columns for react-table
@@ -245,38 +245,43 @@ useEffect(() => {
           </div>
 
           <div className="flex space-x-4 items-center -mt-6">
-            <div>
-              <label htmlFor="startDate" className="block">Start Date</label>
-              <input
-                type="date"
-                id="startDate"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="border border-blue-500 p-2 rounded w-32"
-              />
-            </div>
-            <div>
-              <label htmlFor="endDate" className="block">End Date</label>
-              <input
-                type="date"
-                id="endDate"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="border border-blue-500 p-2 rounded w-32"
-              />
-            </div>
-            <button
+            {role === "Superadmin" && (
+              <>
+                <div>
+                  <label htmlFor="startDate" className="block">Start Date</label>
+                  <input
+                    type="date"
+                    id="startDate"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="border border-blue-500 p-2 rounded w-32"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="endDate" className="block">End Date</label>
+                  <input
+                    type="date"
+                    id="endDate"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="border border-blue-500 p-2 rounded w-32"
+                  />
+                </div>
+                <button
 
-              onClick={applyDateFilter}
-              className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
-            >
-              Apply Filter
-            </button>
+                  onClick={applyDateFilter}
+                  className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
+                >
+                  Apply Filter
+                </button>
+              </>
+            )}
           </div>
-
-          <button onClick={downloadExcel} className="bg-green-500 text-white px-6 py-2 rounded flex items-center hover:bg-green-600">
-            <FaFileDownload className="mr-2" /> Export Data
-          </button>
+          {role === "Superadmin" && (
+            <button onClick={downloadExcel} className="bg-green-500 text-white px-6 py-2 rounded flex items-center hover:bg-green-600">
+              <FaFileDownload className="mr-2" /> Export Data
+            </button>
+          )}
         </div>
         <div className="overflow-x-auto bg-white shadow-md rounded-lg">
           {leads.length === 0 ? (

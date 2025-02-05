@@ -94,14 +94,14 @@ const ProjectManager = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
-  const _id = localStorage.getItem("empId");
+  const id = localStorage.getItem("empId");
   const navigate = useNavigate();
   
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await fetch(`https://sensitivetechcrm.onrender.com/project/getallprojects/${_id}`);
+        const response = await fetch(`https://sensitivetechcrm.onrender.com/project/getallprojects/${id}`);
         const data = await response.json(); // Ensure you're getting the correct data
         if (response.status === 200) {
           setProjects(data); // Set the projects from the response data
@@ -117,7 +117,7 @@ const ProjectManager = () => {
     
 
     fetchProjects();
-  }, [_id]);
+  }, [id]);
 
   // Helper function to get the latest or most relevant value from an array of objects
   const getLatestValue = (array, field) => {

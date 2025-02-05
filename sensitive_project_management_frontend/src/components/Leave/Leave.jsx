@@ -7,6 +7,7 @@ function Leave() {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const id = localStorage.getItem("empId");
   const [leave, setLeave] = useState({
     employee: "",
     leaveCategory: "",

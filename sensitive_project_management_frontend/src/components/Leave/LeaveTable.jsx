@@ -19,6 +19,7 @@ const LeaveTable = () => {
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
+    const id = localStorage.getItem("empId");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -30,7 +31,7 @@ const LeaveTable = () => {
                 const formattedStartDate = firstDayOfLastMonth.toISOString().split('T')[0];
                 const formattedEndDate = today.toISOString().split('T')[0];
     
-                const response = await axios.get(`https://sensitivetechcrm.onrender.com/leaves/get-all?startDate=${formattedStartDate}&endDate=${formattedEndDate}`);
+                const response = await axios.get(`https://sensitivetechcrm.onrender.com/leaves/get-all/${id}?startDate=${formattedStartDate}&endDate=${formattedEndDate}`);
                 
                 setLeaves(response.data);
             } catch (err) {
@@ -41,7 +42,7 @@ const LeaveTable = () => {
         };
     
         fetchLeaves();
-    }, []);
+    }, [id]);
 
     const handleStatusChange = async (leaveId, newStatus) => {
         try {
@@ -195,7 +196,7 @@ const LeaveTable = () => {
                         px-3 py-1 rounded text-sm border
                         ${row.original.status === 'Approved' ? 'bg-green-100 text-green-800 border-green-200' :
                             row.original.status === 'Pending' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
-                                'bg-red-100 text-red-800 border-red-200'}
+                                'bg-red-100 text-red-800 border-red-200'}, ${role !== "Superadmin" ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}
                     `}
                 >
                     <option value="Pending">Pending</option>

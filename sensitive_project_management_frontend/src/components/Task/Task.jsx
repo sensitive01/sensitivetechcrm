@@ -22,18 +22,29 @@ const TaskList = () => {
     const [endDate, setEndDate] = useState('');
     const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
     const [searchTerm, setSearchTerm] = useState('');
+    const id = localStorage.getItem("empId");
+    console.log("Fetching tasks for ID:", id);
+
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchTasks = async () => {
             try {
-                const response = await axios.get('https://sensitivetechcrm.onrender.com/task/getalltask');
-                const updatedTasks = response.data.tasks.map(task => {
+                const response = await axios.get(`https://sensitivetechcrm.onrender.com/task/getalltask/${id}`);
+                console.log("Full API Response:", response.data);
+                
+                let taskList = response.data.tasks || response.data;
+    
+                if (!Array.isArray(taskList)) {
+                    throw new Error("Unexpected API response format");
+                }
+    
+                const updatedTasks = taskList.map(task => {
                     if (task.date) {
                         const dateObj = new Date(task.date);
                         task.date = `${dateObj.getDate().toString().padStart(2, '0')}/${(dateObj.getMonth() + 1).toString().padStart(2, '0')}/${dateObj.getFullYear().toString().slice(-2)}`;
                     }
-
+    
                     if (task.createdAt) {
                         const createdAtObj = new Date(task.createdAt);
                         task.createDate = `${createdAtObj.getDate().toString().padStart(2, '0')}/${(createdAtObj.getMonth() + 1).toString().padStart(2, '0')}/${createdAtObj.getFullYear()}`;
@@ -41,23 +52,19 @@ const TaskList = () => {
                     }
                     return task;
                 });
-
-                // Apply filtering based on role
-                let filteredTasks = updatedTasks;
-                if (role !== "Superadmin") {
-                    filteredTasks = updatedTasks.filter(task => task.status === "Pending");
-                }
-
-                setTasks(filteredTasks);
+    
+                setTasks(updatedTasks);
             } catch (err) {
+                console.error("Error fetching tasks:", err);
                 setError("Failed to load task data");
             } finally {
                 setLoading(false);
             }
         };
-
+    
         fetchTasks();
-    }, [role]);
+    }, [role, id]);
+    
 
 
     const handleDelete = async (taskId) => {
@@ -107,12 +114,16 @@ const TaskList = () => {
     };
 
     const filteredTasks = useMemo(() => {
-        return tasks.filter(task => 
-            role === "Superadmin" ||
-            task.status.toLowerCase().includes(searchTerm.toLowerCase()) || 
-            task.task.toLowerCase().includes(searchTerm.toLowerCase())
+        if (!Array.isArray(tasks)) return []; // Ensure it's always an array
+        return tasks.filter(task => {
+            if (role === "Superadmin") return true;
+            return task.status?.toLowerCase() === "pending"; // Only show pending tasks for employees/leads
+        }).filter(task =>
+            task.task.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            task.status.toLowerCase().includes(searchTerm.toLowerCase())
         );
-    }, [tasks, searchTerm, role]);
+    }, [tasks, role, searchTerm]);
+    
 
     const applyDateFilter = () => {
         if (!startDate || !endDate) {
@@ -200,7 +211,8 @@ const TaskList = () => {
                     <select
                         value={row.original.status || "Pending"}  // Default to "Pending"
                         onChange={handleStatusChange}
-                        className={`border p-2 rounded w-32 ${getStatusStyle(row.original.status)}`}
+                        disabled={role !== "Superadmin"}
+                        className={`border p-2 rounded w-32 ${getStatusStyle(row.original.status)} ${role !== "Superadmin" ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`}
                     >
                         <option value="Pending">Pending</option>
                         <option value="In Progress">In Progress</option>
@@ -244,9 +256,10 @@ const TaskList = () => {
                         <Eye size={20} />
                     </button>
                     <button
-                        className="text-red-500 hover:bg-red-100 p-2 rounded-full transition-colors"
+                        className={`text-green-500 p-2 rounded-full transition-colors ${role !== "Superadmin" ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-200'}`}
                         title="Delete Task"
                         onClick={() => handleDelete(row.original._id)}
+                        disabled={role !== "Superadmin"}
                     >
                         <Trash2 size={20} />
                     </button>
@@ -491,8 +504,9 @@ const TaskList = () => {
                         </div>
                         <div className="flex justify-end space-x-4">
                             <button
-                                className="bg-blue-500 text-white px-4 py-2 rounded"
+                                className={`bg-blue-500 text-white px-4 py-2 rounded ${role !== "Superadmin" ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`}
                                 onClick={() => navigate(`/task-edit/${selectedTask._id}`)}
+                                disabled={role !== "Superadmin"}
                             >
                                 Edit
                             </button>
