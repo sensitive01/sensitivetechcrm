@@ -67,6 +67,7 @@ exports.getAllLeaveRequests = async (req, res) => {
 // };
 
 // Get a leave request by ID
+
 exports.getLeaveRequestById = async (req, res) => {
   try {
     console.log("Fetching leave request by ID", req.params.id);

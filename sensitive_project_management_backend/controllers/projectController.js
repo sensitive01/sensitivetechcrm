@@ -4,21 +4,17 @@ const employeeSchema = require("../models/employeeSchema");
 const createProject = async (req, res) => {
   try {
     const { projectDetails, financialDetails, additionalDetails } = req.body;
-    console.log("Received Data:", req.body); // Log received data
-
-    // Create a new project with the provided details
+    console.log("Received Data:", req.body); 
     const newProject = new Project({
       projectDetails,
       financialDetails,
       additionalDetails,
     });
-
-    // Save the project to the database
     await newProject.save();
 
     res.status(201).json({ message: "Project created successfully", newProject });
   } catch (error) {
-    console.error("Error creating project:", error); // Log the error
+    console.error("Error creating project:", error);
     res.status(500).json({ message: "Error creating project" });
   }
 };
@@ -34,46 +30,11 @@ const createProject = async (req, res) => {
 // };
 
 
-// const getAllProjects = async (req, res) => {
-//   const { empId } = req.params;
-//   console.log("Requested empId:", empId);  // Log the requested empId
-
-//   try {
-//     // Find the employee by empId
-//     const employee = await employeeSchema.findOne({ empId });
-
-//     if (!employee) {
-//       return res.status(404).json({ message: 'Employee not found' });
-//     }
-
-//     console.log("Employee found:", employee);  // Log the employee data
-
-//     // Fetch the projects assigned to the employee
-//     const projects = await Project.find({ assignedTo: empId });  // Ensure assignedTo contains empId
-
-//     console.log("Fetched Projects:", projects);  // Log the fetched projects
-
-//     if (!projects.length) {
-//       return res.status(404).json({ message: 'No projects found for this employee' });
-//     }
-
-//     // Send the project details as the response
-//     res.status(200).json(projects);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Server error' });
-//   }
-// };
-
 const getAllProjects = async (req, res) => {
   try {
-    const { id } = req.params;  // Get the user ID from the URL params
+    const { id } = req.params; 
     console.log("User  ID:", id);
-
-    // Fetch employee details using the user ID
     const empdata = await employeeSchema.findOne({ _id: id }, { role: 1, empId: 1, name: 1 });
-    
-    // Check if employee data was found
     if (!empdata) {
       return res.status(404).json({ message: "Employee not found" });
     }
@@ -81,15 +42,12 @@ const getAllProjects = async (req, res) => {
     console.log("Employee Data:", empdata);
 
     let projects;
-
-    // Check if the user is an admin (can see all projects)
-    if (id === "6779360b3fb6809073b96ef4") {
-      // Admin: Fetch all projects
+    // if (id === "6779360b3fb6809073b96ef4") {
+      if (empdata.role === "Superadmin") {
       projects = await Project.find();
     } else {
-      // Non-admin: Fetch only projects assigned to the employee by name
       projects = await Project.find({
-        "additionalDetails.assignedTo": empdata.name // Match projects where assignedTo contains the employee's name
+        "additionalDetails.assignedTo": empdata.name
       });
     }
 
@@ -101,15 +59,10 @@ const getAllProjects = async (req, res) => {
   }
 };
 
-
-
-// READ: Get project by ID
 const getProjectById = async (req, res) => {
   const { id } = req.params;
   console.log("id ",id)
   try {
-    // const project = await Project.findById(id);
-
     const project = await Project.findOne(
       { _id: id },
       {
@@ -133,7 +86,6 @@ const getProjectById = async (req, res) => {
   }
 };
 
-// UPDATE: Update project by ID
 const updateProjectById = async (req, res) => {
   const { id } = req.params;
   const { projectDetails, financialDetails, additionalDetails } = req.body;
@@ -156,7 +108,6 @@ const updateProjectById = async (req, res) => {
   }
 };
 
-// DELETE: Delete project by ID
 const deleteProjectById = async (req, res) => {
   const { id } = req.params;
   try {
@@ -182,15 +133,11 @@ const getProjectNames = async(req,res) => {
   }
 };
 
-// Get total projects count
 const getTotalProjects = async (req, res) => {
   try {
-    // Count the total number of projects
     const totalProjects = await Project.countDocuments();
 
     console.log("Total projects count:", totalProjects);
-
-    // Return the total projects count as a response
     res.status(200).json({ TotalProjects: totalProjects });
   } catch (error) {
     console.error("Error fetching total projects:", error);

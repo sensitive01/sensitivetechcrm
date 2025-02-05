@@ -1,5 +1,6 @@
 const Task = require("../models/taskSchema"); 
 const { uploadImage } = require("../config/cloudinary");
+const employeeSchema = require("../models/employeeSchema");
 
 const createTask = async (req, res) => {
   try {
@@ -27,28 +28,54 @@ const createTask = async (req, res) => {
 
 
 // Get all tasks
+// const getAllTasks = async (req, res) => {
+//   try {
+//     const tasks = await Task.find(); 
+//     return res.status(200).json({
+//       message: "Tasks retrieved successfully",
+//       tasks,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: "Error retrieving tasks",
+//       error: error.message,
+//     });
+//   }
+// };
+
+
 const getAllTasks = async (req, res) => {
-  try {
-    const tasks = await Task.find(); 
-    return res.status(200).json({
-      message: "Tasks retrieved successfully",
-      tasks,
-    });
+  try{
+    const {id} = req.params;
+    console.log("User ID", id);
+    const empdata = await employeeSchema.findOne({_id: id}, {role: 1, empId:1, name:1 });
+      if(!empdata) {
+        return res.status(404).json({message: "Employee not found"});
+
+      }
+      console.log("Employee Data:", empdata);
+    let tasks;
+    if(empdata.role === "Superadmin"){
+      tasks = await Task.find()
+      
+    }else {
+      tasks = await Task.find({
+        "empId": empdata.name
+      });
+    }
+    console.log("Task:", tasks);
+    res.status(200).json(tasks);
   } catch (error) {
-    return res.status(500).json({
-      message: "Error retrieving tasks",
-      error: error.message,
-    });
+    console.error("Error fetching projects:", error);
+    res.status(500).json({ message: "Error fetching projects" });
   }
 };
-
-// Get task by ID
 const getTaskById = async (req, res) => {
   console.log("Edit task==>")
   const { id } = req.params;
 
   try {
-    const task = await Task.findById(id); // Find a task by its ID
+    const task = await Task.findById(id);
     console.log("task",task)
     if (!task) {
       return res.status(404).json({
@@ -68,7 +95,6 @@ const getTaskById = async (req, res) => {
   }
 };
 
-// Update a task by ID
 const updateTask = async (req, res) => {
   console.log("Update task",req.body)
 
@@ -76,7 +102,7 @@ const updateTask = async (req, res) => {
     const { id } = req.params;
     const updateData = req.body;
     if (req.file) {
-      updateData.attachments = await uploadImage(req.file.buffer); // Process file upload
+      updateData.attachments = await uploadImage(req.file.buffer);
   }
    const updatedTask = await Task.findByIdAndUpdate(id, updateData, { new: true });
 
@@ -98,7 +124,6 @@ const updateTask = async (req, res) => {
   }
 };
 
-// Update the status of a task by ID
 const updateTaskStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
@@ -106,8 +131,8 @@ const updateTaskStatus = async (req, res) => {
   try {
     const updatedTask = await Task.findByIdAndUpdate(
       id,
-      { status }, // Only update the status field
-      { new: true } // Return the updated task
+      { status }, 
+      { new: true } 
     );
 
     if (!updatedTask) {
@@ -128,12 +153,11 @@ const updateTaskStatus = async (req, res) => {
   }
 };
 
-// Delete a task by ID
 const deleteTask = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const deletedTask = await Task.findByIdAndDelete(id); // Delete a task by ID
+    const deletedTask = await Task.findByIdAndDelete(id);
     if (!deletedTask) {
       return res.status(404).json({
         message: "Task not found",
@@ -151,15 +175,11 @@ const deleteTask = async (req, res) => {
   }
 };
 
-// Get total tasks count
 const getTotalTasks = async (req, res) => {
   try {
-    // Count the total number of tasks
     const totalTasks = await Task.countDocuments();
 
     console.log("Total tasks count:", totalTasks);
-
-    // Return the total tasks count as a response
     res.status(200).json({ TotalTasks: totalTasks });
   } catch (error) {
     console.error("Error fetching total tasks:", error);

@@ -7,7 +7,7 @@ const upload = multer({ storage: storage });
 
 
 
-taskRouter.get('/getalltask', taskController.getAllTasks); 
+taskRouter.get('/getalltask/:id', taskController.getAllTasks); 
 taskRouter.get('/gettaskbyid/:id', taskController.getTaskById); 
 taskRouter.put('/updatetask/:id', upload.single("attachments"), taskController.updateTask); 
 taskRouter.delete('/deletetask/:id', taskController.deleteTask); 
