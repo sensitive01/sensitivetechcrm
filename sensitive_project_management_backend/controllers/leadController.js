@@ -1,9 +1,6 @@
   const Lead = require('../models/leadModel');
 
-  // leadController.js
-
-
-  // Controller to create a new lead
+// Controller to create a new lead
   exports. createLead = async (req, res) => {
     const { name, contact, email, requirements, company, location, links, comments, status } = req.body;
 

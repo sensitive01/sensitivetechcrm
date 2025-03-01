@@ -1,15 +1,14 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const PayrollSchema = new mongoose.Schema(
-    {
-        empId: { type: String, },
-        type: { type: String, },
-        amount: { type: String, },
-        note: { type: String },
-    },
-    {
-        timestamps: true, // Automatically add createdAt and updatedAt fields
-    }
-);
+const attendanceSchema = new mongoose.Schema({
+  photo: { type: String },                     
+  employeeId: { type: String },                
+  employeeName: { type: String },             
+  date: { type: Date },                      
+  status: { type: String },                    
+  logintime: { type: String },
+                  
+  logouttime: { type: String },                
+}, { timestamps: true });                     
 
-module.exports = mongoose.model("Payroll", PayrollSchema);
+module.exports = mongoose.model('AttendanceModel', attendanceSchema);

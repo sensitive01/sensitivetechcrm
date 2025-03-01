@@ -1,3 +1,4 @@
+// models/attendanceModel.js
 const mongoose = require('mongoose');
 
 const attendanceSchema = new mongoose.Schema({
@@ -6,9 +7,9 @@ const attendanceSchema = new mongoose.Schema({
   employeeName: { type: String },             
   date: { type: Date },                      
   status: { type: String },                    
-  logintime: { type: String },
-                  
+  logintime: { type: String },                
   logouttime: { type: String },                
 }, { timestamps: true });                     
 
-module.exports = mongoose.model('AttendanceModel', attendanceSchema);
+// Check if model already exists to prevent the OverwriteModelError
+module.exports = mongoose.models.AttendanceModel || mongoose.model('AttendanceModel', attendanceSchema);
