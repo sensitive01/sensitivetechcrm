@@ -186,99 +186,71 @@ const getCurrentMonthDateRange = () => {
   return { firstDay, lastDay };
 };
 
-// Get all employees with comprehensive data
 const getAllEmployeesWithData = async (req, res) => {
   try {
-    // Get current month date range
+
     const { firstDay, lastDay } = getCurrentMonthDateRange();
-    
-    // Fetch all employees
-    const employees = await Employee.find({});
-    
-    // Prepare response array
+
+    const employees = await Employee.find({}, 'name empId department salary');
+
     const results = await Promise.all(employees.map(async (employee) => {
-      // Get employee base info
       const employeeData = {
         name: employee.name,
         empId: employee.empId,
         department: employee.department,
+        salary: employee.salary,  
       };
-      
-      // Get attendance data for current month
+
       const attendanceRecords = await AttendanceModel.find({
         employeeId: employee.empId,
         date: { $gte: firstDay, $lte: lastDay }
       });
-      
-      // Calculate attendance metrics
+
       const present = attendanceRecords.filter(record => record.status === 'Present').length;
       const absent = attendanceRecords.filter(record => record.status === 'Absent').length;
-      
-      // Calculate late days and minutes
+
       let lateDays = 0;
       let lateMins = 0;
       
       attendanceRecords.forEach(record => {
         if (record.status === 'Present' && record.logintime) {
           const loginTime = record.logintime;
-          // Assuming company start time is 9:00 AM, adjust as needed
-          const startTime = "09:00";
-          
+          const startTime = "09:00"; 
           if (loginTime > startTime) {
             lateDays++;
             
-            // Calculate late minutes (simplified version)
-            const loginHour = parseInt(loginTime.split(':')[0]);
-            const loginMin = parseInt(loginTime.split(':')[1]);
-            const startHour = parseInt(startTime.split(':')[0]);
-            const startMin = parseInt(startTime.split(':')[1]);
+            // Calculate late minutes
+            const [loginHour, loginMin] = loginTime.split(':').map(Number);
+            const [startHour, startMin] = startTime.split(':').map(Number);
             
             lateMins += (loginHour - startHour) * 60 + (loginMin - startMin);
           }
         }
       });
-      
+
       // Calculate working days
       const workingDays = present + absent;
-      
+
       // Get payroll adjustments
-      const allowances = await Payroll.find({
-        empId: employee.empId,
-        type: 'Allowance'
-      });
-      
-      const deductions = await Payroll.find({
-        empId: employee.empId,
-        type: 'Deduction'
-      });
-      
-      const advances = await Payroll.find({
-        empId: employee.empId,
-        type: 'Advance'
-      });
-      
+      const allowances = await Payroll.find({ empId: employee.empId, type: 'Allowance' });
+      const deductions = await Payroll.find({ empId: employee.empId, type: 'Deduction' });
+      const advances = await Payroll.find({ empId: employee.empId, type: 'Advance' });
+
       // Calculate total amounts
       const totalAllowances = allowances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
       const totalDeductions = deductions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
       const totalAdvances = advances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-      
+
       // Get leave information
-      const leaves = await LeaveModel.find({
-        employee: employee.empId,
-        startDate: { $gte: firstDay, $lte: lastDay }
-      });
-      
-      // Calculate base salary (placeholder - adjust as needed)
-      const baseSalary = 0; // This would come from your salary structure or configuration
-      
+      const leaves = await LeaveModel.find({ employee: employee.empId, startDate: { $gte: firstDay, $lte: lastDay } });
+
       // Calculate payable amount
-      const payable = baseSalary + totalAllowances - totalDeductions - totalAdvances;
-      
+      const payable = employee.salary + totalAllowances - totalDeductions - totalAdvances;
+
       // Combine all data
       return {
         ...employeeData,
         workingDays,
-        baseSalary,
         present,
         absent,
         lateDays,
@@ -290,13 +262,13 @@ const getAllEmployeesWithData = async (req, res) => {
         leaves: leaves.length
       };
     }));
-    
+
     res.status(200).json({
       success: true,
       count: results.length,
       data: results
     });
-    
+
   } catch (error) {
     console.error('Error fetching employee data:', error);
     res.status(500).json({
@@ -305,6 +277,7 @@ const getAllEmployeesWithData = async (req, res) => {
     });
   }
 };
+
 
 module.exports = {
   createEmployee,
