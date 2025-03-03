@@ -198,7 +198,7 @@ const getAllEmployeesWithData = async (req, res) => {
         name: employee.name,
         empId: employee.empId,
         department: employee.department,
-        salary: employee.salary,  
+        salary: employee.salary,
       };
 
       const attendanceRecords = await AttendanceModel.find({
@@ -211,43 +211,36 @@ const getAllEmployeesWithData = async (req, res) => {
 
       let lateDays = 0;
       let lateMins = 0;
-      
+
       attendanceRecords.forEach(record => {
         if (record.status === 'Present' && record.logintime) {
           const loginTime = record.logintime;
-          const startTime = "09:00"; 
+          const startTime = "09:00";
           if (loginTime > startTime) {
             lateDays++;
-            
-            // Calculate late minutes
+
             const [loginHour, loginMin] = loginTime.split(':').map(Number);
             const [startHour, startMin] = startTime.split(':').map(Number);
-            
+
             lateMins += (loginHour - startHour) * 60 + (loginMin - startMin);
           }
         }
       });
 
-      // Calculate working days
       const workingDays = present + absent;
 
-      // Get payroll adjustments
-      const allowances = await Payroll.find({ empId: employee.empId, type: 'Allowance' });
-      const deductions = await Payroll.find({ empId: employee.empId, type: 'Deduction' });
-      const advances = await Payroll.find({ empId: employee.empId, type: 'Advance' });
+      const allowances = await Payroll.find({ empId: employee.name, type: 'Allowance' });
+      const deductions = await Payroll.find({ empId: employee.name, type: 'Deductions' });
+      const advances = await Payroll.find({ empId: employee.name, type: 'Advance' });
 
-      // Calculate total amounts
       const totalAllowances = allowances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
       const totalDeductions = deductions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
       const totalAdvances = advances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
 
-      // Get leave information
       const leaves = await LeaveModel.find({ employee: employee.empId, startDate: { $gte: firstDay, $lte: lastDay } });
 
-      // Calculate payable amount
       const payable = employee.salary + totalAllowances - totalDeductions - totalAdvances;
 
-      // Combine all data
       return {
         ...employeeData,
         workingDays,
