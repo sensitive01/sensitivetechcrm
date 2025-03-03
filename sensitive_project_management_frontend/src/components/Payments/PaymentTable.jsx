@@ -133,29 +133,51 @@ const PaymentTable = () => {
             ),
         },
         {
-            Header: 'Create Date',
+            Header: 'Created Date & Time',
             accessor: 'createdAt',
-            Cell: ({ value }) => new Date(value).toLocaleDateString('en-GB'),
-            id: 'createdate',
+            Cell: ({ value }) =>
+                value ? (
+                    <>
+                        {new Date(value).toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: '2-digit',
+                        })}
+                        <br />
+                        {new Date(value).toLocaleTimeString('en-GB', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                            hour12: true
+                        })}
+                    </>
+                ) : 'N/A',
+            id: 'created_date_time',
         },
+        
         {
-            Header: 'Create Time',
-            accessor: 'createdAt',
-            Cell: ({ value }) => new Date(value).toLocaleTimeString(),
-            id: 'createtime',
-        },
-        {
-            Header: 'Update Date',
+            Header: 'Updated Date & Time',
             accessor: 'updatedAt',
-            Cell: ({ value }) => (value ? new Date(value).toLocaleDateString('en-GB') : 'N/A'),
-            id: 'updateDate',
+            Cell: ({ value }) =>
+                value ? (
+                    <>
+                        {new Date(value).toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: '2-digit',
+                        })}
+                        <br />
+                        {new Date(value).toLocaleTimeString('en-GB', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                            hour12: true
+                        })}
+                    </>
+                ) : 'N/A',
+            id: 'updated_date_time',
         },
-        {
-            Header: 'Update Time',
-            accessor: 'updatedAt',
-            Cell: ({ value }) => (value ? new Date(value).toLocaleTimeString() : 'N/A'),
-            id: 'updateTime',
-        },
+        
         { Header: 'Notes', accessor: 'notes' },
         {
             Header: 'Actions',
@@ -209,7 +231,7 @@ const PaymentTable = () => {
     if (error) return <div>{error}</div>;
 
     return (
-        <div className="container mx-auto p-4 mt-12">
+        <div className=" mx-auto p-4 mt-12">
             <h2 className="text-4xl font-bold mb-10 text-center mt-24">
              Payment Details
             </h2>

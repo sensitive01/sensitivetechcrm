@@ -47,9 +47,15 @@ const TaskList = () => {
     
                     if (task.createdAt) {
                         const createdAtObj = new Date(task.createdAt);
+                        let hours = createdAtObj.getHours();
+                        const minutes = createdAtObj.getMinutes().toString().padStart(2, '0');
+                        const seconds = createdAtObj.getSeconds().toString().padStart(2, '0');
+                        const ampm = hours >= 12 ? 'PM' : 'AM';
+                        hours = hours % 12 || 12; // Convert 0 to 12 for 12-hour format
                         task.createDate = `${createdAtObj.getDate().toString().padStart(2, '0')}/${(createdAtObj.getMonth() + 1).toString().padStart(2, '0')}/${createdAtObj.getFullYear()}`;
-                        task.createTime = `${createdAtObj.getHours().toString().padStart(2, '0')}:${createdAtObj.getMinutes().toString().padStart(2, '0')}:${createdAtObj.getSeconds().toString().padStart(2, '0')}`;
+                        task.createTime = `${hours}:${minutes}:${seconds} ${ampm}`;
                     }
+                    
                     return task;
                 });
     
@@ -236,13 +242,25 @@ const TaskList = () => {
             },
         },
         {
-            Header: 'Created Date',
-            accessor: 'createDate',
+            Header: 'Created Date & Time',
+            accessor: 'createDate', // Assuming createDate and createTime are stored separately
+            Cell: ({ row }) =>
+                row.original.createDate && row.original.createTime ? (
+                    <>
+                        {row.original.createDate}
+                        <br />
+                        {row.original.createTime}
+                    </>
+                ) : (
+                    'N/A'
+                ),
+            id: 'created_date_time',
         },
-        {
-            Header: 'Created Time',
-            accessor: 'createTime',
-        },
+        
+        // {
+        //     Header: 'Created Time',
+        //     accessor: 'createTime',
+        // },
         {
             Header: 'Actions',
             accessor: '_id',
@@ -311,7 +329,7 @@ const TaskList = () => {
     }
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="mx-auto p-4">
             <h2 className="text-4xl font-bold mb-10 text-center mt-24">Task Details</h2>
 
             <div className="flex justify-between items-center mb-4">

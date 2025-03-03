@@ -128,7 +128,7 @@ const AdjustmentTable = () => {
             accessor: 'note',
         },
         {
-            Header: 'Date',
+            Header: 'Created Date & Time',
             accessor: 'createdAt',
             Cell: ({ value }) => {
                 const formattedDate = new Date(value).toLocaleString('en-GB', {
@@ -254,7 +254,7 @@ const AdjustmentTable = () => {
     }
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="mx-auto p-4">
             <h2 className="text-4xl font-bold mb-10 text-center mt-24">Adjustments Details</h2>
 
             <div className="flex justify-between items-center mb-4">

@@ -1,71 +1,76 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useTable, useGlobalFilter, useSortBy, usePagination } from 'react-table';
-import { Trash2, Eye } from 'lucide-react';
+import { Eye, Trash } from 'lucide-react';
 import { FaFileDownload, FaFilter } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
-import { getTotalExpense } from '../../api/services/projectServices';
+import { deleteQuotations, getTotalQuotations } from '../../api/services/projectServices';
 
-const ExpenseTable = () => {
-    const [expenses, setExpenses] = useState([]);
+
+const QuotationTable = () => {
+    const [quotations, setQuotations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedExpense, setSelectedExpense] = useState(null);
-      const [startDate, setStartDate] = useState("");
-        const [endDate, setEndDate] = useState("");
+    const [selectedQuotation, setSelectedQuotation] = useState(null);
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
 
-    const navigate = useNavigate(); // Initialize useNavigate hook
+    const navigate = useNavigate();
 
-    // Fetch expense data
     useEffect(() => {
-        const fetchExpenseData = async () => {
+        const fetchQuotationData = async () => {
             try {
-                const response = await getTotalExpense();
+                const response = await getTotalQuotations();
                 if (response.status === 200) {
-                    const expenseData = Array.isArray(response.data) ? response.data : response.data.expenses || [];
-                    setExpenses(expenseData);
+                    const quotationData = Array.isArray(response.data) ? response.data : response.data.quotations || [];
+                    setQuotations(quotationData);
                 } else {
-                    setError('Failed to load expense data');
+                    setError('Failed to load quotation data');
                 }
             } catch (error) {
-                setError('Failed to load expense data');
+                setError('Failed to load quotation data');
             } finally {
                 setLoading(false);
             }
         };
-        fetchExpenseData();
+        fetchQuotationData();
     }, []);
 
-    // Handle delete action
-    // const handleDelete = (expenseId) => {
-    //     if (window.confirm('Are you sure you want to delete this expense?')) {
-    //         // Call your delete API endpoint here
-    //         const updatedExpenses = expenses.filter((expense) => expense._id !== expenseId);
-    //         setExpenses(updatedExpenses);
-    //     }
-    // };
-
-    const handleEdit = (expenseId) => {
-        navigate(`/expense-edit/${expenseId}`);
+    const handleEdit = (quotationId) => {
+        navigate(`/quotation-edit/${quotationId}`);
     };
 
-    const handleView = (expense) => {
-        setSelectedExpense(expense);
+    const handleView = (quotation) => {
+        setSelectedQuotation(quotation);
         setIsModalOpen(true);
     };
 
+    const handleDelete = async (quotation) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this quotation?");
+        if (!confirmDelete) return;
+    
+        try {
+            await deleteQuotations(quotation._id);
+            setQuotations(prevQuotations => prevQuotations.filter(q => q._id !== quotation._id));
+            alert("Quotation deleted successfully!");
+        } catch (error) {
+            console.error("Error deleting quotation:", error);
+            alert("Failed to delete quotation. Please try again.");
+        }
+    };
+    
+
     const closeModal = () => {
         setIsModalOpen(false);
-        setSelectedExpense(null);
+        setSelectedQuotation(null);
     };
 
-    // Download table as Excel file
     const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(expenses);
+        const worksheet = XLSX.utils.json_to_sheet(quotations);
         const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Expenses");
-        XLSX.writeFile(workbook, "expenses.xlsx");
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Quotations");
+        XLSX.writeFile(workbook, "quotations.xlsx");
     };
 
     const applyDateFilter = () => {
@@ -73,43 +78,33 @@ const ExpenseTable = () => {
             alert('Please select both start and end dates.');
             return;
         }
-    
-        // Convert dates to Date objects for comparison
+
         const start = new Date(startDate);
         const end = new Date(endDate);
-    
-        const filteredExpenses = expenses.filter((expense) => {
-            const expenseDate = new Date(expense.createdAt);
-            return expenseDate >= start && expenseDate <= end;
+
+        const filteredQuotations = quotations.filter((quotation) => {
+            const quotationDate = new Date(quotation.quotationDate || quotation.createdAt);
+            return quotationDate >= start && quotationDate <= end;
         });
-    
-        setExpenses(filteredExpenses);  // Update expenses state with filtered data
+
+        setQuotations(filteredQuotations);
     };
-    
 
     // Define columns for react-table
     const columns = useMemo(() => [
         { Header: 'S.No', accessor: (row, index) => index + 1 },
-        { Header: 'Type', accessor: 'type' },
-        { Header: 'Project', accessor: 'project' },
-        { Header: 'Amount', accessor: 'amount' },
-        { Header: 'Notes', accessor: 'notes' },
+        { Header: 'Name', accessor: 'name' },
+        { Header: 'Contact', accessor: 'contact' },
+        { Header: 'Company', accessor: 'company' },
+        { Header: 'Requirement', accessor: 'requirement' },
+        { Header: 'Tech Stack', accessor: 'techStack' },
+        { Header: 'Quote', accessor: 'quote' },
+        { Header: 'Note', accessor: 'note' },
+        { Header: 'Quotation', accessor: 'quotation' },
+        { Header: 'Status', accessor: 'status' },
         {
-            Header: 'Attachments',
-            accessor: 'attachments',
-            Cell: ({ value }) => (
-                <div>
-                    {value ? (
-                        <img src={value} alt="Attachment" className="w-20 h-20 object-cover rounded" />
-                    ) : (
-                        <span>No attachment</span>
-                    )}
-                </div>
-            ),
-        },
-        {
-            Header: 'Created Date & Time',
-            accessor: 'createdAt',
+            Header: 'Quotation Date & Time',
+            accessor: 'quotationDate',
             Cell: ({ value }) =>
                 value ? (
                     <>
@@ -120,13 +115,13 @@ const ExpenseTable = () => {
                 ) : (
                     'N/A'
                 ),
-            id: 'created_date_time',
+            id: 'date_time',
         },
         
         // {
-        //     Header: 'Create Time',
-        //     accessor: 'createdAt',
-        //     Cell: ({ value }) => new Date(value).toLocaleTimeString(),
+        //     Header: 'Quotation Time',
+        //     accessor: 'quotationDate',
+        //     Cell: ({ value }) => value ? new Date(value).toLocaleTimeString() : 'N/A',
         //     id: 'time',
         // },
         // {
@@ -148,24 +143,24 @@ const ExpenseTable = () => {
                 <div className="flex justify-center space-x-2">
                     <button
                         className="text-blue-500 hover:bg-blue-100 p-2 rounded-full"
-                        title="View Expense"
+                        title="View Quotation"
                         onClick={() => handleView(row.original)}
                     >
                         <Eye size={20} />
                     </button>
-                    {/* <button
+                    <button
                         className="text-red-500 hover:bg-red-100 p-2 rounded-full"
-                        title="Delete Expense"
-                        onClick={() => handleDelete(row.original._id)}
+                        title="Delete Quotation"
+                        onClick={() => handleDelete(row.original)}
                     >
-                        <Trash2 size={20} />
-                    </button> */}
+                        <Trash size={20} />
+                    </button>
+
                 </div>
             ),
         },
-    ], [expenses]);
-    
-    // Initialize react-table
+    ], []);
+
     const {
         getTableProps,
         getTableBodyProps,
@@ -182,7 +177,7 @@ const ExpenseTable = () => {
     } = useTable(
         {
             columns,
-            data: expenses,
+            data: quotations,
             initialState: { pageSize: 10 }
         },
         useGlobalFilter,
@@ -209,9 +204,9 @@ const ExpenseTable = () => {
     }
 
     return (
-        <div className=" mx-auto p-4 mt-12">
+        <div className="mx-auto p-4 mt-12">
             <h2 className="text-4xl font-bold mb-10 text-center mt-24">
-                Expense Table
+                Quotation Table
             </h2>
 
             {/* Data Table Section */}
@@ -229,42 +224,39 @@ const ExpenseTable = () => {
                     </div>
 
                     <div className="flex space-x-4 items-center -mt-6">
-                    <div>
-                        <label htmlFor="startDate" className="block">Start Date</label>
-                        <input
-                            type="date"
-                            id="startDate"
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                           
-                            className="border border-blue-500 p-2 rounded w-32"
-                        />
+                        <div>
+                            <label htmlFor="startDate" className="block">Start Date</label>
+                            <input
+                                type="date"
+                                id="startDate"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                className="border border-blue-500 p-2 rounded w-32"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="endDate" className="block">End Date</label>
+                            <input
+                                type="date"
+                                id="endDate"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                className="border border-blue-500 p-2 rounded w-32"
+                            />
+                        </div>
+                        <button
+                            onClick={applyDateFilter}
+                            className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
+                        >
+                            Apply Filter
+                        </button>
                     </div>
-                    <div>
-                        <label htmlFor="endDate" className="block">End Date</label>
-                        <input
-                            type="date"
-                            id="endDate"
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                           
-                            className="border border-blue-500 p-2 rounded w-32"
-                        />
-                    </div>
-                    <button
-
-                        onClick={applyDateFilter}
-                        className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
-                    >
-                        Apply Filter
-                    </button>
-                </div>
                     <div className="flex space-x-4">
                         <button
-                            onClick={() => navigate('/expense-form')}
+                            onClick={() => navigate('/quotation-form')}
                             className="bg-blue-500 text-white px-6 py-2 rounded flex items-center hover:bg-blue-600"
                         >
-                            Add Expense
+                            Create Quotation
                         </button>
                         <button onClick={downloadExcel} className="bg-green-500 text-white px-6 py-2 rounded flex items-center hover:bg-green-600">
                             <FaFileDownload className="mr-2" /> Export Data
@@ -272,8 +264,8 @@ const ExpenseTable = () => {
                     </div>
                 </div>
                 <div className="overflow-x-auto bg-white shadow-md rounded-lg">
-                    {expenses.length === 0 ? (
-                        <p className="text-center p-4">No expense records found.</p>
+                    {quotations.length === 0 ? (
+                        <p className="text-center p-4">No quotation records found.</p>
                     ) : (
                         <>
                             <table {...getTableProps()} className="w-full">
@@ -335,35 +327,32 @@ const ExpenseTable = () => {
                         </>
                     )}
                 </div>
-                {/* Modal for Viewing Expense */}
+                {/* Modal for Viewing Quotation */}
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
                         <div className="bg-white rounded-lg p-8 w-1/2">
-                            <h2 className="text-2xl font-semibold mb-4">Expense Details</h2>
-                            {selectedExpense && (
-                                <div className="flex flex-col md:flex-row md:space-x-4">
-                                    <div className="flex-1">
-                                        <p><strong>Employee ID:</strong> {selectedExpense.empId}</p>
-                                        <p><strong>Type:</strong> {selectedExpense.type}</p>
-                                        <p><strong>Project:</strong> {selectedExpense.project}</p>
-                                        <p><strong>Amount:</strong> {selectedExpense.amount}</p>
-                                        <p><strong>Note:</strong> {selectedExpense.notes}</p>
-                                        <p><strong>Date:</strong> {new Date(selectedExpense.createdAt).toLocaleDateString('en-GB')}</p>
-                                        <p><strong>Time:</strong> {new Date(selectedExpense.createdAt).toLocaleTimeString()}</p>
+                            <h2 className="text-2xl font-semibold mb-4">Quotation Details</h2>
+                            {selectedQuotation && (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <p><strong>Client Name:</strong> {selectedQuotation.name}</p>
+                                        <p><strong>Contact:</strong> {selectedQuotation.contact}</p>
+                                        <p><strong>Company:</strong> {selectedQuotation.company}</p>
+                                        <p><strong>Requirement:</strong> {selectedQuotation.requirement}</p>
+                                        <p><strong>Tech Stack:</strong> {selectedQuotation.techStack}</p>
                                     </div>
-                                    <div className="mt-4 md:mt-0 flex justify-end items-center">
-                                        {selectedExpense.attachments && (
-                                            <div>
-                                                <strong>Attachment:</strong>
-                                                <img src={selectedExpense.attachments} alt="Attachment" className="mt-2 w-40 h-40 object-cover rounded" />
-                                            </div>
-                                        )}
+                                    <div>
+                                        <p><strong>Quote Amount:</strong> {selectedQuotation.quote}</p>
+                                        <p><strong>Status:</strong> {selectedQuotation.status}</p>
+                                        <p><strong>Date:</strong> {new Date(selectedQuotation.quotationDate || selectedQuotation.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' })}</p>
+                                        <p><strong>Notes:</strong> {selectedQuotation.note}</p>
+                                        <p><strong>Update Log:</strong> {selectedQuotation.updateLog}</p>
                                     </div>
                                 </div>
                             )}
                             <div className="mt-4 flex justify-between">
                                 <button
-                                    onClick={() => handleEdit(selectedExpense._id)}
+                                    onClick={() => handleEdit(selectedQuotation._id)}
                                     className="bg-blue-500 text-white px-6 py-2 rounded"
                                 >
                                     Edit
@@ -373,10 +362,9 @@ const ExpenseTable = () => {
                         </div>
                     </div>
                 )}
-
             </div>
         </div>
     );
 };
 
-export default ExpenseTable;
+export default QuotationTable;

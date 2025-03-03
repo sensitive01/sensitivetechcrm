@@ -21,11 +21,11 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      console.log("Login Data:", formData);
 
       const response = await verifyLogin(formData);
-
-      console.log(response);
+      
+      
+      //console.log(response);
 
       if (response.status === 200) {
         const { _id, role } = response.data.employee || response.data.admin;

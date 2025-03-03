@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Paperclip, Calendar, Clock, Users, X} from 'lucide-react';
+import { Paperclip, Calendar, Clock, Users, X } from 'lucide-react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { getMoMById, updateMoM } from '../../api/services/projectServices';
@@ -28,9 +28,9 @@ const MoMEdit = () => {
     agenda: '',
     discussionNotes: '',
     actionItems: '',
-    agendaFile:'',
-    discussionFile:'',
-    actionFile:'',
+    agendaFile: '',
+    discussionFile: '',
+    actionFile: '',
   });
 
   const [existingFiles, setExistingFiles] = useState({
@@ -50,7 +50,7 @@ const MoMEdit = () => {
       try {
         setLoading(true);
         const response = await getMoMById(id);
-        console.log("response",response)
+        console.log("response", response)
 
         if (response && response.data) {
           setMeetingDetails({
@@ -66,7 +66,7 @@ const MoMEdit = () => {
             agendaFile: '',
             discussionFile: '',
             actionFile: '',
-            
+
           });
           setExistingFiles({
             agendaFile: response.data.agendaFile || null,
@@ -172,9 +172,9 @@ const MoMEdit = () => {
       {existingFiles[field] ? (
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <Paperclip className="w-4 h-4" />
-          <a 
-            href={existingFiles[field]} 
-            target="_blank" 
+          <a
+            href={existingFiles[field]}
+            target="_blank"
             rel="noopener noreferrer"
             className="hover:text-blue-500"
           >
@@ -204,18 +204,15 @@ const MoMEdit = () => {
 
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Header */}
-          <div className="space-y-4">
-            <h1 className="text-3xl font-bold text-center text-gray-800">
-              Minutes of Meeting
-            </h1>
+    <div className="mt-28 mb-12 container mx-auto">
+      <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg">
+        <form onSubmit={handleSubmit}>
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold text-gray-800 mb-2 text-center">Minutes of Meeting</h1>
             <input
               type="text"
               placeholder="Meeting Title"
-              className="w-full text-xl p-3 border-b-2 border-blue-500 focus:outline-none focus:border-blue-700"
+              className="w-full text-xl p-2 border-b-2 border-blue-500 focus:outline-none"
               value={meetingDetails.title}
               onChange={(e) => handleChange(e.target.value, 'title')}
             />
@@ -311,10 +308,10 @@ const MoMEdit = () => {
             />
             <label className="flex items-center gap-2 mt-4">
               <Paperclip className="w-5 h-5 text-blue-500" />
-              <FileAttachment 
-              field="agendaFile" 
-              label="Attach agenda file" 
-            />
+              <FileAttachment
+                field="agendaFile"
+                label="Attach agenda file"
+              />
             </label>
           </div>
 
@@ -335,9 +332,9 @@ const MoMEdit = () => {
           </div>
           <label className="flex items-center gap-2 mt-12">
             <Paperclip className="w-5 h-5 text-blue-500" />
-            <FileAttachment 
-              field="discussionFile" 
-              label="Attach discussion file" 
+            <FileAttachment
+              field="discussionFile"
+              label="Attach discussion file"
             />
           </label>
 
@@ -355,10 +352,10 @@ const MoMEdit = () => {
             />
             <label className="flex items-center gap-2 mt-4">
               <Paperclip className="w-5 h-5 text-blue-500" />
-              <FileAttachment 
-              field="actionFile" 
-              label="Attach action items file" 
-            />
+              <FileAttachment
+                field="actionFile"
+                label="Attach action items file"
+              />
             </label>
           </div>
 

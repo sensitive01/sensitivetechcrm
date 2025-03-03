@@ -38,6 +38,11 @@ import AdjustmentEdit from "./components/Adjustment/AdjustmentEdit";
 import MoM from "./components/MoM/MoM";
 import BlogPage from "./components/MoM/BlogPage";
 import MoMEdit from "./components/MoM/MoMEdit";
+import PayrollEmployee from "./components/PayrollEmployee/PayrollEmployee";
+import PayrollForm from "./components/PayrollEmployee/PayrollForm";
+import QuotationForm from "./components/Quotations/Quotations";
+import QuotationTable from "./components/Quotations/Quotationstable";
+import QuotationEdit from "./components/Quotations/QuotationsEdit";
 // import DispositionForm from "./components/UpdateLog/UpdateLog";
 
 // Route Transition Component
@@ -171,6 +176,11 @@ const RoutesWithPreloader = ({ role }) => {
                   <Route path="/momdetails" element={<BlogPage />} />
                   <Route path="/mom-edit/:id" element={<MoMEdit />} />
                   {/* <Route path="/updatelog" element={<DispositionForm />} /> */}
+                  <Route path="/payroll-table" element={<PayrollEmployee />} />
+                  <Route path="/payroll-form" element={<PayrollForm />} />
+                  <Route path="/quotation-form" element={<QuotationForm />} />
+                  <Route path="/quotation-table" element={<QuotationTable />} />
+                  <Route path="/quotation-edit/:id" element={<QuotationEdit />} />
                 </Routes>
               </AdminLayout>
             )

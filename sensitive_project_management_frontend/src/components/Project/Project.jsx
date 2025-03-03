@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import { Eye, ChevronLeft, ChevronRight, Edit, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { FaFileDownload, FaFilter } from "react-icons/fa";
 import { deletetheProject } from "../../api/services/projectServices";
 
 const ProjectDetailsModal = ({ project, onClose, onEdit }) => {
@@ -10,68 +11,56 @@ const ProjectDetailsModal = ({ project, onClose, onEdit }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg p-4 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Project Details</h2>
-
-        <div className="space-y-4">
-          <section>
-            <h3 className="text-lg font-semibold mb-2">Project Information:</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <p><strong>Project Name:</strong> {renderArrayData(project.projectDetails, 'projectName')}</p>
-              <p><strong>Tech Stack:</strong> {renderArrayData(project.projectDetails, 'techStack')}</p>
-              <p><strong>Type:</strong> {renderArrayData(project.projectDetails, 'type')}</p>
-              <p><strong>Category:</strong> {renderArrayData(project.projectDetails, 'category')}</p>
-              <p><strong>Domain:</strong> {renderArrayData(project.projectDetails, 'domain')}</p>
-              <p><strong>Requirements:</strong> {renderArrayData(project.projectDetails, 'requirements')}</p>
-              <p><strong>Description:</strong> {renderArrayData(project.projectDetails, 'description')}</p>
-              <p><strong>Designation:</strong> {renderArrayData(project.projectDetails, 'designation')}</p>
-              <p><strong>AddOnServices:</strong> {renderArrayData(project.projectDetails, 'addOnServices')}</p>
-              <p><strong>Duration:</strong> {renderArrayData(project.projectDetails, 'duration')}</p>
-              <p><strong>Dependencies:</strong> {renderArrayData(project.projectDetails, 'dependencies')}</p>
-              <p><strong>CompanyName:</strong> {renderArrayData(project.projectDetails, 'companyName')}</p>
-              <p><strong>Task:</strong> {renderArrayData(project.projectDetails, 'task')}</p>
-            </div>
-          </section>
-
-          <section>
-            <h3 className="text-lg font-semibold mb-2">Financial Details:</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <p><strong>Quoted Value:</strong> {renderArrayData(project.financialDetails, 'quotedValue')}</p>
-              <p><strong>Approved Value:</strong> {renderArrayData(project.financialDetails, 'approvedValue')}</p>
-              <p><strong>Payment Terms:</strong> {renderArrayData(project.financialDetails, 'paymentTerms')}</p>
-              <p><strong>FinalQuotation:</strong> {renderArrayData(project.financialDetails, 'finalQuotation')}</p>
-              <p><strong>Tax Terms:</strong> {renderArrayData(project.financialDetails, 'taxTerms')}</p>
-            </div>
-          </section>
-
-          <section>
-            <h3 className="text-lg font-semibold mb-2">Additional Information:</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <p><strong>ProjectDocument:</strong> {renderArrayData(project.additionalDetails, 'projectDocument')}</p>
-              <p><strong>Assigned To:</strong> {renderArrayData(project.additionalDetails, 'assignedTo')}</p>
-              <p><strong>Status:</strong> {renderArrayData(project.additionalDetails, 'status')}</p>
-              <p><strong>NDA:</strong> {renderArrayData(project.additionalDetails, 'nda')}</p>
-              <p><strong>MSA:</strong> {renderArrayData(project.additionalDetails, 'msa')}</p>
-              <p><strong>Created Date:</strong> {
-                project.additionalDetails?.[0]?.createdDate
-                  ? new Date(project.additionalDetails[0].createdDate).toLocaleDateString()
-                  : "N/A"
-              }</p>
-            </div>
-          </section>
+    <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center mt-20">
+      <div className="bg-white rounded-lg p-4 w-full sm:w-2/3 md:w-1/2 lg:w-1/3 max-h-[500px] overflow-auto flex flex-col">
+        <h2 className="text-2xl font-semibold mb-4">Project Details</h2>
+        <div className="flex flex-row justify-between">
+          {/* Left Side - Text Data */}
+          <div className="w-1/2 pr-4">
+            <section>
+              <h3 className="text-lg font-semibold mb-2">Project Information:</h3>
+              <div className="space-y-2">
+                <p><strong>Project Name:</strong> {renderArrayData(project.projectDetails, 'projectName')}</p>
+                <p><strong>Tech Stack:</strong> {renderArrayData(project.projectDetails, 'techStack')}</p>
+                <p><strong>Type:</strong> {renderArrayData(project.projectDetails, 'type')}</p>
+                <p><strong>Category:</strong> {renderArrayData(project.projectDetails, 'category')}</p>
+                <p><strong>Domain:</strong> {renderArrayData(project.projectDetails, 'domain')}</p>
+                <p><strong>Requirements:</strong> {renderArrayData(project.projectDetails, 'requirements')}</p>
+                <p><strong>Description:</strong> {renderArrayData(project.projectDetails, 'description')}</p>
+                <p><strong>Designation:</strong> {renderArrayData(project.projectDetails, 'designation')}</p>
+              </div>
+            </section>
+          </div>
+          
+          {/* Right Side - Additional Data */}
+          <div className="w-1/2 pl-4">
+            <section>
+              <h3 className="text-lg font-semibold mb-2">Additional Details:</h3>
+              <div className="space-y-2">
+                <p><strong>AddOnServices:</strong> {renderArrayData(project.projectDetails, 'addOnServices')}</p>
+                <p><strong>Duration:</strong> {renderArrayData(project.projectDetails, 'duration')}</p>
+                <p><strong>Dependencies:</strong> {renderArrayData(project.projectDetails, 'dependencies')}</p>
+                <p><strong>CompanyName:</strong> {renderArrayData(project.projectDetails, 'companyName')}</p>
+                <p><strong>Task:</strong> {renderArrayData(project.projectDetails, 'task')}</p>
+                <p><strong>Quoted Value:</strong> {renderArrayData(project.financialDetails, 'quotedValue')}</p>
+                <p><strong>Approved Value:</strong> {renderArrayData(project.financialDetails, 'approvedValue')}</p>
+                <p><strong>Payment Terms:</strong> {renderArrayData(project.financialDetails, 'paymentTerms')}</p>
+              </div>
+            </section>
+          </div>
         </div>
 
-        <div className="mt-6 flex justify-end space-x-4">
+        {/* Modal Buttons */}
+        <div className="mt-4 flex justify-between">
           <button
             onClick={() => onEdit(project)}
-            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700"
+            className="bg-blue-500 text-white px-6 py-2 rounded"
           >
             Edit
           </button>
-          <button
-            onClick={onClose}
-            className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-700"
+          <button 
+            onClick={onClose} 
+            className="bg-red-500 text-white px-6 py-2 rounded"
           >
             Close
           </button>
@@ -90,7 +79,7 @@ const ProjectManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-  const ITEMS_PER_PAGE = 5;
+  const ITEMS_PER_PAGE = 10; // Increased to match payment table
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
@@ -102,9 +91,9 @@ const ProjectManager = () => {
     const fetchProjects = async () => {
       try {
         const response = await fetch(`https://sensitivetechcrm.onrender.com/project/getallprojects/${id}`);
-        const data = await response.json(); // Ensure you're getting the correct data
+        const data = await response.json(); 
         if (response.status === 200) {
-          setProjects(data); // Set the projects from the response data
+          setProjects(data); 
         } else {
           throw new Error("Failed to fetch projects");
         }
@@ -115,11 +104,9 @@ const ProjectManager = () => {
       }
     };
     
-
     fetchProjects();
   }, [id]);
 
-  // Helper function to get the latest or most relevant value from an array of objects
   const getLatestValue = (array, field) => {
     if (!array || !Array.isArray(array) || array.length === 0) return "N/A";
     const uniqueValues = [...new Set(array.map(item => item[field]).filter(Boolean))];
@@ -138,7 +125,7 @@ const ProjectManager = () => {
         task: getLatestValue(project.projectDetails, 'task'),
         status: getLatestValue(project.additionalDetails, 'status'),
         createdDate: project.additionalDetails?.[0]?.createdDate
-          ? new Date(project.additionalDetails[0].createdDate).toLocaleDateString()
+          ? new Date(project.additionalDetails[0].createdDate).toLocaleString()
           : "N/A"
       }
     }))
@@ -147,10 +134,8 @@ const ProjectManager = () => {
     );
   }, [projects, role]);
   
-  
-
   const handleAddProject = () => {
-    window.location.href = '/add-project';
+    navigate('/add-project');
   };
 
   const handleDelete = async (projectId) => {
@@ -180,7 +165,6 @@ const ProjectManager = () => {
       }
     }
   };
-
 
   const handleExportData = () => {
     const csvRows = [];
@@ -226,18 +210,16 @@ const ProjectManager = () => {
       return;
     }
 
-    // Convert dates to Date objects for comparison
     const start = new Date(startDate);
     const end = new Date(endDate);
 
     const filteredProjects = projects.filter((project) => {
-      const projectDate = new Date(project.additionalDetails?.[0]?.createdDate); // Or another date property
+      const projectDate = new Date(project.additionalDetails?.[0]?.createdDate); 
       return projectDate >= start && projectDate <= end;
     });
 
-    setProjects(filteredProjects); // Update the projects state with the filtered results
+    setProjects(filteredProjects);
   };
-
 
   const handleView = (project) => {
     setSelectedProject(project);
@@ -304,174 +286,207 @@ const ProjectManager = () => {
   const totalPages = Math.ceil(filteredAndSortedProjects.length / ITEMS_PER_PAGE);
 
   return (
-    <div className="p-4 bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-semibold text-gray-800 mb-6 text-center mt-28">Project List</h1>
+    <div className="mx-auto p-4 mt-12">
+      <h2 className="text-4xl font-bold mb-10 text-center mt-24">
+        Project List
+      </h2>
 
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center border border-blue-500 rounded w-64">
-          <span className="px-2 text-gray-500">
-            <Filter className="h-5 w-5" />
-          </span>
+      {/* Data Table Section */}
+      <div className="mt-12">
+        <div className="flex justify-between items-center mb-6">
+          <div className="relative">
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search projects..."
+              className="border border-blue-500 p-2 rounded w-64 pl-8"
+            />
+            <FaFilter className="absolute left-2 top-3 text-blue-500" />
+          </div>
 
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search projects..."
-            className="p-2 rounded w-full outline-none"
-          />
+          <div className="flex space-x-4 items-center -mt-6">
+            {role === "Superadmin" && (
+              <>
+                <div>
+                  <label htmlFor="startDate" className="block">Start Date</label>
+                  <input
+                    type="date"
+                    id="startDate"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="border border-blue-500 p-2 rounded w-32"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="endDate" className="block">End Date</label>
+                  <input
+                    type="date"
+                    id="endDate"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="border border-blue-500 p-2 rounded w-32"
+                  />
+                </div>
+                <button
+                  onClick={applyDateFilter}
+                  className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
+                >
+                  Apply Filter
+                </button>
+              </>
+            )}
+          </div>
+          <div className="flex space-x-4">
+            <button
+              onClick={handleAddProject}
+              className="bg-blue-500 text-white px-6 py-2 rounded flex items-center hover:bg-blue-600"
+            >
+              Add Project
+            </button>
+            {role === "Superadmin" && (
+              <button 
+                onClick={handleExportData} 
+                className="bg-green-500 text-white px-6 py-2 rounded flex items-center hover:bg-green-600"
+              >
+                <FaFileDownload className="mr-2" /> Export Data
+              </button>
+            )}
+          </div>
         </div>
 
-        <div className="flex space-x-4 items-center -mt-6">
-          {role === "Superadmin" && (
+        <div className="overflow-x-auto bg-white shadow-md rounded-lg">
+          {paginatedProjects.length === 0 ? (
+            <p className="text-center p-4">No project records found.</p>
+          ) : loading ? (
+            <p className="text-center p-4">Loading...</p>
+          ) : error ? (
+            <p className="text-center p-4 text-red-500">{error}</p>
+          ) : (
             <>
-              <div>
-                <label htmlFor="startDate" className="block">Start Date</label>
-                <input
-                  type="date"
-                  id="startDate"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                 
-                  className="border border-blue-500 p-2 rounded w-32"
-                />
+              <table className="w-full">
+                <thead className="bg-[#2563eb] text-white border-b">
+                  <tr>
+                    <th className="p-4 text-left cursor-pointer whitespace-nowrap">
+                      <div className="flex items-center">
+                        S.No
+                      </div>
+                    </th>
+                    <th className="p-4 text-left cursor-pointer whitespace-nowrap" onClick={() => handleSort('projectName')}>
+                      <div className="flex items-center">
+                        Project Name
+                        <span>{sortConfig.key === 'projectName' ? (sortConfig.direction === 'asc' ? ' 🔼' : ' 🔽') : ''}</span>
+                      </div>
+                    </th>
+                    <th className="p-4 text-left cursor-pointer whitespace-nowrap" onClick={() => handleSort('techStack')}>
+                      <div className="flex items-center">
+                        Tech Stack
+                        <span>{sortConfig.key === 'techStack' ? (sortConfig.direction === 'asc' ? ' 🔼' : ' 🔽') : ''}</span>
+                      </div>
+                    </th>
+                    <th className="p-4 text-left cursor-pointer whitespace-nowrap" onClick={() => handleSort('companyName')}>
+                      <div className="flex items-center">
+                        Client Company
+                        <span>{sortConfig.key === 'companyName' ? (sortConfig.direction === 'asc' ? ' 🔼' : ' 🔽') : ''}</span>
+                      </div>
+                    </th>
+                    <th className="p-4 text-left cursor-pointer whitespace-nowrap" onClick={() => handleSort('assignedTo')}>
+                      <div className="flex items-center">
+                        Assigned To
+                        <span>{sortConfig.key === 'assignedTo' ? (sortConfig.direction === 'asc' ? ' 🔼' : ' 🔽') : ''}</span>
+                      </div>
+                    </th>
+                    <th className="p-4 text-left cursor-pointer whitespace-nowrap" onClick={() => handleSort('duration')}>
+                      <div className="flex items-center">
+                        Duration
+                        <span>{sortConfig.key === 'duration' ? (sortConfig.direction === 'asc' ? ' 🔼' : ' 🔽') : ''}</span>
+                      </div>
+                    </th>
+                    <th className="p-4 text-left cursor-pointer whitespace-nowrap">
+                      <div className="flex items-center">
+                        Tasks
+                      </div>
+                    </th>
+                    <th className="p-4 text-left cursor-pointer whitespace-nowrap" onClick={() => handleSort('status')}>
+                      <div className="flex items-center">
+                        Status
+                        <span>{sortConfig.key === 'status' ? (sortConfig.direction === 'asc' ? ' 🔼' : ' 🔽') : ''}</span>
+                      </div>
+                    </th>
+                    <th className="p-4 text-left cursor-pointer whitespace-nowrap" onClick={() => handleSort('createdDate')}>
+                      <div className="flex items-center">
+                        Created Date
+                        <span>{sortConfig.key === 'createdDate' ? (sortConfig.direction === 'asc' ? ' 🔼' : ' 🔽') : ''}</span>
+                      </div>
+                    </th>
+                    <th className="p-4 text-left cursor-pointer whitespace-nowrap">
+                      <div className="flex items-center">
+                        Actions
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginatedProjects.map((project, index) => (
+                    <tr key={project._id} className="border-b hover:bg-gray-50 transition-colors">
+                      <td className="p-4">{currentPage * ITEMS_PER_PAGE + index + 1}</td>
+                      <td className="p-4">{project.displayData.projectName}</td>
+                      <td className="p-4">{project.displayData.techStack}</td>
+                      <td className="p-4">{project.displayData.companyName}</td>
+                      <td className="p-4">{project.displayData.assignedTo}</td>
+                      <td className="p-4">{project.displayData.duration}</td>
+                      <td className="p-4">{project.displayData.task}</td>
+                      <td className="p-4">{project.displayData.status}</td>
+                      <td className="p-4">{project.displayData.createdDate}</td>
+                      <td className="p-4">
+                        <div className="flex justify-center space-x-2">
+                          <button
+                            className="text-blue-500 hover:bg-blue-100 p-2 rounded-full"
+                            title="View Project"
+                            onClick={() => handleView(project)}
+                          >
+                            <Eye size={20} />
+                          </button>
+                          <button
+                            className="text-red-500 hover:bg-red-100 p-2 rounded-full"
+                            title="Delete Project"
+                            onClick={() => handleDelete(project._id)}
+                          >
+                            <Trash2 size={20} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <div className="flex justify-between items-center p-4">
+                <div>
+                  <span>
+                    Page <strong>{currentPage + 1} of {totalPages}</strong>
+                  </span>
+                </div>
+                <div className="space-x-2">
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
+                    disabled={currentPage === 0}
+                    className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))}
+                    disabled={currentPage + 1 === totalPages}
+                    className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
-              <div>
-                <label htmlFor="endDate" className="block">End Date</label>
-                <input
-                  type="date"
-                  id="endDate"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                 
-                  className="border border-blue-500 p-2 rounded w-32"
-                />
-              </div>
-              <button
-                onClick={applyDateFilter}
-                className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
-              >
-                Apply Filter
-              </button>
             </>
           )}
         </div>
-
-        <div className="flex justify-end items-center space-x-4 mb-4">
-          {role === "Superadmin" && (
-            <button
-              onClick={handleExportData}
-              className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-700 flex items-center"
-            >
-              Export Data
-            </button>
-          )}
-          <button
-            onClick={handleAddProject}
-            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700 flex items-center"
-          >
-            <span className="mr-2">+</span> Add Project
-          </button>
-        </div>
-      </div>
-
-      {loading ? (
-        <p className="text-gray-500 text-lg text-center">Loading projects...</p>
-      ) : error ? (
-        <p className="text-red-500 text-lg text-center">{error}</p>
-      ) : paginatedProjects.length > 0 ? (
-        <div className="overflow-x-auto bg-white shadow-md rounded-lg">
-          <table className="w-full">
-            <thead className="bg-[#2563eb] text-white border-b">
-              <tr>
-                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200"
-                  onClick={() => handleSort('projectName')}>
-                  Project Name
-                </th>
-                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200"
-                  onClick={() => handleSort('techStack')}>
-                  Tech Stack
-                </th>
-                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200"
-                  onClick={() => handleSort('companyName')}>
-                  Client Company
-                </th>
-                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200"
-                  onClick={() => handleSort('assignedTo')}>
-                  Assigned To
-                </th>
-                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200"
-                  onClick={() => handleSort('duration')}>
-                  Duration
-                </th>
-                <th className="px-4 py-2 border border-gray-300">Tasks</th>
-                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200"
-                  onClick={() => handleSort('status')}>
-                  Status
-                </th>
-                <th className="px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-200"
-                  onClick={() => handleSort('createdDate')}>
-                  Created Date
-                </th>
-                <th className="px-4 py-2 border border-gray-300">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedProjects.map((project) => (
-                <tr key={project._id} className="hover:bg-gray-100">
-                  <td className="px-4 py-2 border border-gray-300">{project.displayData.projectName}</td>
-                  <td className="px-4 py-2 border border-gray-300">{project.displayData.techStack}</td>
-                  <td className="px-4 py-2 border border-gray-300">{project.displayData.companyName}</td>
-                  <td className="px-4 py-2 border border-gray-300">{project.displayData.assignedTo}</td>
-                  <td className="px-4 py-2 border border-gray-300">{project.displayData.duration}</td>
-                  <td className="px-4 py-2 border border-gray-300">{project.displayData.task}</td>
-                  <td className="px-4 py-2 border border-gray-300">{project.displayData.status}</td>
-                  <td className="px-4 py-2 border border-gray-300">{project.displayData.createdDate}</td>
-                  <td className="px-4 py-2 border border-gray-300">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleView(project)}
-                        className="bg-blue-500 text-white py-1 px-2 rounded hover:bg-blue-700"
-                      >
-                        View
-                      </button>
-                      <button
-                        onClick={() => handleDelete(project._id)}
-                        className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-700"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <p className="text-gray-500 text-lg text-center">No projects found.</p>
-      )}
-
-      <div className="mt-4 flex justify-between items-center">
-        <button
-          disabled={currentPage === 0}
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
-          className={`px-4 py-2 rounded ${currentPage === 0 ? 'bg-gray-300' : 'bg-blue-500 text-white hover:bg-blue-700'}`}
-        >
-          <ChevronLeft className="h-5 w-5 inline" />
-          Previous
-        </button>
-        <p className="text-gray-700">
-          Page {currentPage + 1} of {totalPages}
-        </p>
-        <button
-          disabled={currentPage + 1 === totalPages}
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1))}
-          className={`px-4 py-2 rounded ${currentPage + 1 === totalPages ? 'bg-gray-300' : 'bg-blue-500 text-white hover:bg-blue-700'}`}
-        >
-          Next
-          <ChevronRight className="h-5 w-5 inline" />
-        </button>
       </div>
 
       {isModalOpen && selectedProject && (

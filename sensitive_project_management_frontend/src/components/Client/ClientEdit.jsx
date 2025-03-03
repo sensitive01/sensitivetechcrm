@@ -3,7 +3,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 
 function ClientEdit() {
-  const { id } = useParams(); // Assume ID is passed in the URL as /client-edit/:id
+  const { id } = useParams(); 
   console.log(id)
   const [client, setClient] = useState({
     organization: "",

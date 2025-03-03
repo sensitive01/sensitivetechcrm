@@ -100,6 +100,21 @@ const LeadTable = () => {
         { Header: 'Comments', accessor: 'comments' },
         { Header: 'Status', accessor: 'status' },
         {
+            Header: 'Created Date & Time',
+            accessor: 'createdAt',
+            Cell: ({ value }) =>
+                value ? (
+                    <>
+                        {new Date(value).toLocaleDateString('en-GB')}
+                        <br />
+                        {new Date(value).toLocaleTimeString()}
+                    </>
+                ) : (
+                    'N/A'
+                ),
+            id: 'created_date_time',
+        },
+        {
             Header: 'Update Log',
             accessor: 'updateLog',
             Cell: ({ row }) => (
@@ -163,7 +178,7 @@ const LeadTable = () => {
     }
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="mx-auto p-4">
             <h2 className="text-4xl font-bold mb-10 text-center mt-24">Enquires Details</h2>
             <div className="flex justify-between items-center mb-4">
                 <div className="relative">

@@ -319,7 +319,7 @@ const EmployeeTable = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="mx-auto p-4">
       <h2 className="text-4xl font-bold mb-10 text-center mt-20">
         Employee Details
       </h2>

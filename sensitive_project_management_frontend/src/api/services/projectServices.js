@@ -435,4 +435,58 @@ export const deleteMoM = async (id) => {
   }
 };
 
+export const createQuotation = async (formData) => {
+  try {
+    const response = await projectServices.post(`/quotation/quotationcreate`, formData, {
+      headers: {
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error("Error in createPayment API:", error);
+    throw error;
+  }
+};
+
+export const updateQuotation = async (quotationId, formData) => {
+  try {
+    const response = await projectServices.put(`/quotation/quotationupdate/${quotationId}`, formData);
+    return response;
+  } catch (err) {
+    console.error("Error in updateExpenseById:", err);
+    throw err;
+  }
+};
+
+export const getTotalQuotations = async () => {
+  try {
+    const response = await projectServices.get(`/quotation/allquotation`);
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
+
+export const deleteQuotations = async (id) => {
+  try {
+      const response = await projectServices.delete(`/quotation/quotationdelete/${id}`); 
+      return response.data;
+  } catch (err) {
+      console.error('Error deleting MoM:', err);
+      throw err;
+  }
+};
+
+export const getQuotationsById = async (quotationId) => {
+  try {
+    const response = await projectServices.get(`/quotation/quotationbyid/${quotationId}`,  {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response;
+  } catch (err) {
+    return err;
+  }
+};
 

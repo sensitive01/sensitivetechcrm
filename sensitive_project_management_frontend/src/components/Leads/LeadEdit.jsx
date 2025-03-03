@@ -182,7 +182,7 @@ const LeadEdit = () => {
   if (error) return <div>{error}</div>;
 
   return (
-    <div className="container mx-auto p-4 mt-12">
+    <div className=" mx-auto p-4 mt-12">
       <h2 className="text-4xl font-bold mb-10 text-center mt-24">
         Call Logs
       </h2>

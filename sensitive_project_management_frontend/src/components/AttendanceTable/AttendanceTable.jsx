@@ -244,7 +244,7 @@ const AttendanceTable = () => {
     if (error) return <p className="text-center text-red-500 p-6">Error: {error}</p>;
 
     return (
-        <div className="container mx-auto p-6">
+        <div className=" mx-auto p-6">
             <h2 className="text-4xl font-bold mb-10 text-center mt-24">Attendance Records</h2>
 
             <div className="flex justify-between items-center mb-4">

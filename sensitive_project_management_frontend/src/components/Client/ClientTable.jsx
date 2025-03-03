@@ -48,12 +48,9 @@ const ClientTable = () => {
     }
   };
 
-  // Edit client function (redirect to the client edit form)
   const handleEdit = (clientId) => {
     navigate(`/client-edit/${clientId}`);
   };
-
-  // Export data to Excel
   const exportToExcel = () => {
     const exportData = clients.map((client, index) => ({
       'S.No': index + 1,
@@ -81,35 +78,51 @@ const ClientTable = () => {
       alert('Please select both start and end dates.');
       return;
     }
-  
-    // Convert dates to Date objects for comparison
+
     const start = new Date(startDate);
     const end = new Date(endDate);
-  
-    // Filter clients based on the date range
+
     const filteredClients = clients.filter((client) => {
       const clientDate = new Date(client.createdAt);
       return clientDate >= start && clientDate <= end;
     });
-  
+
     setClients(filteredClients);
   };
-  
 
-  // Define columns for react-table
   const columns = useMemo(() => [
     { Header: 'S.No', accessor: (row, index) => index + 1 },
     { Header: 'Organization', accessor: 'organization' },
     { Header: 'Contact Person', accessor: 'contactPerson' },
-    { Header: 'Contact Number', accessor: 'contactNumber' },
-    { Header: 'Alternate Contact', accessor: 'alternateContact' },
-    { Header: 'Email ID', accessor: 'emailId' },
-    { Header: 'Alternate Mail ID', accessor: 'alternateMailId' },
-    { Header: 'Business Category', accessor: 'businessCategory' },
+    {
+      Header: 'Contact',
+      accessor: 'contactNumber',
+      Cell: ({ value, row }) => (
+        <div>
+          <div>{value}</div>
+          {row.original.alternateContact && (
+            <div className="text-gray-700 text-sm mt-1">{row.original.alternateContact}</div>
+          )}
+        </div>
+      )
+    },
+    {
+      Header: 'Email ID',
+      accessor: 'emailId',
+      Cell: ({ value, row }) => (
+        <div>
+          <div>{value}</div>
+          {row.original.alternateMailId && (
+            <div className="text-gray-700 text-sm mt-1">{row.original.alternateMailId}</div>
+          )}
+        </div>
+      )
+    },
+    { Header: 'Category', accessor: 'businessCategory' },
     { Header: 'Office Location', accessor: 'officeLocation', Cell: ({ value }) => `${value.addressLine}, ${value.area}, ${value.city}, ${value.state} - ${value.pincode}` },
     { Header: 'Registered Address', accessor: 'registeredAddress', Cell: ({ value }) => `${value.addressLine}, ${value.area}, ${value.city}, ${value.state} - ${value.pincode}` },
     { Header: 'Status', accessor: 'status' },
-    { Header: 'Created Date-Time', accessor: 'createdAt', Cell: ({ value }) => new Date(value).toLocaleString() },
+    { Header: 'Created At', accessor: 'createdAt', Cell: ({ value }) => new Date(value).toLocaleString() },
     {
       Header: 'Actions',
       accessor: '_id',
@@ -126,7 +139,6 @@ const ClientTable = () => {
     }
   ], [clients]);
 
-  // Initialize react-table
   const {
     getTableProps,
     getTableBodyProps,
@@ -162,10 +174,9 @@ const ClientTable = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="mx-auto p-4 ">
       <h2 className="text-4xl font-bold mb-10 text-center mt-24">Client Details</h2>
 
-      {/* Action Buttons Section */}
       <div className="flex justify-between items-center mb-4">
         <div className="relative">
           <input
@@ -186,7 +197,7 @@ const ClientTable = () => {
               id="startDate"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="border border-blue-500 p-2 rounded w-32"
+              className="border border-blue-500 p-2 rounded w-36"
             />
           </div>
           <div>
@@ -196,7 +207,7 @@ const ClientTable = () => {
               id="endDate"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="border border-blue-500 p-2 rounded w-32"
+              className="border border-blue-500 p-2 rounded w-36"
             />
           </div>
           <button

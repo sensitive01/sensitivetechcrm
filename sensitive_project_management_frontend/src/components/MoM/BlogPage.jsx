@@ -118,7 +118,7 @@ const BlogPage = () => {
     }
 
     return (
-        <div className="container mx-auto px-4 py-8 mt-28">
+        <div className=" mx-auto px-4 py-8 mt-28">
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-3xl font-bold text-gray-800">Meeting Minutes</h1>
                 <div className="flex space-x-4 items-center -mt-6">

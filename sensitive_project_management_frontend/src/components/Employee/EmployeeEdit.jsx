@@ -15,6 +15,7 @@ const EmployeeEdit = () => {
   };
   const [formData, setFormData] = useState({
     role: '',
+    salary: '',
     empId: '',
     name: '',
     gender: '',
@@ -129,7 +130,7 @@ const EmployeeEdit = () => {
         const employeeData = response.data;
         const { formatted: dobFormatted, isoDate: dobIso } = formatDate(employeeData.dob);
         const { formatted: dojFormatted, isoDate: dojIso } = formatDate(employeeData.doj);
-  
+
         // Ensure ID Proof Type and Address Proof Type are included in response data
         setFormData((prevData) => ({
           ...prevData,
@@ -189,7 +190,7 @@ const EmployeeEdit = () => {
     }
   };
 
-  
+
 
   return (
     <div className="container mx-auto p-6 mt-20">
@@ -336,6 +337,18 @@ const EmployeeEdit = () => {
                 type="text"
                 name="role"
                 value={formData.role}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-md"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block font-semibold">Salary</label>
+              <input
+                type="text"
+                name="salary"
+                value={formData.salary}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
@@ -674,25 +687,25 @@ const EmployeeEdit = () => {
             </div>
 
             <div>
-  <label className="block font-semibold mb-2">Password</label>
-  <div className="relative">
-    <input
-      type={showPassword ? "text" : "password"} // Dynamically toggle the type
-      name="password"
-      value={formData.password}
-      onChange={handleChange}
-      className="w-full px-4 py-2 border rounded-md"
-      required
-    />
-    <button
-      type="button"
-      onClick={() => setShowPassword((prev) => !prev)} // Toggle visibility
-      className="absolute right-3 top-3 text-gray-500"
-    >
-      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />} {/* Icon */}
-    </button>
-  </div>
-</div>
+              <label className="block font-semibold mb-2">Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"} // Dynamically toggle the type
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-md"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)} // Toggle visibility
+                  className="absolute right-3 top-3 text-gray-500"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />} {/* Icon */}
+                </button>
+              </div>
+            </div>
 
 
             <div className="col-span-3 flex justify-center">

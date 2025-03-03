@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Eye, EyeOff } from "lucide-react";
 
 const EmployeeForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isPermanentAddressSame, setIsPermanentAddressSame] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     role: '',
+    salary: '',
     empId: '',
     name: '',
     gender: '',
@@ -148,7 +151,7 @@ const EmployeeForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent page reload on form submission
-  
+
     console.log(formData);
     try {
       const response = await axios.post(
@@ -157,19 +160,19 @@ const EmployeeForm = () => {
       );
       console.log("Response:", response.data);
       alert("Form submitted successfully!");
-  
+
       // Store user details in localStorage (for the purpose of displaying in the Topbar)
       localStorage.setItem("empName", formData.name);
       localStorage.setItem("empEmail", formData.email);
       localStorage.setItem("empPassword", formData.password);
       localStorage.setItem("role", formData.role);  // Optional: Store role if needed
-  
+
     } catch (error) {
       console.error("Error:", error);
       alert("Failed to submit the form.");
     }
   };
-  
+
   return (
     <div className="container mx-auto p-6 mt-20">
       <h2 className="text-4xl font-bold mb-8 text-center">Employee Form</h2>
@@ -315,6 +318,18 @@ const EmployeeForm = () => {
                 type="text"
                 name="role"
                 value={formData.role}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-md"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block font-semibold">Salary</label>
+              <input
+                type="text"
+                name="salary"
+                value={formData.salary}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
                 required
@@ -625,15 +640,24 @@ const EmployeeForm = () => {
             </div>
 
             <div>
-              <label className="block font-semibold">Password</label>
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-md"
-                required
-              />
+              <label className="block font-semibold mb-2">Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"} // Dynamically toggle the type
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border rounded-md"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)} // Toggle visibility
+                  className="absolute right-3 top-3 text-gray-500"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />} {/* Icon */}
+                </button>
+              </div>
             </div>
 
             <div className="col-span-3 flex justify-center">

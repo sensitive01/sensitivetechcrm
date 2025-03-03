@@ -30,9 +30,9 @@ const LeaveTable = () => {
                 const firstDayOfLastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
                 const formattedStartDate = firstDayOfLastMonth.toISOString().split('T')[0];
                 const formattedEndDate = today.toISOString().split('T')[0];
-    
+
                 const response = await axios.get(`https://sensitivetechcrm.onrender.com/leaves/get-all/${id}?startDate=${formattedStartDate}&endDate=${formattedEndDate}`);
-                
+
                 setLeaves(response.data);
             } catch (err) {
                 setError("Failed to load leave data");
@@ -40,7 +40,7 @@ const LeaveTable = () => {
                 setLoading(false);
             }
         };
-    
+
         fetchLeaves();
     }, [id]);
 
@@ -211,36 +211,50 @@ const LeaveTable = () => {
             accessor: 'approvedBy',
         },
         {
-            Header: 'Status Change Date',
-            accessor: (row) => row.statusChangeDate
-                ? new Date(row.statusChangeDate).toLocaleString('en-GB', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true
-                })
-                : 'N/A',
+            Header: 'Status Change Date & Time',
+            accessor: (row) =>
+                row.statusChangeDate ? (
+                    <>
+                        {new Date(row.statusChangeDate).toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: '2-digit',
+                        })}
+                        <br />
+                        {new Date(row.statusChangeDate).toLocaleTimeString('en-GB', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true
+                        })}
+                    </>
+                ) : 'N/A',
         },
+
         {
             Header: 'Leave Applied On',
             accessor: 'leaveType',
         },
         {
             Header: 'Created Date & Time',
-            accessor: (row) => row.createdAt
-                ? new Date(row.createdAt).toLocaleString('en-GB', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: true
-                })
-                : 'N/A',
+            accessor: (row) =>
+                row.createdAt ? (
+                    <>
+                        {new Date(row.createdAt).toLocaleDateString('en-GB', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: '2-digit',
+                        })}
+                        <br />
+                        {new Date(row.createdAt).toLocaleTimeString('en-GB', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit',
+                            hour12: true
+                        })}
+                    </>
+                ) : 'N/A',
         },
+
         {
             Header: 'Actions',
             accessor: '_id',
@@ -310,7 +324,7 @@ const LeaveTable = () => {
     }
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="mx-auto p-4">
             <h2 className="text-4xl font-bold mb-10 text-center mt-24">Leave Details</h2>
 
             <div className="flex justify-between items-center mb-4">
