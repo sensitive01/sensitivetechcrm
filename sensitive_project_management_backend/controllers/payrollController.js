@@ -49,7 +49,6 @@ exports.deletePayroll = async (req, res) => {
   }
 };
 
-// Update Payroll Entry
 exports.updatePayroll = async (req, res) => {
     const { id } = req.params;
     const { empId, type, amount, note } = req.body;

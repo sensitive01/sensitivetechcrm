@@ -178,18 +178,25 @@ const getEmployeeDetailsById = async (req, res) => {
   }
 };
 
-// Helper function to get the current month's date range
-const getCurrentMonthDateRange = () => {
+
+const getMonthDateRange = (monthOffset = 0) => {
   const now = new Date();
-  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  return { firstDay, lastDay };
+  const year = now.getFullYear();
+  const month = now.getMonth() + monthOffset; // Offset: 0 for current, -1 for previous
+
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const totalDays = lastDay.getDate(); // Get total days in the month
+
+  return { firstDay, lastDay, totalDays };
 };
 
 const getAllEmployeesWithData = async (req, res) => {
   try {
-
-    const { firstDay, lastDay } = getCurrentMonthDateRange();
+    // Get current month data
+    const { firstDay: currentFirstDay, lastDay: currentLastDay, totalDays: currentTotalDays } = getMonthDateRange(0);
+    // Get previous month data
+    const { firstDay: prevFirstDay, lastDay: prevLastDay, totalDays: prevTotalDays } = getMonthDateRange(-1);
 
     const employees = await Employee.find({}, 'name empId department salary');
 
@@ -201,58 +208,55 @@ const getAllEmployeesWithData = async (req, res) => {
         salary: employee.salary,
       };
 
-      const attendanceRecords = await AttendanceModel.find({
+      // Fetch attendance records for both current and previous month
+      const currentAttendance = await AttendanceModel.find({
         employeeId: employee.empId,
-        date: { $gte: firstDay, $lte: lastDay }
+        date: { $gte: currentFirstDay, $lte: currentLastDay }
       });
 
-      const present = attendanceRecords.filter(record => record.status === 'Present').length;
-      const absent = attendanceRecords.filter(record => record.status === 'Absent').length;
+      const prevAttendance = await AttendanceModel.find({
+        employeeId: employee.empId,
+        date: { $gte: prevFirstDay, $lte: prevLastDay }
+      });
 
-      let lateDays = 0;
-      let lateMins = 0;
+      // Function to calculate attendance details
+      const calculateAttendance = (attendanceRecords) => {
+        const present = attendanceRecords.filter(record => record.status === 'Present').length;
+        const absent = attendanceRecords.filter(record => record.status === 'Absent').length;
+        let lateDays = 0, lateMins = 0;
 
-      attendanceRecords.forEach(record => {
-        if (record.status === 'Present' && record.logintime) {
-          const loginTime = record.logintime;
-          const startTime = "09:00";
-          if (loginTime > startTime) {
-            lateDays++;
+        attendanceRecords.forEach(record => {
+          if (record.status === 'Present' && record.logintime) {
+            const loginTime = record.logintime;
+            const startTime = "09:00";
+            if (loginTime > startTime) {
+              lateDays++;
 
-            const [loginHour, loginMin] = loginTime.split(':').map(Number);
-            const [startHour, startMin] = startTime.split(':').map(Number);
+              const [loginHour, loginMin] = loginTime.split(':').map(Number);
+              const [startHour, startMin] = startTime.split(':').map(Number);
 
-            lateMins += (loginHour - startHour) * 60 + (loginMin - startMin);
+              lateMins += (loginHour - startHour) * 60 + (loginMin - startMin);
+            }
           }
-        }
-      });
+        });
 
-      const workingDays = present + absent;
+        return { present, absent, lateDays, lateMins, workingDays: present + absent };
+      };
 
-      const allowances = await Payroll.find({ empId: employee.name, type: 'Allowance' });
-      const deductions = await Payroll.find({ empId: employee.name, type: 'Deductions' });
-      const advances = await Payroll.find({ empId: employee.name, type: 'Advance' });
-
-      const totalAllowances = allowances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-      const totalDeductions = deductions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-      const totalAdvances = advances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-
-      const leaves = await LeaveModel.find({ employee: employee.empId, startDate: { $gte: firstDay, $lte: lastDay } });
-
-      const payable = employee.salary + totalAllowances - totalDeductions - totalAdvances;
+      // Get attendance summary
+      const currentAttendanceSummary = calculateAttendance(currentAttendance);
+      const prevAttendanceSummary = calculateAttendance(prevAttendance);
 
       return {
         ...employeeData,
-        workingDays,
-        present,
-        absent,
-        lateDays,
-        lateMins,
-        allowances: totalAllowances,
-        deductions: totalDeductions,
-        advances: totalAdvances,
-        payable,
-        leaves: leaves.length
+        currentMonth: {
+          totalDays: currentTotalDays,
+          ...currentAttendanceSummary
+        },
+        previousMonth: {
+          totalDays: prevTotalDays,
+          ...prevAttendanceSummary
+        }
       };
     }));
 
@@ -270,6 +274,8 @@ const getAllEmployeesWithData = async (req, res) => {
     });
   }
 };
+
+
 
 
 module.exports = {
