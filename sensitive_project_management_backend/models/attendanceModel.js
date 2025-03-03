@@ -11,5 +11,4 @@ const attendanceSchema = new mongoose.Schema({
   logouttime: { type: String },                
 }, { timestamps: true });                     
 
-// Check if model already exists to prevent the OverwriteModelError
 module.exports = mongoose.models.AttendanceModel || mongoose.model('AttendanceModel', attendanceSchema);
