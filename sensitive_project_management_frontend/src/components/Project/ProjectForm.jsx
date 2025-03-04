@@ -8,9 +8,11 @@ const ProjectForm = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const id = localStorage.getItem("empId");
+  const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
 
 
- 
+
   const statuses = ["Pending", "In Progress", "Completed", "On Hold"];
 
   const [projects, setProjects] = useState([]);
@@ -57,14 +59,14 @@ const ProjectForm = () => {
     const fetchEmployees = async () => {
       try {
         setLoading(true);
-  
-       
-        const response = await employeename(); 
+
+
+        const response = await employeename(`${id}`);
         console.log("Employees fetched:", response);
-  
+
         if (response) {
-          setEmployees(response.data); 
-          setError(null); 
+          setEmployees(response.data);
+          setError(null);
         } else {
           throw new Error("Failed to fetch employees.");
         }
@@ -75,10 +77,10 @@ const ProjectForm = () => {
         setLoading(false);
       }
     };
-  
+
     fetchEmployees();
-  }, []);
-  
+  }, [role, id]);
+
   const handleAddProject = async () => {
     if (!validateForm()) {
       alert("Please fill out all mandatory fields!");
@@ -228,7 +230,7 @@ const ProjectForm = () => {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className="min-h-screen flex justify-center items-center">

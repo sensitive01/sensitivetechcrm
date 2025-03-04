@@ -15,7 +15,9 @@ function TaskEdit() {
     date: "",
     attachments: "", // Store as a single string (URL or filename)
   });
-
+  
+ const id = localStorage.getItem("empId");
+  const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
   const [projects, setProjects] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -28,9 +30,8 @@ function TaskEdit() {
 
         // Fetch employees and project names concurrently
         const [employeesResponse, projectsResponse] = await Promise.all([
-          employeename(),
+        employeename(`${id}`),
           projectname(), 
-          // axios.get("https://sensitivetechcrm.onrender.com/project/projectname"),
         ]);
 
         if (employeesResponse && projectsResponse) {
@@ -55,7 +56,7 @@ function TaskEdit() {
     };
 
     fetchData();
-  }, []);
+  }, [role, id]);
 
   useEffect(() => {
     const fetchTaskData = async () => {

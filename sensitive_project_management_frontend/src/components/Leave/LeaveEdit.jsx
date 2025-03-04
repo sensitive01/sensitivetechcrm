@@ -20,6 +20,8 @@ function LeaveEdit() {
     endTime: "",
   });
    const [currentDate, setCurrentDate] = useState("");
+   const taskid = localStorage.getItem("empId");
+     const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
 
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -44,7 +46,7 @@ function LeaveEdit() {
     const fetchEmployees = async () => {
       try {
         setLoading(true);
-        const response = await employeename();
+        const response = await employeename(`${taskid}`);
         if (response) {
           setEmployees(response.data);
           setError(null);
@@ -61,7 +63,7 @@ function LeaveEdit() {
 
     fetchEmployees();
     setCurrentDate(new Date().toISOString().split("T")[0]); 
-  }, []);
+  }, [role, taskid]);
 
 
 

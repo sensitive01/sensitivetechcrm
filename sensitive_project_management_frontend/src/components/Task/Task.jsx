@@ -32,19 +32,19 @@ const TaskList = () => {
             try {
                 const response = await axios.get(`https://sensitivetechcrm.onrender.com/task/getalltask/${id}`);
                 console.log("Full API Response:", response.data);
-                
+
                 let taskList = response.data.tasks || response.data;
-    
+
                 if (!Array.isArray(taskList)) {
                     throw new Error("Unexpected API response format");
                 }
-    
+
                 const updatedTasks = taskList.map(task => {
                     if (task.date) {
                         const dateObj = new Date(task.date);
                         task.date = `${dateObj.getDate().toString().padStart(2, '0')}/${(dateObj.getMonth() + 1).toString().padStart(2, '0')}/${dateObj.getFullYear().toString().slice(-2)}`;
                     }
-    
+
                     if (task.createdAt) {
                         const createdAtObj = new Date(task.createdAt);
                         let hours = createdAtObj.getHours();
@@ -55,10 +55,10 @@ const TaskList = () => {
                         task.createDate = `${createdAtObj.getDate().toString().padStart(2, '0')}/${(createdAtObj.getMonth() + 1).toString().padStart(2, '0')}/${createdAtObj.getFullYear()}`;
                         task.createTime = `${hours}:${minutes}:${seconds} ${ampm}`;
                     }
-                    
+
                     return task;
                 });
-    
+
                 setTasks(updatedTasks);
             } catch (err) {
                 console.error("Error fetching tasks:", err);
@@ -67,10 +67,10 @@ const TaskList = () => {
                 setLoading(false);
             }
         };
-    
+
         fetchTasks();
     }, [role, id]);
-    
+
 
 
     const handleDelete = async (taskId) => {
@@ -129,7 +129,7 @@ const TaskList = () => {
             task.status.toLowerCase().includes(searchTerm.toLowerCase())
         );
     }, [tasks, role, searchTerm]);
-    
+
 
     const applyDateFilter = () => {
         if (!startDate || !endDate) {
@@ -217,8 +217,8 @@ const TaskList = () => {
                     <select
                         value={row.original.status || "Pending"}  // Default to "Pending"
                         onChange={handleStatusChange}
-                        disabled={role !== "Superadmin"}
-                        className={`border p-2 rounded w-32 ${getStatusStyle(row.original.status)} ${role !== "Superadmin" ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`}
+                        // disabled={role !== "Superadmin"}
+                        className={`border p-2 rounded w-32 ${getStatusStyle(row.original.status)} `}
                     >
                         <option value="Pending">Pending</option>
                         <option value="In Progress">In Progress</option>
@@ -256,7 +256,7 @@ const TaskList = () => {
                 ),
             id: 'created_date_time',
         },
-        
+
         // {
         //     Header: 'Created Time',
         //     accessor: 'createTime',
@@ -378,15 +378,15 @@ const TaskList = () => {
 
 
                 <div className="flex space-x-4">
-                {role === "Superadmin" && (
-                    <button
-                        onClick={exportToExcel}
-                        className="bg-green-500 text-white px-6 py-2 rounded flex items-center hover:bg-green-600"
-                    >
-                        <FaFileDownload className="mr-2" />
-                        Export Data
-                    </button>
-                )}
+                    {role === "Superadmin" && (
+                        <button
+                            onClick={exportToExcel}
+                            className="bg-green-500 text-white px-6 py-2 rounded flex items-center hover:bg-green-600"
+                        >
+                            <FaFileDownload className="mr-2" />
+                            Export Data
+                        </button>
+                    )}
 
                     <Link
                         to="/task-form"

@@ -9,7 +9,8 @@ const ProjectEdit = () => {
     const [employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-
+    const id = localStorage.getItem("empId");
+    const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
     const statuses = ["Pending", "In Progress", "Completed", "On Hold"];
     const [projects, setProjects] = useState([]);
     const [projectDetails, setProjectDetails] = useState([{
@@ -51,7 +52,7 @@ const ProjectEdit = () => {
                 setLoading(true);
 
 
-                const response = await employeename();
+                const response = await employeename(`${id}`);
                 console.log("Employees fetched:", response);
 
                 if (response) {
@@ -69,7 +70,7 @@ const ProjectEdit = () => {
         };
 
         fetchEmployees();
-    }, []);
+    }, [role, id]);
 
     useEffect(() => {
         const fetchProjectDetails = async () => {
@@ -311,11 +312,11 @@ const ProjectEdit = () => {
                                                                 </option>
                                                             ))}
                                                         </select>
-                                                    ) :  field.includes("Document") ? (
+                                                    ) : field.includes("Document") ? (
                                                         <input
-                                                          type="file"
-                                                          onChange={(e) => handleFileChange(index, field, e)}
-                                                          className="w-full border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                                            type="file"
+                                                            onChange={(e) => handleFileChange(index, field, e)}
+                                                            className="w-full border rounded-lg px-4 py-2 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
                                                         />
                                                     ) : (
                                                         <input

@@ -8,6 +8,7 @@ function Leave() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const id = localStorage.getItem("empId");
+  const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
   const [leave, setLeave] = useState({
     employee: "",
     leaveCategory: "",
@@ -31,7 +32,7 @@ function Leave() {
       try {
         setLoading(true);
 
-        const response = await employeename();
+        const response = await employeename(`${id}`);
         console.log("Employees fetched:", response);
 
         if (response) {
@@ -50,7 +51,7 @@ function Leave() {
 
     fetchEmployees();
     setCurrentDate(new Date().toISOString().split("T")[0]); 
-  }, []);
+  }, [role, id]);
 
   const leaveTypes = ["Sick Leave", "Casual Leave", "Emergency Leave", "Others"];
 

@@ -7,44 +7,47 @@ import { deletetheProject } from "../../api/services/projectServices";
 const ProjectDetailsModal = ({ project, onClose, onEdit }) => {
   const renderArrayData = (array, field) => {
     if (!array || !Array.isArray(array) || array.length === 0) return "N/A";
-    return array.map((item, index) => item[field]).filter(Boolean).join(", ");
+    return array.map((item) => item[field]).filter(Boolean).join(", ");
   };
+
+  const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
 
   return (
     <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center mt-20">
       <div className="bg-white rounded-lg p-4 w-full sm:w-2/3 md:w-1/2 lg:w-1/3 max-h-[500px] overflow-auto flex flex-col">
         <h2 className="text-2xl font-semibold mb-4">Project Details</h2>
         <div className="flex flex-row justify-between">
-          {/* Left Side - Text Data */}
+          {/* Left Side - Project Info */}
           <div className="w-1/2 pr-4">
             <section>
               <h3 className="text-lg font-semibold mb-2">Project Information:</h3>
               <div className="space-y-2">
-                <p><strong>Project Name:</strong> {renderArrayData(project.projectDetails, 'projectName')}</p>
-                <p><strong>Tech Stack:</strong> {renderArrayData(project.projectDetails, 'techStack')}</p>
-                <p><strong>Type:</strong> {renderArrayData(project.projectDetails, 'type')}</p>
-                <p><strong>Category:</strong> {renderArrayData(project.projectDetails, 'category')}</p>
-                <p><strong>Domain:</strong> {renderArrayData(project.projectDetails, 'domain')}</p>
-                <p><strong>Requirements:</strong> {renderArrayData(project.projectDetails, 'requirements')}</p>
-                <p><strong>Description:</strong> {renderArrayData(project.projectDetails, 'description')}</p>
-                <p><strong>Designation:</strong> {renderArrayData(project.projectDetails, 'designation')}</p>
+                <p><strong>Project Name:</strong> {renderArrayData(project.projectDetails, "projectName")}</p>
+                <p><strong>Tech Stack:</strong> {renderArrayData(project.projectDetails, "techStack")}</p>
+                <p><strong>Type:</strong> {renderArrayData(project.projectDetails, "type")}</p>
+                <p><strong>Category:</strong> {renderArrayData(project.projectDetails, "category")}</p>
+                <p><strong>Domain:</strong> {renderArrayData(project.projectDetails, "domain")}</p>
+                <p><strong>Requirements:</strong> {renderArrayData(project.projectDetails, "requirements")}</p>
+                <p><strong>Description:</strong> {renderArrayData(project.projectDetails, "description")}</p>
+                <p><strong>Designation:</strong> {renderArrayData(project.projectDetails, "designation")}</p>
               </div>
             </section>
           </div>
-          
-          {/* Right Side - Additional Data */}
+
+          {/* Right Side - Additional Details */}
           <div className="w-1/2 pl-4">
             <section>
               <h3 className="text-lg font-semibold mb-2">Additional Details:</h3>
               <div className="space-y-2">
-                <p><strong>AddOnServices:</strong> {renderArrayData(project.projectDetails, 'addOnServices')}</p>
-                <p><strong>Duration:</strong> {renderArrayData(project.projectDetails, 'duration')}</p>
-                <p><strong>Dependencies:</strong> {renderArrayData(project.projectDetails, 'dependencies')}</p>
-                <p><strong>CompanyName:</strong> {renderArrayData(project.projectDetails, 'companyName')}</p>
-                <p><strong>Task:</strong> {renderArrayData(project.projectDetails, 'task')}</p>
-                <p><strong>Quoted Value:</strong> {renderArrayData(project.financialDetails, 'quotedValue')}</p>
-                <p><strong>Approved Value:</strong> {renderArrayData(project.financialDetails, 'approvedValue')}</p>
-                <p><strong>Payment Terms:</strong> {renderArrayData(project.financialDetails, 'paymentTerms')}</p>
+                <p><strong>AddOnServices:</strong> {renderArrayData(project.projectDetails, "addOnServices")}</p>
+                <p><strong>Duration:</strong> {renderArrayData(project.projectDetails, "duration")}</p>
+                <p><strong>Dependencies:</strong> {renderArrayData(project.projectDetails, "dependencies")}</p>
+                <p><strong>Company Name:</strong> {renderArrayData(project.projectDetails, "companyName")}</p>
+                <p><strong>Task:</strong> {renderArrayData(project.projectDetails, "task")}</p>
+                <p><strong>Quoted Value:</strong> {renderArrayData(project.financialDetails, "quotedValue")}</p>
+                <p><strong>Approved Value:</strong> {renderArrayData(project.financialDetails, "approvedValue")}</p>
+                <p><strong>Payment Terms:</strong> {renderArrayData(project.financialDetails, "paymentTerms")}</p>
+                <p><strong>Assigned To:</strong> {renderArrayData(project.additionalDetails, "assignedTo")}</p> {/* Added field */}
               </div>
             </section>
           </div>
@@ -54,12 +57,13 @@ const ProjectDetailsModal = ({ project, onClose, onEdit }) => {
         <div className="mt-4 flex justify-between">
           <button
             onClick={() => onEdit(project)}
-            className="bg-blue-500 text-white px-6 py-2 rounded"
+            className={`bg-blue-500 text-white px-4 py-2 rounded ${role !== "Superadmin" ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`}
+            disabled={role !== "Superadmin"}
           >
             Edit
           </button>
-          <button 
-            onClick={onClose} 
+          <button
+            onClick={onClose}
             className="bg-red-500 text-white px-6 py-2 rounded"
           >
             Close
@@ -69,6 +73,7 @@ const ProjectDetailsModal = ({ project, onClose, onEdit }) => {
     </div>
   );
 };
+
 
 const ProjectManager = () => {
   const [projects, setProjects] = useState([]);
@@ -85,15 +90,15 @@ const ProjectManager = () => {
   const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
   const id = localStorage.getItem("empId");
   const navigate = useNavigate();
-  
+
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const response = await fetch(`https://sensitivetechcrm.onrender.com/project/getallprojects/${id}`);
-        const data = await response.json(); 
+        const data = await response.json();
         if (response.status === 200) {
-          setProjects(data); 
+          setProjects(data);
         } else {
           throw new Error("Failed to fetch projects");
         }
@@ -103,7 +108,7 @@ const ProjectManager = () => {
         setLoading(false);
       }
     };
-    
+
     fetchProjects();
   }, [id]);
 
@@ -129,11 +134,11 @@ const ProjectManager = () => {
           : "N/A"
       }
     }))
-    .filter(project => 
-      role === "Superadmin" || project.displayData.status.toLowerCase() === "pending"
-    );
+      .filter(project =>
+        role === "Superadmin" || project.displayData.status.toLowerCase() === "pending"
+      );
   }, [projects, role]);
-  
+
   const handleAddProject = () => {
     navigate('/add-project');
   };
@@ -214,7 +219,7 @@ const ProjectManager = () => {
     const end = new Date(endDate);
 
     const filteredProjects = projects.filter((project) => {
-      const projectDate = new Date(project.additionalDetails?.[0]?.createdDate); 
+      const projectDate = new Date(project.additionalDetails?.[0]?.createdDate);
       return projectDate >= start && projectDate <= end;
     });
 
@@ -345,8 +350,8 @@ const ProjectManager = () => {
               Add Project
             </button>
             {role === "Superadmin" && (
-              <button 
-                onClick={handleExportData} 
+              <button
+                onClick={handleExportData}
                 className="bg-green-500 text-white px-6 py-2 rounded flex items-center hover:bg-green-600"
               >
                 <FaFileDownload className="mr-2" /> Export Data

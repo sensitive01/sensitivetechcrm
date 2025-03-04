@@ -94,9 +94,18 @@ export const projectname=async() => {
 
 
 
-export const employeename=async() => {
+// export const employeename=async() => {
+//   try {
+//     const response = await projectServices.get(`/employename` );
+//     return response;
+//   } catch (err) {
+//     return err;
+//   }
+// };
+
+export const employeename = async (id) => {
   try {
-    const response = await projectServices.get(`/employename` );
+    const response = await projectServices.get(`/employename/${id}`);
     return response;
   } catch (err) {
     return err;

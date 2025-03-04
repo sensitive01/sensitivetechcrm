@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
-import { createTask, employeename } from "../../api/services/projectServices";
+import { createTask, employeename, projectname } from "../../api/services/projectServices";
 
 function TaskForm() {
   const [tasks, setTasks] = useState([
@@ -14,8 +14,11 @@ function TaskForm() {
       date: "",
       attachments: null,
     },
+    
   ]);
 
+  const id = localStorage.getItem("empId");
+  const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
   const [projects, setprojects] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState([]);
@@ -28,8 +31,8 @@ function TaskForm() {
 
         // Fetch employees and project names concurrently using Promise.all
         const [employeesResponse, projectsResponse] = await Promise.all([
-          employeename(), // Assuming employeename() returns the employees data
-          axios.get("https://sensitivetechcrm.onrender.com/project/projectname") // Fetching project names
+          employeename(`${id}`),
+          projectname()
         ]);
 
         console.log("Employees fetched:", employeesResponse);
@@ -57,7 +60,7 @@ function TaskForm() {
     };
 
     fetchData();
-  }, []);
+  },[role, id]);
 
 
 
