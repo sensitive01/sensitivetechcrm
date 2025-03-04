@@ -1,4 +1,3 @@
-// controllers/employeeController.js
 const Employee = require("../models/employeeSchema");
 const LeaveModel = require("../models/leaveModel");
 const Payroll = require('../models/payrollModel');
@@ -6,14 +5,12 @@ const AttendanceModel = require('../models/attendanceModel');
 const { uploadImage } = require("../config/cloudinary");
 const axios = require('axios');
 
-// Create Employee
 const createEmployee = async (req, res) => {
   try {
     console.log("Creating employee", req.body);
 
     const employeeData = req.body;
 
-    // Process uploaded files
     if (req.files) {
       if (req.files.profileImage) {
         employeeData.profileImage = await uploadImage(req.files.profileImage[0].buffer);
@@ -50,7 +47,6 @@ const getAllEmployees = async (req, res) => {
   }
 };
 
-// Get a specific employee by ID
 const getEmployeeById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -64,13 +60,10 @@ const getEmployeeById = async (req, res) => {
   }
 };
 
-// Update an employee
 const updateEmployee = async (req, res) => {
   try {
     const { id } = req.params;
     const updatedData = req.body;
-
-    // Process uploaded files
     if (req.files) {
       if (req.files.profileImage) {
         updatedData.profileImage = await uploadImage(req.files.profileImage[0].buffer);
@@ -98,7 +91,6 @@ const updateEmployee = async (req, res) => {
   }
 };
 
-// Delete an employee
 const deleteEmployee = async (req, res) => {
   try {
     const { id } = req.params;
@@ -125,10 +117,8 @@ const deleteEmployee = async (req, res) => {
 
 const getEmployeeNames = async (req, res) => {
   try {
-    const { id } = req.params; // User ID from request parameters
+    const { id } = req.params;
     console.log("User ID:", id);
-
-    // Fetch the employee details based on the given ID
     const empdata = await Employee.findOne({ _id: id }, { role: 1, name: 1 });
 
     if (!empdata) {
@@ -139,10 +129,8 @@ const getEmployeeNames = async (req, res) => {
 
     let employees;
     if (empdata.role === "Superadmin") {
-      // If Superadmin, fetch all employee names
       employees = await Employee.find({}, "name");
     } else {
-      // Otherwise, fetch only the logged-in employee's name
       employees = [{ name: empdata.name }];
     }
 
@@ -154,8 +142,6 @@ const getEmployeeNames = async (req, res) => {
   }
 };
 
-
-// Get total employee count
 const getTotalEmployees = async (req, res) => {
   try {
     const totalEmployees = await Employee.countDocuments();
@@ -165,12 +151,10 @@ const getTotalEmployees = async (req, res) => {
   }
 };
 
-// Fetch address details by pincode
 const fetchAddressDetailsByPincode = async (pincode) => {
   try {
     const response = await axios.get(`https://api.zippopotam.us/in/${pincode}`);
 
-    // Validate response structure
     if (response.data && Array.isArray(response.data.places) && response.data.places.length > 0) {
       const { "place name": area, state, country } = response.data.places[0];
       const city = state || area;
@@ -195,7 +179,6 @@ const fetchAddressDetailsByPincode = async (pincode) => {
   }
 };
 
-// Get employee details by ID
 const getEmployeeDetailsById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -215,11 +198,11 @@ const getEmployeeDetailsById = async (req, res) => {
 const getMonthDateRange = (monthOffset = 0) => {
   const now = new Date();
   const year = now.getFullYear();
-  const month = now.getMonth() + monthOffset; 
+  const month = now.getMonth() + monthOffset;
 
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
-  const totalDays = lastDay.getDate(); 
+  const totalDays = lastDay.getDate();
 
   return { firstDay, lastDay, totalDays };
 };
@@ -244,44 +227,44 @@ const getAllEmployeesWithData = async (req, res) => {
           employeeId: employee.empId,
           date: { $gte: firstDay, $lte: lastDay }
         });
-      
+
         const present = attendanceRecords.filter(record => record.status === 'Present').length;
         const absent = totalDays - present;
-      
+
         let lateDays = 0, lateMins = 0;
         attendanceRecords.forEach(record => {
           if (record.status === 'Present' && record.logintime) {
             const loginTime = record.logintime;
-            const startTime = "09:30"; 
-      
+            const startTime = "09:30";
+
             if (loginTime > startTime) {
               lateDays++;
-      
+
               const [loginHour, loginMin] = loginTime.split(':').map(Number);
               const [startHour, startMin] = startTime.split(':').map(Number);
               let minutesLate = (loginHour * 60 + loginMin) - (startHour * 60 + startMin);
-              
-              lateMins += Math.abs(minutesLate); 
+
+              lateMins += Math.abs(minutesLate);
             }
           }
         });
-      
+
         const lateHours = Math.floor(lateMins / 60);
         const remainingMins = lateMins % 60;
         const formattedLateTime = `${lateHours}h ${remainingMins}m`;
-      
-        return { 
-          totalDays, 
-          present, 
-          absent, 
-          lateDays, 
-          lateTime: formattedLateTime, 
-          workingDays: present + absent 
+
+        return {
+          totalDays,
+          present,
+          absent,
+          lateDays,
+          lateTime: formattedLateTime,
+          workingDays: present + absent
         };
       };
-      
-      
-      
+
+
+
 
       const currentAttendance = await fetchAttendanceData(currentMonthData);
       const prevAttendance = await fetchAttendanceData(prevMonthData);
