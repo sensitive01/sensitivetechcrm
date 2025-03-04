@@ -14,32 +14,32 @@ const upload = multer({ storage: storage });
 
 // employeeRouter.post("/createemployee", Employee.createEmployee)
 employeeRouter.post(
-    "/createemployee",
-    upload.fields([
-      { name: "profileImage", maxCount: 1 },
-      { name: "addressProofFile", maxCount: 1 },
-      { name: "idProofFile", maxCount: 1 },
-      { name: "resume", maxCount: 1 }
-    ]),
-    Employee.createEmployee
-  )
-  
+  "/createemployee",
+  upload.fields([
+    { name: "profileImage", maxCount: 1 },
+    { name: "addressProofFile", maxCount: 1 },
+    { name: "idProofFile", maxCount: 1 },
+    { name: "resume", maxCount: 1 }
+  ]),
+  Employee.createEmployee
+)
+
 employeeRouter.get("/getallemployees", Employee.getAllEmployees)
 employeeRouter.get("/getemployeesbyid/:id", Employee.getEmployeeById)
 // employeeRouter.patch("/updateemployee/:id", Employee.updateEmployee)
 employeeRouter.patch(
-    "/updateemployee/:id",
-    upload.fields([
-      { name: "profileImage", maxCount: 1 },
-      { name: "addressProofFile", maxCount: 1 },
-      { name: "idProofFile", maxCount: 1 },
-      { name: "resume", maxCount: 1 }
-    ]),
-    
-    Employee.updateEmployee
-  );
+  "/updateemployee/:id",
+  upload.fields([
+    { name: "profileImage", maxCount: 1 },
+    { name: "addressProofFile", maxCount: 1 },
+    { name: "idProofFile", maxCount: 1 },
+    { name: "resume", maxCount: 1 }
+  ]),
+
+  Employee.updateEmployee
+);
 employeeRouter.delete("/deleteemployee/:id", Employee.deleteEmployee)
-employeeRouter.get("/employename",Employee.getEmployeeNames)
+employeeRouter.get("/employename/:id", Employee.getEmployeeNames)
 employeeRouter.get("/totalemployee", Employee.getTotalEmployees);
 
 employeeRouter.get("/getaddressbypincode/:pincode", async (req, res) => {

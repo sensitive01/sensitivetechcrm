@@ -113,14 +113,47 @@ const deleteEmployee = async (req, res) => {
 };
 
 // Get employee names with role "employee"
+// const getEmployeeNames = async (req, res) => {
+//   try {
+//     const employees = await Employee.find({ role: "employee" }).select("name");
+//     res.json(employees);
+//   } catch (error) {
+//     res.status(500).json({ message: "Error fetching employees" });
+//   }
+// };
+
+
 const getEmployeeNames = async (req, res) => {
   try {
-    const employees = await Employee.find({ role: "employee" }).select("name");
-    res.json(employees);
+    const { id } = req.params; // User ID from request parameters
+    console.log("User ID:", id);
+
+    // Fetch the employee details based on the given ID
+    const empdata = await Employee.findOne({ _id: id }, { role: 1, name: 1 });
+
+    if (!empdata) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    console.log("Employee Data:", empdata);
+
+    let employees;
+    if (empdata.role === "Superadmin") {
+      // If Superadmin, fetch all employee names
+      employees = await Employee.find({}, "name");
+    } else {
+      // Otherwise, fetch only the logged-in employee's name
+      employees = [{ name: empdata.name }];
+    }
+
+    console.log("Employee Names:", employees);
+    res.status(200).json(employees);
   } catch (error) {
+    console.error("Error fetching employees:", error);
     res.status(500).json({ message: "Error fetching employees" });
   }
 };
+
 
 // Get total employee count
 const getTotalEmployees = async (req, res) => {
