@@ -1,7 +1,6 @@
 const leaveModel = require("../models/leaveModel");
 const { uploadImage } = require("../config/cloudinary");
 const employeeSchema = require("../models/employeeSchema");
-// const employeeSchema = require("../models/employeeSchema");
 
 // Create a new leave request
 exports.createLeaveRequest = async (req, res) => {

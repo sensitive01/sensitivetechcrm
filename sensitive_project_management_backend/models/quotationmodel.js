@@ -10,7 +10,7 @@ const QuotationSchema = new mongoose.Schema({
     note: { type: String },
     quotation: { type: String },
     status: { type: String, enum: ['Pending', 'Sent', 'Accepted', 'Rejected', 'In Negotiation'], default: 'Pending' },
-    quotationDate: { type: Date, default: Date.now },
+    quotationDate: { type: String },
     updateLog: { type: String }
 }, { timestamps: true });
 

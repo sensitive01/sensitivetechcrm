@@ -1,9 +1,15 @@
 const Quotation = require('../models/quotationmodel');
+const { uploadImage } = require("../config/cloudinary");
 
 // Create a new quotation
 exports.createQuotation = async (req, res) => {
     try {
-        const quotation = new Quotation(req.body);
+        const quotationData = req.body;
+        console.log("CREATE LEAVE REQUEST", quotationData);
+        if (req.file) {
+            quotationData.quotation = await uploadImage(req.file.buffer); // Correct file handling for a single file
+        }
+        const quotation = new Quotation(quotationData);
         await quotation.save();
         res.status(201).json({ message: 'Quotation created successfully', quotation });
     } catch (error) {
@@ -35,12 +41,19 @@ exports.getQuotationById = async (req, res) => {
 // Update a quotation
 exports.updateQuotation = async (req, res) => {
     try {
-        const quotation = await Quotation.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const { id } = req.params;
+        const quotationData = req.body;
+        console.log("Update LEAVE REQUEST", quotationData);
+        if (req.file) {
+            quotationData.quotation = await uploadImage(req.file.buffer); // Correct file handling for a single file
+        }
+        const quotation = await Quotation.findByIdAndUpdate(id, quotationData, { new: true });
         if (!quotation) return res.status(404).json({ error: 'Quotation not found' });
         res.status(200).json({ message: 'Quotation updated successfully', quotation });
     } catch (error) {
-        res.status(500).json({ error: 'Error updating quotation', details: error.message });
-    }
+        console.error("Error updating Quotation:", error);
+        res.status(500).json({ error: "Failed to update Quotation." });
+      }
 };
 
 // Delete a quotation
