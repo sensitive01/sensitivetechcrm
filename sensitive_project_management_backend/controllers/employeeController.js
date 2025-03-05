@@ -325,6 +325,175 @@ const getAllEmployeesWithData = async (req, res) => {
   }
 };
 
+const getEmployeeDataById = async (req, res) => {
+  try {
+    const { empId } = req.params; // Get empId from URL parameters
+    if (!empId) {
+      return res.status(400).json({ success: false, error: 'Employee ID is required' });
+    }
+
+    const currentMonthData = getMonthDateRange(0);
+    const prevMonthData = getMonthDateRange(-1);
+
+    const employee = await Employee.findOne({ empId }, 'name empId department salary');
+    if (!employee) {
+      return res.status(404).json({ success: false, error: 'Employee not found' });
+    }
+
+    const fetchAttendanceData = async ({ firstDay, lastDay, totalDays }) => {
+      const attendanceRecords = await AttendanceModel.find({
+        employeeId: empId,
+        date: { $gte: firstDay, $lte: lastDay }
+      });
+
+      const present = attendanceRecords.filter(record => record.status === 'Present').length;
+      const absent = totalDays - present;
+
+      let lateDays = 0, lateMins = 0;
+      attendanceRecords.forEach(record => {
+        if (record.status === 'Present' && record.logintime) {
+          const loginTime = record.logintime;
+          const startTime = "09:30";
+
+          if (loginTime > startTime) {
+            lateDays++;
+
+            const [loginHour, loginMin] = loginTime.split(':').map(Number);
+            const [startHour, startMin] = startTime.split(':').map(Number);
+            let minutesLate = (loginHour * 60 + loginMin) - (startHour * 60 + startMin);
+
+            lateMins += Math.abs(minutesLate);
+          }
+        }
+      });
+
+      const lateHours = Math.floor(lateMins / 60);
+      const remainingMins = lateMins % 60;
+      const formattedLateTime = `${lateHours}h ${remainingMins}m`;
+
+      return {
+        totalDays,
+        present,
+        absent,
+        lateDays,
+        lateTime: formattedLateTime,
+        workingDays: present + absent
+      };
+    };
+
+    const currentAttendance = await fetchAttendanceData(currentMonthData);
+    const prevAttendance = await fetchAttendanceData(prevMonthData);
+
+    const fetchPayrollData = async (firstDay, lastDay) => {
+      const allowances = await Payroll.find({ empId: employee.name, type: 'Allowance' });
+      const deductions = await Payroll.find({ empId: employee.name, type: 'Deductions' });
+      const advances = await Payroll.find({ empId: employee.name, type: 'Advance' });
+
+      const totalAllowances = allowances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+      const totalDeductions = deductions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+      const totalAdvances = advances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+
+      const payable = employee.salary + totalAllowances - totalDeductions - totalAdvances;
+
+      return { totalAllowances, totalDeductions, totalAdvances, payable };
+    };
+
+    const currentPayroll = await fetchPayrollData(currentMonthData.firstDay, currentMonthData.lastDay);
+    const prevPayroll = await fetchPayrollData(prevMonthData.firstDay, prevMonthData.lastDay);
+
+    const fetchLeaveData = async (firstDay, lastDay) => {
+      const leaves = await LeaveModel.find({ employee: empId, startDate: { $gte: firstDay, $lte: lastDay } });
+      return leaves.length;
+    };
+
+    const currentLeaves = await fetchLeaveData(currentMonthData.firstDay, currentMonthData.lastDay);
+    const prevLeaves = await fetchLeaveData(prevMonthData.firstDay, prevMonthData.lastDay);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        name: employee.name,
+        empId: employee.empId,
+        department: employee.department,
+        salary: employee.salary,
+        currentMonth: {
+          ...currentAttendance,
+          ...currentPayroll,
+          leaves: currentLeaves
+        },
+        previousMonth: {
+          ...prevAttendance,
+          ...prevPayroll,
+          leaves: prevLeaves
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching employee data:', error);
+    res.status(500).json({ success: false, error: 'Server Error' });
+  }
+};
+
+const updateEmployeeDataById = async (req, res) => {
+  try {
+    const { empId } = req.params; // Get empId from URL parameters
+    const updateData = req.body; // Get data to update from request body
+
+    if (!empId) {
+      return res.status(400).json({ success: false, error: 'Employee ID is required' });
+    }
+
+    let updatedResponse = {};
+
+    // Update Employee Basic Info
+    if (updateData.name || updateData.department || updateData.salary) {
+      const updatedEmployee = await Employee.findOneAndUpdate(
+        { empId },
+        { $set: updateData },
+        { new: true, runValidators: true }
+      );
+      updatedResponse.employee = updatedEmployee;
+    }
+
+    // Update Attendance Data
+    if (updateData.attendance) {
+      await AttendanceModel.updateMany(
+        { employeeId: empId, date: { $gte: updateData.startDate, $lte: updateData.endDate } },
+        { $set: updateData.attendance }
+      );
+      updatedResponse.attendance = 'Updated successfully';
+    }
+
+    // Update Payroll Data
+    if (updateData.payroll) {
+      await Payroll.updateMany(
+        { empId },
+        { $set: updateData.payroll }
+      );
+      updatedResponse.payroll = 'Updated successfully';
+    }
+
+    // Update Leave Data
+    if (updateData.leave) {
+      await LeaveModel.updateMany(
+        { employee: empId },
+        { $set: updateData.leave }
+      );
+      updatedResponse.leave = 'Updated successfully';
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Employee data updated successfully',
+      data: updatedResponse
+    });
+
+  } catch (error) {
+    console.error('Error updating employee data:', error);
+    res.status(500).json({ success: false, error: 'Server Error' });
+  }
+};
 
 
 
@@ -339,5 +508,7 @@ module.exports = {
   getTotalEmployees,
   fetchAddressDetailsByPincode,
   getEmployeeDetailsById,
-  getAllEmployeesWithData
+  getAllEmployeesWithData,
+  getEmployeeDataById,
+  updateEmployeeDataById
 };

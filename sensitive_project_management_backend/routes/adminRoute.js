@@ -69,7 +69,8 @@ employeeRouter.get("/getaddressbypincode/:pincode", async (req, res) => {
 
 employeeRouter.get("/employeedetails/:id", Employee.getEmployeeDetailsById);
 employeeRouter.get('/allemployeesdata', Employee.getAllEmployeesWithData);
-
+employeeRouter.get('/employeedatabyid/:empId', Employee.getEmployeeDataById);
+employeeRouter.put('/employeeupdatedata/:empId', Employee.updateEmployeeDataById);
 
 
 
