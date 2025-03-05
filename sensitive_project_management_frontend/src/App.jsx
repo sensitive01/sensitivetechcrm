@@ -178,7 +178,7 @@ const RoutesWithPreloader = ({ role }) => {
                   {/* <Route path="/updatelog" element={<DispositionForm />} /> */}
                   <Route path="/payroll-table" element={<PayrollEmployee />} />
                   <Route path="/payroll-form" element={<PayrollForm />} />
-                  <Route path="/quotation-form" element={<QuotationForm />} />
+                  <Route path="/quotation-form/:id" element={<QuotationForm />} />
                   <Route path="/quotation-table" element={<QuotationTable />} />
                   <Route path="/quotation-edit/:id" element={<QuotationEdit />} />
                 </Routes>

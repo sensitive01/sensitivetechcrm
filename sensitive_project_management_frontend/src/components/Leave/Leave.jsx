@@ -25,19 +25,23 @@ function Leave() {
   });
 
   const [currentDate, setCurrentDate] = useState("");
-  const navigate = useNavigate();  
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchEmployees = async () => {
+    const fetchEmployeeData = async () => {
       try {
         setLoading(true);
-
         const response = await employeename(`${id}`);
         console.log("Employees fetched:", response);
 
         if (response) {
           setEmployees(response.data);
           setError(null);
+
+          if (role !== "Superadmin" && response.data.length > 0) {
+            // Automatically set the employee for Employee and Lead
+            setLeave((prev) => ({ ...prev, employee: response.data[0].name }));
+          }
         } else {
           throw new Error("Failed to fetch employees.");
         }
@@ -49,9 +53,10 @@ function Leave() {
       }
     };
 
-    fetchEmployees();
-    setCurrentDate(new Date().toISOString().split("T")[0]); 
+    fetchEmployeeData();
+    setCurrentDate(new Date().toISOString().split("T")[0]);
   }, [role, id]);
+
 
   const leaveTypes = ["Sick Leave", "Casual Leave", "Emergency Leave", "Others"];
 
@@ -83,10 +88,10 @@ function Leave() {
     try {
       const response = await axios.post(
         "https://sensitivetechcrm.onrender.com/leaves/create",
-        formData,  
+        formData,
         {
           headers: {
-            "Content-Type": "multipart/form-data", 
+            "Content-Type": "multipart/form-data",
           },
         }
       );
@@ -140,23 +145,36 @@ function Leave() {
         {/* Form Fields */}
         <div className="border border-blue-500 p-6 rounded-lg">
           <div className="space-y-8 pb-4">
-            <div>
-              <label className="block text-sm font-medium pb-4">Select Employee:</label>
-              <select
-                name="employee"
-                value={leave.employee}
-                onChange={handleChange}
-                required
-                className="border border-blue-300 p-2 w-full rounded"
-              >
-                <option value="">Select Employee</option>
-                {employees.map((employee) => (
-                  <option key={employee._id} value={employee.name}>
-                    {employee.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {role === "Superadmin" ? (
+              <div>
+                <label className="block text-sm font-medium pb-4">Select Employee:</label>
+                <select
+                  name="employee"
+                  value={leave.employee}
+                  onChange={handleChange}
+                  required
+                  className="border border-blue-300 p-2 w-full rounded"
+                >
+                  <option value="">Select Employee</option>
+                  {employees.map((employee) => (
+                    <option key={employee._id} value={employee.name}>
+                      {employee.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-sm font-medium pb-4">Employee Name:</label>
+                <input
+                  type="text"
+                  value={leave.employee}
+                  readOnly
+                  className="border border-blue-300 p-2 w-full rounded bg-gray-100"
+                />
+              </div>
+            )}
+
 
             {/* Leave or Permission Radio Buttons */}
             <div className="pb-4">
@@ -235,7 +253,7 @@ function Leave() {
                     onChange={handleChange}
                     className="border border-blue-300 p-2 w-full rounded"
                     required
-                    min={currentDate} 
+                    min={currentDate}
                   />
                   <span className="pt-2">to</span>
                   <input
@@ -245,7 +263,7 @@ function Leave() {
                     onChange={handleChange}
                     className="border border-blue-300 p-2 w-full rounded"
                     required
-                    min={currentDate} 
+                    min={currentDate}
                   />
                 </div>
               </div>
@@ -262,7 +280,7 @@ function Leave() {
                   onChange={handleChange}
                   className="border border-blue-300 p-2 w-full rounded"
                   required
-                  min={currentDate} 
+                  min={currentDate}
                 />
               </div>
             )}
@@ -276,7 +294,7 @@ function Leave() {
                     type="time"
                     name="startTime"
                     value={leave.startTime}
-                    onChange={handleChange} 
+                    onChange={handleChange}
                     className="border border-blue-300 p-2 w-full rounded"
                     required
                   />

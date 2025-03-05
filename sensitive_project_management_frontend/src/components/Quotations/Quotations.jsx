@@ -13,7 +13,7 @@ const QuotationForm = () => {
         company: '',
         quote: '',
         note: '',
-        quotation: '',
+        quotation: null,
         status: 'Pending',
         quotationDate: new Date().toISOString().split('T')[0],
         updateLog: ''
@@ -26,13 +26,28 @@ const QuotationForm = () => {
             [name]: value
         });
     };
+    const handleFileChange = (e) => {
+        setFormData({
+            ...formData,
+            quotation: e.target.files[0] // Store the selected file
+        });
+    };
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
+        // Create a FormData object
+        const formDataToSubmit = new FormData();
+
+        // Append all form fields to the FormData object
+        for (const key in formData) {
+            formDataToSubmit.append(key, formData[key]);
+        }
+
         try {
-            const response = await createQuotation(formData);
+            const response = await createQuotation(formDataToSubmit);
 
             if (response.status === 201 || response.status === 200) {
                 alert('Quotation created successfully!');
@@ -47,7 +62,6 @@ const QuotationForm = () => {
             setLoading(false);
         }
     };
-
     return (
         <div className="max-w-4xl mx-auto p-4 mt-24">
             <h2 className="text-4xl font-bold mb-10 text-center">Create New Quotation</h2>
@@ -163,17 +177,8 @@ const QuotationForm = () => {
                         ></textarea>
                     </div>
                     <div className="mb-4 md:col-span-2">
-                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="note">
-                            Quotation
-                        </label>
-                        <textarea
-                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-24"
-                            id="quotation"
-                            name="quotation"
-                            value={formData.quotation}
-                            onChange={handleChange}
-                            placeholder="Additional notes about the quotation"
-                        ></textarea>
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="quotation">Upload Quotation</label>
+                        <input className="shadow border rounded w-full py-2 px-3" id="quotation" type="file" name="quotation" accept=".pdf,.jpg,.png" onChange={handleFileChange} />
                     </div>
 
                     <div className="mb-4 md:col-span-2">

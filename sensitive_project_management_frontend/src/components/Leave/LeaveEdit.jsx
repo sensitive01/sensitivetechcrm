@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams,useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { employeename, getLeaveById } from "../../api/services/projectServices";
 
 function LeaveEdit() {
@@ -19,16 +19,16 @@ function LeaveEdit() {
     startTime: "",
     endTime: "",
   });
-   const [currentDate, setCurrentDate] = useState("");
-   const taskid = localStorage.getItem("empId");
-     const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
+  const [currentDate, setCurrentDate] = useState("");
+  const taskid = localStorage.getItem("empId");
+  const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
 
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const { id } = useParams();
-    const navigate = useNavigate();  
+  const navigate = useNavigate();
 
   // Define the leave types here
   const leaveTypes = ["Sick Leave", "Casual Leave", "Emergency Leave", "Others"];
@@ -62,7 +62,7 @@ function LeaveEdit() {
     };
 
     fetchEmployees();
-    setCurrentDate(new Date().toISOString().split("T")[0]); 
+    setCurrentDate(new Date().toISOString().split("T")[0]);
   }, [role, taskid]);
 
 
@@ -167,7 +167,7 @@ function LeaveEdit() {
           startTime: "",
           endTime: "",
         });
-        navigate("/leave-table"); 
+        navigate("/leave-table");
       } else {
         alert(`Error: ${response.statusText}`);
       }
@@ -201,23 +201,36 @@ function LeaveEdit() {
         {/* Form Fields */}
         <div className="border border-blue-500 p-6 rounded-lg">
           <div className="space-y-8 pb-4">
-            <div>
-              <label className="block text-sm font-medium pb-4">Select Employee:</label>
-              <select
-                name="employee"
-                value={leave.employee}
-                onChange={handleChange}
-                required
-                className="border border-blue-300 p-2 w-full rounded"
-              >
-                <option value="">Select Employee</option>
-                {employees.map((employee) => (
-                  <option key={employee._id} value={employee.name}>
-                    {employee.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {role === "Superadmin" ? (
+              <div>
+                <label className="block text-sm font-medium pb-4">Select Employee:</label>
+                <select
+                  name="employee"
+                  value={leave.employee}
+                  onChange={handleChange}
+                  required
+                  className="border border-blue-300 p-2 w-full rounded"
+                >
+                  <option value="">Select Employee</option>
+                  {employees.map((employee) => (
+                    <option key={employee._id} value={employee.name}>
+                      {employee.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-sm font-medium pb-4">Employee Name:</label>
+                <input
+                  type="text"
+                  value={leave.employee}
+                  readOnly
+                  className="border border-blue-300 p-2 w-full rounded bg-gray-100"
+                />
+              </div>
+            )}
+
 
             {/* Leave or Permission Radio Buttons */}
             <div className="pb-4">
@@ -250,7 +263,6 @@ function LeaveEdit() {
               </div>
             </div>
 
-            {/* Leave Type Dropdown (only shown if "Leave" is selected) */}
             {leave.leaveCategory === "Leave" && (
               <div>
                 <label className="block text-sm font-medium pb-4">Leave Type:</label>
@@ -271,8 +283,8 @@ function LeaveEdit() {
               </div>
             )}
 
-            {/* Custom Leave Type Textarea (only shown if "Others" is selected) */}
-            {leave.leaveCategory === "Leave" && leave.leaveType === "Others" && (
+            {/* Show custom leave type input if "Others" is selected */}
+            {leave.leaveType === "Others" && (
               <div>
                 <label className="block text-sm font-medium pb-4">Specify Leave Type:</label>
                 <textarea
@@ -285,7 +297,7 @@ function LeaveEdit() {
               </div>
             )}
 
-            {/* Leave Dates Input (only shown if "Leave" is selected) */}
+
             {leave.leaveCategory === "Leave" && (
               <div>
                 <label className="block text-sm font-medium pb-4">Leave Dates:</label>
@@ -297,7 +309,7 @@ function LeaveEdit() {
                     onChange={handleChange}
                     className="border border-blue-300 p-2 w-full rounded"
                     required
-                    min={currentDate} 
+                    min={currentDate}
                   />
                   <span className="pt-2">to</span>
                   <input
@@ -307,7 +319,7 @@ function LeaveEdit() {
                     onChange={handleChange}
                     className="border border-blue-300 p-2 w-full rounded"
                     required
-                    min={currentDate} 
+                    min={currentDate}
                   />
                 </div>
               </div>
@@ -324,8 +336,34 @@ function LeaveEdit() {
                   onChange={handleChange}
                   className="border border-blue-300 p-2 w-full rounded"
                   required
-                  min={currentDate} 
+                  min={currentDate}
                 />
+              </div>
+            )}
+
+            {/* Time Range Input (only shown if "Permission" is selected) */}
+            {leave.leaveCategory === "Permission" && (
+              <div>
+                <label className="block text-sm font-medium pb-4">Time Range:</label>
+                <div className="flex space-x-4">
+                  <input
+                    type="time"
+                    name="startTime"
+                    value={leave.startTime}
+                    onChange={handleChange}
+                    className="border border-blue-300 p-2 w-full rounded"
+                    required
+                  />
+                  <span className="pt-2">to</span>
+                  <input
+                    type="time"
+                    name="endTime"
+                    value={leave.endTime}
+                    onChange={handleChange}
+                    className="border border-blue-300 p-2 w-full rounded"
+                    required
+                  />
+                </div>
               </div>
             )}
           </div>

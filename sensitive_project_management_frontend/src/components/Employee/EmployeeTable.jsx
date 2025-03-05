@@ -23,6 +23,7 @@ const Modal = ({ isOpen, onClose, children }) => {
 // Employee Details Modal Component
 const EmployeeDetailsModal = ({ isOpen, onClose, employee }) => {
   if (!employee) return null;
+  const combinedShiftTime = `${employee.shiftStartTime} to ${employee.shiftEndTime}`;
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -56,6 +57,8 @@ const EmployeeDetailsModal = ({ isOpen, onClose, employee }) => {
               <DetailItem label="Date of Joining" value={formatDate(employee.doj)} />
               <DetailItem label="Status" value={employee.status} />
               <DetailItem label="Created Date" value={formatDateTime(employee.createdAt)} />
+              <DetailItem label="Shift Date" value={formatDate(employee.shiftDate)} />
+              <DetailItem label="Shift Time" value={combinedShiftTime} /> {/* Combined Shift Time */}
             </div>
           </div>
         </div>
@@ -344,7 +347,7 @@ const EmployeeTable = () => {
               id="startDate"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-             
+
               className="border border-blue-500 p-2 rounded w-32"
             />
           </div>
@@ -355,7 +358,7 @@ const EmployeeTable = () => {
               id="endDate"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-             
+
               className="border border-blue-500 p-2 rounded w-32"
             />
           </div>

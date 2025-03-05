@@ -264,7 +264,6 @@ const LeaveTable = () => {
                         className="text-green-500 hover:bg-green-100 p-2 rounded-full transition-colors"
                         title="Edit Leave"
                         onClick={() => handleEdit(row.original._id)}
-                        disabled={role !== "Superadmin"}  // Disable for non-Superadmins
                     >
                         <Edit size={20} />
                     </button>
@@ -272,7 +271,6 @@ const LeaveTable = () => {
                         className="text-red-500 hover:bg-red-100 p-2 rounded-full transition-colors"
                         title="Delete Leave"
                         onClick={() => handleDelete(row.original._id)}
-                        disabled={role !== "Superadmin"}
                     >
                         <Trash2 size={20} />
                     </button>

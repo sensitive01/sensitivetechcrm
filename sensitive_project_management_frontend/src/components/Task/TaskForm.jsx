@@ -14,7 +14,7 @@ function TaskForm() {
       date: "",
       attachments: null,
     },
-    
+
   ]);
 
   const id = localStorage.getItem("empId");
@@ -60,7 +60,7 @@ function TaskForm() {
     };
 
     fetchData();
-  },[role, id]);
+  }, [role, id]);
 
 
 
@@ -105,7 +105,7 @@ function TaskForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       for (const formTask of tasks) {
         const formData = new FormData();
@@ -116,7 +116,7 @@ function TaskForm() {
         formData.append("timeline", formTask.timeline);
         formData.append("status", formTask.status);
         formData.append("date", formTask.date);
-  
+
         // Append files properly
         if (formTask.attachments) {
           Array.from(formTask.attachments).forEach((file) => {
@@ -125,9 +125,9 @@ function TaskForm() {
         } else {
           formData.append("attachments", ""); // Ensure backend gets at least an empty string
         }
-  
+
         const response = await createTask(formData);
-  
+
         if (response.status === 201) {
           alert("Task created successfully!");
         } else {
@@ -139,7 +139,7 @@ function TaskForm() {
       alert("An error occurred while creating the tasks.");
     }
   };
-  
+
   if (loading) {
     return (
       <div className="container mx-auto p-8 mt-20 text-center">
@@ -203,6 +203,7 @@ function TaskForm() {
 
               {/* EmpID */}
               <div>
+
                 <label className="block text-sm font-medium pb-2 text-gray-600">Employee:</label>
                 <select
                   name="empId"

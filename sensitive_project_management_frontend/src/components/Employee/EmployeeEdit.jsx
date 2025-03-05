@@ -9,6 +9,7 @@ const EmployeeEdit = () => {
   const { id } = useParams();
   console.log(id)
   const [showPassword, setShowPassword] = useState(false);
+    const [profileImagePreview, setProfileImagePreview] = useState(null);
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -58,6 +59,10 @@ const EmployeeEdit = () => {
     addressProofNumber: '',
     addressProofFile: null,
     password: '',
+    profileImage: null, 
+    shiftStartTime: '',
+    shiftEndTime: '',
+    shiftDate: '',
     status: 'Active'
   });
   const [loading, setLoading] = useState(true);
@@ -98,12 +103,42 @@ const EmployeeEdit = () => {
     }
   };
 
+  // const handleFileChange = (e) => {
+  //   const { name, files } = e.target;
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     [name]: files[0]
+  //   }));
+  // };
+
   const handleFileChange = (e) => {
     const { name, files } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: files[0]
-    }));
+    
+    // Special handling for profile image
+    if (name === 'profileImage') {
+      const file = files[0];
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: file
+      }));
+
+      // Create image preview
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setProfileImagePreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setProfileImagePreview(null);
+      }
+    } else {
+      // Existing file change handling for other files
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: files[0]
+      }));
+    }
   };
 
   const handleAddressChange = (e, type) => {
@@ -130,6 +165,7 @@ const EmployeeEdit = () => {
         const employeeData = response.data;
         const { formatted: dobFormatted, isoDate: dobIso } = formatDate(employeeData.dob);
         const { formatted: dojFormatted, isoDate: dojIso } = formatDate(employeeData.doj);
+        const { formatted: shiftDateFormatted, isoDate: shiftDateIso } = formatDate(employeeData.shiftDate); 
 
         // Ensure ID Proof Type and Address Proof Type are included in response data
         setFormData((prevData) => ({
@@ -138,8 +174,9 @@ const EmployeeEdit = () => {
           dob: dobIso,
           dobFormatted,
           doj: dojIso,
-          dojFormatted
-
+          dojFormatted,
+          shiftDate: shiftDateIso,
+          shiftDateFormatted,
         }));
       } catch (err) {
         setError(err.message);
@@ -173,24 +210,72 @@ const EmployeeEdit = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent page reload on form submission
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault(); // Prevent page reload on form submission
 
-    console.log(formData);
-    try {
-      const response = await axios.post(
-        "https://sensitivetechcrm.onrender.com/createemployee",
-        formData
-      );
-      console.log("Response:", response.data);
-      alert("Form submitted successfully!");
-    } catch (error) {
-      console.error("Error:", error);
-      alert("Failed to submit the form.");
+  //   console.log(formData);
+  //   try {
+  //     const response = await axios.post(
+  //       "https://sensitivetechcrm.onrender.com/createemployee",
+  //       formData
+  //     );
+  //     console.log("Response:", response.data);
+  //     alert("Form submitted successfully!");
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //     alert("Failed to submit the form.");
+  //   }
+  // };
+
+ 
+
+ 
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  // Create a FormData object
+  const formDataToSubmit = new FormData();
+
+  // Append all form fields to FormData
+  Object.keys(formData).forEach(key => {
+    if (key === 'presentAddress' || key === 'permanentAddress') {
+      // Append nested address objects
+      Object.keys(formData[key]).forEach(addressKey => {
+        formDataToSubmit.append(`${key}[${addressKey}]`, formData[key][addressKey]);
+      });
+    } else if (formData[key] instanceof File) {
+      // Handle file uploads
+      formDataToSubmit.append(key, formData[key]);
+    } else {
+      formDataToSubmit.append(key, formData[key]);
     }
-  };
+  });
 
+  try {
+    const response = await axios.patch(
+     `https://sensitivetechcrm.onrender.com/updateemployee/${id}`, 
+      formDataToSubmit,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
+    );
 
+    console.log("Response:", response.data);
+    alert("Form submitted successfully!");
+
+    // Store user details in localStorage
+    localStorage.setItem("empName", formData.name);
+    localStorage.setItem("empEmail", formData.email);
+    localStorage.setItem("empPassword", formData.password);
+    localStorage.setItem("role", formData.role);
+
+  } catch (error) {
+    console.error("Error:", error.response ? error.response.data : error);
+    alert(`Failed to submit the form: ${error.response ? error.response.data.error : 'Unknown error'}`);
+  }
+};
 
   return (
     <div className="container mx-auto p-6 mt-20">
@@ -431,6 +516,28 @@ const EmployeeEdit = () => {
               />
             </div>
 
+            <div className="mb-6">
+            <label className="block font-semibold mb-2">Profile Image</label>
+            <div className="flex items-center space-x-4">
+              <input
+                type="file"
+                name="profileImage"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="w-full px-4 py-2 border rounded-md"
+              />
+              {profileImagePreview && (
+                <div className="w-24 h-24 rounded-full overflow-hidden">
+                  <img 
+                    src={profileImagePreview} 
+                    alt="Profile Preview" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
             <div>
               <label className="block font-semibold">Qualification</label>
               <input
@@ -515,6 +622,47 @@ const EmployeeEdit = () => {
                 <option value="Divorced">Divorced</option>
                 <option value="Widowed">Widowed</option>
               </select>
+            </div>
+
+            <div className="col-span-3">
+              <label className="block font-semibold ">Shift Date and Time</label>
+              <div className="border border-gray-300 p-4 rounded-md mt-2 w-1/2">
+                <div className="flex items-center space-x-4">
+                  <div className="flex-1">
+                    <label className="block">Shift Date</label>
+                    <input
+                      type="date"
+                      name="shiftDate"
+                      value={formData.shiftDate}
+                      onChange={handleChange}
+                      className="w-full px-4 py-2 border rounded-md"
+                      required
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <label className="block">Shift Time</label>
+                    <div className="flex space-x-2">
+                      <input
+                        type="time"
+                        name="shiftStartTime"
+                        value={formData.shiftStartTime}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border rounded-md"
+                        required
+                      />
+                      <span className="self-center">to</span>
+                      <input
+                        type="time"
+                        name="shiftEndTime"
+                        value={formData.shiftEndTime}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border rounded-md"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="col-span-3">

@@ -1,11 +1,10 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { useTable, useGlobalFilter, useSortBy, usePagination } from 'react-table';
 import { Eye, Trash } from 'lucide-react';
 import { FaFileDownload, FaFilter } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import { deleteQuotations, getTotalQuotations } from '../../api/services/projectServices';
-
 
 const QuotationTable = () => {
     const [quotations, setQuotations] = useState([]);
@@ -60,7 +59,6 @@ const QuotationTable = () => {
         }
     };
     
-
     const closeModal = () => {
         setIsModalOpen(false);
         setSelectedQuotation(null);
@@ -100,7 +98,22 @@ const QuotationTable = () => {
         { Header: 'Tech Stack', accessor: 'techStack' },
         { Header: 'Quote', accessor: 'quote' },
         { Header: 'Note', accessor: 'note' },
-        { Header: 'Quotation', accessor: 'quotation' },
+        {
+            Header: 'Quotation',
+            accessor: 'quotation',
+            Cell: ({ value }) => (
+                value ? (
+                    <a 
+                        href={value} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-blue-500 underline"
+                    >
+                        {value.split('/').pop()} {/* Display the file name */}
+                    </a>
+                ) : 'N/A'
+            ),
+        },
         { Header: 'Status', accessor: 'status' },
         {
             Header: 'Quotation Date & Time',
@@ -117,25 +130,6 @@ const QuotationTable = () => {
                 ),
             id: 'date_time',
         },
-        
-        // {
-        //     Header: 'Quotation Time',
-        //     accessor: 'quotationDate',
-        //     Cell: ({ value }) => value ? new Date(value).toLocaleTimeString() : 'N/A',
-        //     id: 'time',
-        // },
-        // {
-        //     Header: 'Update Date',
-        //     accessor: 'updatedAt',
-        //     Cell: ({ value }) => (value ? new Date(value).toLocaleDateString('en-GB') : 'N/A'),
-        //     id: 'updateDate',
-        // },
-        // {
-        //     Header: 'Update Time',
-        //     accessor: 'updatedAt',
-        //     Cell: ({ value }) => (value ? new Date(value).toLocaleTimeString() : 'N/A'),
-        //     id: 'updateTime',
-        // },
         {
             Header: 'Actions',
             accessor: '_id',
@@ -155,7 +149,6 @@ const QuotationTable = () => {
                     >
                         <Trash size={20} />
                     </button>
-
                 </div>
             ),
         },
@@ -347,6 +340,19 @@ const QuotationTable = () => {
                                         <p><strong>Date:</strong> {new Date(selectedQuotation.quotationDate || selectedQuotation.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' })}</p>
                                         <p><strong>Notes:</strong> {selectedQuotation.note}</p>
                                         <p><strong>Update Log:</strong> {selectedQuotation.updateLog}</p>
+                                        {selectedQuotation.quotation && (
+                                            <p>
+                                                <strong>Quotation File:</strong> 
+                                                <a 
+                                                    href={selectedQuotation.quotation} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer" 
+                                                    className="text-blue-500 underline"
+                                                >
+                                                    {selectedQuotation.quotation.split('/').pop()}
+                                                </a>
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             )}
