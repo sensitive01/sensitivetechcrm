@@ -40,6 +40,9 @@ const EmployeeSchema = new mongoose.Schema({
   profileImage:{ type: String, },
   password: { type: String,  },
   status: { type: String, default: "Active" },
+  shiftStartTime: { type: String, required: true }, 
+  shiftEndTime: { type: String, required: true }, 
+  shiftDate: { type: Date, required: true },   
 }, { timestamps: true });                     
 
 
