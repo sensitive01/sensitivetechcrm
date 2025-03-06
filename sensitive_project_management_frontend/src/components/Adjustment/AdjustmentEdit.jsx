@@ -5,6 +5,8 @@ import { useParams } from "react-router-dom";
 function AdjustmentEdit({payrollId}) {
     const {id} = useParams();
     console.log(id);
+    const empid = localStorage.getItem("empId");
+    const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
     const [payrolls, setPayrolls] = useState([
         {
             empId: "",
@@ -21,7 +23,7 @@ function AdjustmentEdit({payrollId}) {
         const fetchEmployees = async () => {
             try {
                 setLoading(true);
-                const employeesResponse = await employeename();
+                const employeesResponse = await employeename(`${empid}`);
                 console.log(employeesResponse.data)
                 setEmployees(employeesResponse.data);
                 setError(null);

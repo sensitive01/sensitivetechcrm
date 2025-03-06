@@ -1,228 +1,13 @@
-// // AttendanceForm.jsx
-// import React, { useState } from 'react';
-
-// const PayrollForm = ({ onSubmit }) => {
-//   const [formData, setFormData] = useState({
-//     name: '',
-//     employeeId: '',
-//     branch: '',
-//     workingDays: 28,
-//     salary: 0,
-//     present: 0,
-//     absent: 0,
-//     lateDays: 0,
-//     lateMins: 0,
-//     allowances: 0,
-//     deductions: 0,
-//     advance: 0
-//   });
-
-//   const handleChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData({
-//       ...formData,
-//       [name]: name === 'name' || name === 'employeeId' || name === 'branch' 
-//         ? value 
-//         : Number(value)
-//     });
-//   };
-
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     const payable = formData.salary + formData.allowances - formData.deductions - formData.advance;
-//     onSubmit({ ...formData, payable });
-//   };
-
-//   return (
-//     <div className="bg-white p-6 rounded-lg shadow mb-6">
-//       <h2 className="text-xl font-semibold text-gray-800 mb-4 mt-24">Add Payroll Record</h2>
-      
-//       <form onSubmit={handleSubmit}>
-//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-//           <div>
-//             <label className="block text-sm font-medium text-gray-700 mb-1">
-//               Name
-//             </label>
-//             <input
-//               type="text"
-//               name="name"
-//               value={formData.name}
-//               onChange={handleChange}
-//               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               required
-//             />
-//           </div>
-          
-//           <div>
-//             <label className="block text-sm font-medium text-gray-700 mb-1">
-//               Employee ID
-//             </label>
-//             <input
-//               type="text"
-//               name="employeeId"
-//               value={formData.employeeId}
-//               onChange={handleChange}
-//               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               required
-//             />
-//           </div>
-          
-//           <div>
-//             <label className="block text-sm font-medium text-gray-700 mb-1">
-//               Branch
-//             </label>
-//             <input
-//               type="text"
-//               name="branch"
-//               value={formData.branch}
-//               onChange={handleChange}
-//               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-//             />
-//           </div>
-          
-//           <div>
-//             <label className="block text-sm font-medium text-gray-700 mb-1">
-//               Working Days
-//             </label>
-//             <input
-//               type="number"
-//               name="workingDays"
-//               value={formData.workingDays}
-//               onChange={handleChange}
-//               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               required
-//             />
-//           </div>
-          
-//           <div>
-//             <label className="block text-sm font-medium text-gray-700 mb-1">
-//               Salary
-//             </label>
-//             <input
-//               type="number"
-//               name="salary"
-//               value={formData.salary}
-//               onChange={handleChange}
-//               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-//               required
-//             />
-//           </div>
-          
-//           <div>
-//             <label className="block text-sm font-medium text-gray-700 mb-1">
-//               Present
-//             </label>
-//             <input
-//               type="number"
-//               name="present"
-//               value={formData.present}
-//               onChange={handleChange}
-//               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-//             />
-//           </div>
-          
-//           <div>
-//             <label className="block text-sm font-medium text-gray-700 mb-1">
-//               Absent
-//             </label>
-//             <input
-//               type="number"
-//               name="absent"
-//               value={formData.absent}
-//               onChange={handleChange}
-//               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-//             />
-//           </div>
-          
-//           <div>
-//             <label className="block text-sm font-medium text-gray-700 mb-1">
-//               Late Days
-//             </label>
-//             <input
-//               type="number"
-//               name="lateDays"
-//               value={formData.lateDays}
-//               onChange={handleChange}
-//               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-//             />
-//           </div>
-          
-//           <div>
-//             <label className="block text-sm font-medium text-gray-700 mb-1">
-//               Late Mins
-//             </label>
-//             <input
-//               type="number"
-//               name="lateMins"
-//               value={formData.lateMins}
-//               onChange={handleChange}
-//               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-//             />
-//           </div>
-          
-//           <div>
-//             <label className="block text-sm font-medium text-gray-700 mb-1">
-//               Allowances
-//             </label>
-//             <input
-//               type="number"
-//               name="allowances"
-//               value={formData.allowances}
-//               onChange={handleChange}
-//               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-//             />
-//           </div>
-          
-//           <div>
-//             <label className="block text-sm font-medium text-gray-700 mb-1">
-//               Deductions
-//             </label>
-//             <input
-//               type="number"
-//               name="deductions"
-//               value={formData.deductions}
-//               onChange={handleChange}
-//               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-//             />
-//           </div>
-          
-//           <div>
-//             <label className="block text-sm font-medium text-gray-700 mb-1">
-//               Advance
-//             </label>
-//             <input
-//               type="number"
-//               name="advance"
-//               value={formData.advance}
-//               onChange={handleChange}
-//               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-//             />
-//           </div>
-//         </div>
-        
-//         <div className="flex justify-end">
-//           <button
-//             type="submit"
-//             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-//           >
-//             Submit
-//           </button>
-//         </div>
-//       </form>
-//     </div>
-//   );
-// };
-
-// export default PayrollForm;
-
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useParams } from "react-router-dom";
 
-const PayrollForm = ({ employeeId, onSubmit }) => {
+const PayrollForm = ({ onSubmit }) => {
+  const { id } = useParams();
+  
   const [formData, setFormData] = useState({
     name: "",
-    employeeId: "",
+    empId: "",
     branch: "",
     workingDays: 28,
     salary: 0,
@@ -238,42 +23,51 @@ const PayrollForm = ({ employeeId, onSubmit }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch employee data when employeeId is provided
   useEffect(() => {
-    if (employeeId) {
+    if (id) {
       setLoading(true);
+      console.log("Fetching data for employee:", id);
+  
       axios
-        .get(`https://sensitivetechcrm.onrender.com/employeedatabyid/${employeeId}`)
+        .get(`https://sensitivetechcrm.onrender.com/employeedatabyid/${id}`)
         .then((response) => {
-          const data = response.data;
-          setFormData({
-            name: data.name || "",
-            employeeId: data.employeeId || "",
-            branch: data.branch || "",
-            workingDays: data.workingDays || 28,
-            salary: data.salary || 0,
-            present: data.present || 0,
-            absent: data.absent || 0,
-            lateDays: data.lateDays || 0,
-            lateMins: data.lateMins || 0,
-            allowances: data.allowances || 0,
-            deductions: data.deductions || 0,
-            advance: data.advance || 0,
-          });
+          console.log("API Response:", response.data);
+  
+          if (response.data.success) {
+            const data = response.data.data;
+            setFormData({
+              name: data.name || "",
+              empId: data.empId || "",
+              branch: data.department || "", // 'department' in API maps to 'branch' in your form
+              workingDays: data.currentMonth.workingDays || 28,
+              salary: Number(data.salary) || 0,
+              present: data.currentMonth.present || 0,
+              absent: data.currentMonth.absent || 0,
+              lateDays: data.currentMonth.lateDays || 0,
+              lateMins: parseInt(data.currentMonth.lateTime) || 0, // Parse lateTime if needed
+              allowances: data.currentMonth.totalAllowances || 0,
+              deductions: data.currentMonth.totalDeductions || 0,
+              advance: data.currentMonth.totalAdvances || 0,
+            });
+          } else {
+            setError("Invalid employee data");
+          }
+  
           setLoading(false);
         })
         .catch((err) => {
+          console.error("Error fetching employee data:", err);
           setError("Failed to fetch employee data");
           setLoading(false);
         });
     }
-  }, [employeeId]);
-
+  }, [id]);
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: ["name", "employeeId", "branch"].includes(name) ? value : Number(value),
+      [name]: ["name", "empId", "branch"].includes(name) ? value : Number(value),
     });
   };
 
@@ -297,7 +91,7 @@ const PayrollForm = ({ employeeId, onSubmit }) => {
                 {key.charAt(0).toUpperCase() + key.slice(1)}
               </label>
               <input
-                type={["name", "employeeId", "branch"].includes(key) ? "text" : "number"}
+                type={["name", "empId", "branch"].includes(key) ? "text" : "number"}
                 name={key}
                 value={formData[key]}
                 onChange={handleChange}

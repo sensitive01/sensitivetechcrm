@@ -83,7 +83,7 @@ const LeaveTable = () => {
     const exportToExcel = () => {
         const exportData = leaves.map((leave, index) => ({
             'S.No': index + 1,
-            'Leave ID': leave.leaveId,
+            'Leave ID': leave.row._id,
             'Name': leave.employee,
             'Running Projects': leave.runningProjects,
             'Leave Dates': leave.leaveDates,
@@ -106,16 +106,15 @@ const LeaveTable = () => {
             return;
         }
 
-        // Convert dates to Date objects for comparison
         const start = new Date(startDate);
         const end = new Date(endDate);
 
         const filteredLeaves = leaves.filter((leave) => {
-            const leaveDate = new Date(leave.leaveAppliedOn); // Or another date property
+            const leaveDate = new Date(leave.leaveAppliedOn);
             return leaveDate >= start && leaveDate <= end;
         });
 
-        setLeaves(filteredLeaves); // Update the leaves state with the filtered results
+        setLeaves(filteredLeaves); 
     };
 
 
@@ -231,7 +230,7 @@ const LeaveTable = () => {
         },
 
         {
-            Header: 'Leave Applied On',
+            Header: 'Leave Type',
             accessor: 'leaveType',
         },
         {

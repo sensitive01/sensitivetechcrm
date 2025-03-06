@@ -10,6 +10,8 @@ function Adjustment() {
             note: "",
         },
     ]);
+    const empid = localStorage.getItem("empId");
+    const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
 
     const [employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -19,7 +21,7 @@ function Adjustment() {
         const fetchEmployees = async () => {
             try {
                 setLoading(true);
-                const employeesResponse = await employeename();
+                const employeesResponse = await employeename(`${empid}`);
                 setEmployees(employeesResponse.data);
                 setError(null);
             } catch (error) {

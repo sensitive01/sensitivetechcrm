@@ -117,7 +117,7 @@ const PayrollEmployee = () => {
   const previousMonthName = getMonthName(1);
 
   const handleEdit = (empId) => {
-    navigate(`/quotation-form/${empId}`);
+    navigate(`/payroll-form/${empId}`);
   };
 
   return (

@@ -3,12 +3,12 @@ import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo light.png";
 import axios from "axios";
 import { verifyLogin } from "../../api/services/projectServices";
-import { Eye, EyeOff } from "lucide-react"; // Import Eye and EyeOff icons from lucide-react
+import { Eye, EyeOff } from "lucide-react";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -23,10 +23,6 @@ const LoginPage = () => {
     try {
 
       const response = await verifyLogin(formData);
-      
-      
-      //console.log(response);
-
       if (response.status === 200) {
         const { _id, role } = response.data.employee || response.data.admin;
         localStorage.setItem("empId", _id);
@@ -51,7 +47,7 @@ const LoginPage = () => {
   };
 
   const togglePasswordVisibility = () => {
-    setShowPassword((prevState) => !prevState); // Toggle password visibility
+    setShowPassword((prevState) => !prevState);
   };
 
   return (
@@ -87,7 +83,7 @@ const LoginPage = () => {
               Password
             </label>
             <input
-              type={showPassword ? "text" : "password"} // Toggle between password and text input
+              type={showPassword ? "text" : "password"}
               id="password"
               name="password"
               value={formData.password}
@@ -100,9 +96,9 @@ const LoginPage = () => {
               onClick={togglePasswordVisibility}
             >
               {showPassword ? (
-                <EyeOff className="text-blue-500" /> // Blue icon for hidden password
+                <EyeOff className="text-blue-500" />
               ) : (
-                <Eye className="text-blue-500" /> // Blue icon for visible password
+                <Eye className="text-blue-500" />
               )}
             </div>
             <div className="mt-2 text-right">
