@@ -327,39 +327,55 @@ const getAllEmployeesWithData = async (req, res) => {
 
 const getEmployeeDataById = async (req, res) => {
   try {
-    const { empId } = req.params; // Get empId from URL parameters
+    const { empId } = req.params;
     if (!empId) {
-      return res.status(400).json({ success: false, error: 'Employee ID is required' });
+      return res.status(400).json({ success: false, error: "Employee ID is required" });
     }
 
     const currentMonthData = getMonthDateRange(0);
     const prevMonthData = getMonthDateRange(-1);
 
-    const employee = await Employee.findOne({ empId }, 'name empId department salary');
+    const employee = await Employee.findOne(
+      { empId },
+      "name empId department salary shiftStartTime shiftEndTime"
+    );
     if (!employee) {
-      return res.status(404).json({ success: false, error: 'Employee not found' });
+      return res.status(404).json({ success: false, error: "Employee not found" });
     }
 
-    const fetchAttendanceData = async ({ firstDay, lastDay, totalDays }) => {
+    const convertTo24HourFormat = (timeStr) => {
+      const [time, modifier] = timeStr.split(" ");
+      let [hours, minutes, seconds] = time.split(":").map(Number);
+
+      if (modifier === "PM" && hours !== 12) hours += 12;
+      if (modifier === "AM" && hours === 12) hours = 0;
+
+      return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+    };
+
+    const fetchAttendanceData = async ({ firstDay, lastDay, totalDays }, employee) => {
       const attendanceRecords = await AttendanceModel.find({
-        employeeId: empId,
-        date: { $gte: firstDay, $lte: lastDay }
+        employeeId: employee.empId,
+        date: { $gte: firstDay, $lte: lastDay },
       });
 
-      const present = attendanceRecords.filter(record => record.status === 'Present').length;
+      const present = attendanceRecords.filter((record) => record.status === "Present").length;
       const absent = totalDays - present;
 
-      let lateDays = 0, lateMins = 0;
-      attendanceRecords.forEach(record => {
-        if (record.status === 'Present' && record.logintime) {
-          const loginTime = record.logintime;
-          const startTime = "09:30";
+      let lateDays = 0,
+        lateMins = 0;
 
-          if (loginTime > startTime) {
+      attendanceRecords.forEach((record) => {
+        if (record.status === "Present" && record.logintime) {
+          const loginTime = convertTo24HourFormat(record.logintime); // Convert loginTime to 24-hour format
+          const shiftStartTime = employee.shiftStartTime; // 24-hour format
+          const shiftEndTime = employee.shiftEndTime; // 24-hour format
+
+          if (loginTime > shiftStartTime && loginTime < shiftEndTime) {
             lateDays++;
 
-            const [loginHour, loginMin] = loginTime.split(':').map(Number);
-            const [startHour, startMin] = startTime.split(':').map(Number);
+            const [loginHour, loginMin] = loginTime.split(":").map(Number);
+            const [startHour, startMin] = shiftStartTime.split(":").map(Number);
             let minutesLate = (loginHour * 60 + loginMin) - (startHour * 60 + startMin);
 
             lateMins += Math.abs(minutesLate);
@@ -369,7 +385,7 @@ const getEmployeeDataById = async (req, res) => {
 
       const lateHours = Math.floor(lateMins / 60);
       const remainingMins = lateMins % 60;
-      const formattedLateTime = `${lateHours}h ${remainingMins}m`;
+      const formattedLateTime = lateMins > 0 ? `${lateHours}h ${remainingMins}m` : "0h 0m";
 
       return {
         totalDays,
@@ -377,17 +393,17 @@ const getEmployeeDataById = async (req, res) => {
         absent,
         lateDays,
         lateTime: formattedLateTime,
-        workingDays: present + absent
+        workingDays: present + absent,
       };
     };
 
-    const currentAttendance = await fetchAttendanceData(currentMonthData);
-    const prevAttendance = await fetchAttendanceData(prevMonthData);
+    const currentAttendance = await fetchAttendanceData(currentMonthData, employee);
+    const prevAttendance = await fetchAttendanceData(prevMonthData, employee);
 
     const fetchPayrollData = async (firstDay, lastDay) => {
-      const allowances = await Payroll.find({ empId: employee.name, type: 'Allowance' });
-      const deductions = await Payroll.find({ empId: employee.name, type: 'Deductions' });
-      const advances = await Payroll.find({ empId: employee.name, type: 'Advance' });
+      const allowances = await Payroll.find({ empId: employee.name, type: "Allowance" });
+      const deductions = await Payroll.find({ empId: employee.name, type: "Deductions" });
+      const advances = await Payroll.find({ empId: employee.name, type: "Advance" });
 
       const totalAllowances = allowances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
       const totalDeductions = deductions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
@@ -419,21 +435,21 @@ const getEmployeeDataById = async (req, res) => {
         currentMonth: {
           ...currentAttendance,
           ...currentPayroll,
-          leaves: currentLeaves
+          leaves: currentLeaves,
         },
         previousMonth: {
           ...prevAttendance,
           ...prevPayroll,
-          leaves: prevLeaves
-        }
-      }
+          leaves: prevLeaves,
+        },
+      },
     });
-
   } catch (error) {
-    console.error('Error fetching employee data:', error);
-    res.status(500).json({ success: false, error: 'Server Error' });
+    console.error("Error fetching employee data:", error);
+    res.status(500).json({ success: false, error: "Server Error" });
   }
 };
+
 
 // const updateEmployeeDataById = async (req, res) => {
 //   try {
@@ -494,6 +510,7 @@ const getEmployeeDataById = async (req, res) => {
 //     res.status(500).json({ success: false, error: 'Server Error' });
 //   }
 // };
+
 const updateEmployeeDataById = async (req, res) => {
   try {
     const { empId } = req.params;
