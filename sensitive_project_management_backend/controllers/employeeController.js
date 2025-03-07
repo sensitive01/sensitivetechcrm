@@ -344,6 +344,11 @@ const getEmployeeDataById = async (req, res) => {
     }
 
     const convertTo24HourFormat = (timeStr) => {
+      if (!timeStr) return null;
+      
+      // Check if already in 24-hour format
+      if (!timeStr.includes(" ")) return timeStr;
+      
       const [time, modifier] = timeStr.split(" ");
       let [hours, minutes, seconds] = time.split(":").map(Number);
 
@@ -362,16 +367,14 @@ const getEmployeeDataById = async (req, res) => {
       const present = attendanceRecords.filter((record) => record.status === "Present").length;
       const absent = totalDays - present;
 
-      let lateDays = 0,
-        lateMins = 0;
+      let lateDays = 0, lateMins = 0;
 
       attendanceRecords.forEach((record) => {
         if (record.status === "Present" && record.logintime) {
-          const loginTime = convertTo24HourFormat(record.logintime); // Convert loginTime to 24-hour format
-          const shiftStartTime = employee.shiftStartTime; // 24-hour format
-          const shiftEndTime = employee.shiftEndTime; // 24-hour format
+          const loginTime = convertTo24HourFormat(record.logintime);
+          const shiftStartTime = employee.shiftStartTime || "09:30"; // Default if not set
 
-          if (loginTime > shiftStartTime && loginTime < shiftEndTime) {
+          if (loginTime && loginTime > shiftStartTime) {
             lateDays++;
 
             const [loginHour, loginMin] = loginTime.split(":").map(Number);
@@ -397,33 +400,65 @@ const getEmployeeDataById = async (req, res) => {
       };
     };
 
-    const currentAttendance = await fetchAttendanceData(currentMonthData, employee);
-    const prevAttendance = await fetchAttendanceData(prevMonthData, employee);
-
     const fetchPayrollData = async (firstDay, lastDay) => {
-      const allowances = await Payroll.find({ empId: employee.name, type: "Allowance" });
-      const deductions = await Payroll.find({ empId: employee.name, type: "Deductions" });
-      const advances = await Payroll.find({ empId: employee.name, type: "Advance" });
+      // Filter payroll records by createdAt timestamp
+      const allowances = await Payroll.find({ 
+        empId: employee.name, 
+        type: "Allowance",
+        createdAt: { $gte: firstDay, $lte: lastDay }
+      });
+      
+      const deductions = await Payroll.find({ 
+        empId: employee.name, 
+        type: "Deductions",
+        createdAt: { $gte: firstDay, $lte: lastDay }
+      });
+      
+      const advances = await Payroll.find({ 
+        empId: employee.name, 
+        type: "Advance",
+        createdAt: { $gte: firstDay, $lte: lastDay }
+      });
 
       const totalAllowances = allowances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
       const totalDeductions = deductions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
       const totalAdvances = advances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
 
-      const payable = employee.salary + totalAllowances - totalDeductions - totalAdvances;
+      const payable = parseFloat(employee.salary || 0) + totalAllowances - totalDeductions - totalAdvances;
 
       return { totalAllowances, totalDeductions, totalAdvances, payable };
     };
 
-    const currentPayroll = await fetchPayrollData(currentMonthData.firstDay, currentMonthData.lastDay);
-    const prevPayroll = await fetchPayrollData(prevMonthData.firstDay, prevMonthData.lastDay);
-
     const fetchLeaveData = async (firstDay, lastDay) => {
-      const leaves = await LeaveModel.find({ employee: empId, startDate: { $gte: firstDay, $lte: lastDay } });
+      const leaves = await LeaveModel.find({ 
+        employee: empId, 
+        startDate: { $gte: firstDay, $lte: lastDay } 
+      });
       return leaves.length;
     };
 
-    const currentLeaves = await fetchLeaveData(currentMonthData.firstDay, currentMonthData.lastDay);
-    const prevLeaves = await fetchLeaveData(prevMonthData.firstDay, prevMonthData.lastDay);
+    // Execute all data fetching in parallel for better performance
+    const [currentAttendance, prevAttendance, currentPayroll, prevPayroll, currentLeaves, prevLeaves] = 
+      await Promise.all([
+        fetchAttendanceData(currentMonthData, employee),
+        fetchAttendanceData(prevMonthData, employee),
+        fetchPayrollData(currentMonthData.firstDay, currentMonthData.lastDay),
+        fetchPayrollData(prevMonthData.firstDay, prevMonthData.lastDay),
+        fetchLeaveData(currentMonthData.firstDay, currentMonthData.lastDay),
+        fetchLeaveData(prevMonthData.firstDay, prevMonthData.lastDay)
+      ]);
+
+    // Debug logging to check what data is being fetched
+    console.log("Current Month Date Range:", {
+      first: currentMonthData.firstDay.toISOString(),
+      last: currentMonthData.lastDay.toISOString()
+    });
+    console.log("Previous Month Date Range:", {
+      first: prevMonthData.firstDay.toISOString(),
+      last: prevMonthData.lastDay.toISOString()
+    });
+    console.log("Current Month Payroll:", currentPayroll);
+    console.log("Previous Month Payroll:", prevPayroll);
 
     res.status(200).json({
       success: true,
