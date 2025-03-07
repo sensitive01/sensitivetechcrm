@@ -9,6 +9,7 @@ function LeaveEdit() {
     leaveCategory: "",
     leaveType: "",
     customLeaveType: "",
+    customPermissonType: "",
     permissionDate: "",
     startDate: "",
     endDate: "",
@@ -132,22 +133,35 @@ function LeaveEdit() {
 
     const formData = new FormData();
 
+    // Determine the correct leaveType value
+    const finalLeaveType =
+      leave.leaveType === "Others" ? leave.customLeaveType : leave.leaveType;
+
+    const finalPermissionType =
+      leave.leaveType === "Others" ? leave.customPermissionType : leave.leaveType;
+
     // Append other fields to formData
     Object.keys(leave).forEach((key) => {
-      formData.append(key, leave[key]);
+      if (key !== "attachment") {
+        if (key === "leaveType") {
+          formData.append("leaveType", leave.leaveCategory === "Leave" ? finalLeaveType : finalPermissionType);
+        } else if (leave[key]) {
+          formData.append(key, leave[key]); // Only append non-empty values
+        }
+      }
     });
+
+    if (leave.attachment) {
+      formData.append("attachment", leave.attachment);
+    }
 
     try {
       const response = id
         ? await axios.put(`https://sensitivetechcrm.onrender.com/leaves/update/${id}`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          headers: { "Content-Type": "multipart/form-data" },
         }) // Update leave
-        : await axios.post(`https://sensitivetechcrm.onrender.com/leaves/create`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+        : await axios.post("https://sensitivetechcrm.onrender.com/leaves/create", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
         }); // Create leave
 
       if (response.status === 200 || response.status === 201) {
@@ -157,6 +171,7 @@ function LeaveEdit() {
           leaveCategory: "",
           leaveType: "",
           customLeaveType: "",
+          customPermissonType: "", // Fixed typo
           permissionDate: "",
           startDate: "",
           endDate: "",
@@ -176,6 +191,7 @@ function LeaveEdit() {
       alert(`Submission failed: ${error.message}`);
     }
   };
+
 
 
   if (loading) {
@@ -283,8 +299,7 @@ function LeaveEdit() {
               </div>
             )}
 
-            {/* Show custom leave type input if "Others" is selected */}
-            {leave.leaveType === "Others" && (
+            {leave.leaveType === "Others" && leave.leaveCategory === "Leave" && (
               <div>
                 <label className="block text-sm font-medium pb-4">Specify Leave Type:</label>
                 <textarea
@@ -296,6 +311,7 @@ function LeaveEdit() {
                 />
               </div>
             )}
+
 
 
             {leave.leaveCategory === "Leave" && (
@@ -324,6 +340,43 @@ function LeaveEdit() {
                 </div>
               </div>
             )}
+
+            {leave.leaveCategory === "Permission" && (
+              <div>
+                <label className="block text-sm font-medium pb-4">Permission Type:</label>
+                <select
+                  name="leaveType"
+                  value={leave.leaveType}
+                  onChange={handleChange}
+                  required
+                  className="border border-blue-300 p-2 w-full rounded"
+                >
+                  <option value="">Select Permission Type</option>
+                  {leaveTypes
+                    .filter(type => type.includes("Permission") || type === "Others") // Show only "Permission" types
+                    .map((type, index) => (
+                      <option key={index} value={type}>
+                        {type}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            )}
+
+            {/* Show Custom Permission Type Field if "Others" is selected */}
+            {leave.leaveType === "Others" && leave.leaveCategory === "Permission" && (
+              <div>
+                <label className="block text-sm font-medium pb-4">Specify Permission Type:</label>
+                <textarea
+                  name="customPermissionType"
+                  value={leave.customPermissonType}
+                  onChange={handleChange}
+                  className="border border-blue-300 p-2 w-full rounded"
+                  placeholder="Enter custom permission type"
+                />
+              </div>
+            )}
+
 
             {/* Permission Date Input (only shown if "Permission" is selected) */}
             {leave.leaveCategory === "Permission" && (

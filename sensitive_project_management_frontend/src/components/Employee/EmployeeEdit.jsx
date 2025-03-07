@@ -628,7 +628,7 @@ const EmployeeEdit = () => {
               <label className="block font-semibold ">Shift Date and Time</label>
               <div className="border border-gray-300 p-4 rounded-md mt-2 w-1/2">
                 <div className="flex items-center space-x-4">
-                  <div className="flex-1">
+                  {/* <div className="flex-1">
                     <label className="block">Shift Date</label>
                     <input
                       type="date"
@@ -638,7 +638,7 @@ const EmployeeEdit = () => {
                       className="w-full px-4 py-2 border rounded-md"
                       required
                     />
-                  </div>
+                  </div> */}
                   <div className="flex-1">
                     <label className="block">Shift Time</label>
                     <div className="flex space-x-2">

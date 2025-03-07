@@ -14,7 +14,7 @@ function Leave() {
     leaveCategory: "",
     leaveType: "",
     customLeaveType: "", 
-    customPermissonType: "",  // Add state for custom leave type
+    customPermissonType: "",
     permissionDate: "",
     startDate: "",
     endDate: "",
@@ -117,7 +117,7 @@ function Leave() {
           leaveCategory: "",
           leaveType: "",
           customLeaveType: "",
-          customPermissionType: "",
+          customPermissonType: "",
           permissionDate: "",
           startDate: "",
           endDate: "",
@@ -312,7 +312,7 @@ function Leave() {
                 <label className="block text-sm font-medium pb-4">Specify Permission Type:</label>
                 <textarea
                   name="customPermissionType"
-                  value={leave.customPermissionType}
+                  value={leave.customPermissonType}
                   onChange={handleChange}
                   className="border border-blue-300 p-2 w-full rounded"
                   placeholder="Enter custom permission type"

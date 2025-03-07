@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { updatePayroll, getPayrollById, employeename } from "../../api/services/projectServices";
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function AdjustmentEdit({payrollId}) {
+    const navigate = useNavigate(); 
     const {id} = useParams();
     console.log(id);
     const empid = localStorage.getItem("empId");
@@ -82,6 +84,7 @@ function AdjustmentEdit({payrollId}) {
                 const response = await updatePayroll(id, formData); // Update the payroll
                 if (response.status === 200) {
                     alert("Adjustment updated successfully!");
+                    navigate("/adjustment-table"); 
                 }
             }
         } catch (error) {

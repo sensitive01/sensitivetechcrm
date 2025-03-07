@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { createPayroll, employeename } from "../../api/services/projectServices";
+import { useNavigate } from "react-router-dom";
 
 function Adjustment() {
+    const navigate = useNavigate(); 
     const [payrolls, setPayrolls] = useState([
         {
             empId: "",
@@ -61,6 +63,7 @@ function Adjustment() {
 
                 if (response.status === 201) {
                     alert("Payroll entry created successfully!");
+                    navigate("/adjustment-table"); 
                 } else {
                     alert("Failed to create payroll entry.");
                 }

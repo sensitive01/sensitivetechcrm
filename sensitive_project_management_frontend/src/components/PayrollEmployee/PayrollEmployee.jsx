@@ -17,13 +17,16 @@ const PayrollEmployee = () => {
   }, []);
 
   useEffect(() => {
-    applyMonthFilter(activeFilter);
+    if (payrollData.length > 0) {
+      applyMonthFilter(activeFilter);
+    }
   }, [payrollData, activeFilter]);
 
   const fetchPayrollData = async () => {
     try {
       const response = await axios.get('https://sensitivetechcrm.onrender.com/allemployeesdata');
       if (response.data.success) {
+        console.log('Raw API data:', response.data.data); // Debug: log raw data
         setPayrollData(response.data.data);
       }
     } catch (error) {
@@ -32,28 +35,54 @@ const PayrollEmployee = () => {
   };
 
   const applyMonthFilter = (filter) => {
+    // We'll create a completely separate processing logic for each month
     let result = [];
 
     if (filter === 'current') {
-      result = payrollData.map((employee, index) => ({
-        serial: index + 1,
-        ...employee,
-        ...employee.currentMonth,
-        allowances: employee.currentMonth.totalAllowances,
-        deductions: employee.currentMonth.totalDeductions,
-        advances: employee.currentMonth.totalAdvances,
-      }));
+      // Only process employees with currentMonth data
+      result = payrollData
+        .filter(employee => employee.currentMonth)
+        .map((employee, index) => ({
+          serial: index + 1,
+          name: employee.name || '',
+          empId: employee.empId || '',
+          department: employee.department || '',
+          totalDays: employee.currentMonth?.totalDays || 0,
+          workingDays: employee.currentMonth?.workingDays || 0,
+          salary: employee.salary || 0,
+          present: employee.currentMonth?.present || 0,
+          absent: employee.currentMonth?.absent || 0,
+          lateDays: employee.currentMonth?.lateDays || 0,
+          lateTime: employee.currentMonth?.lateTime || '0h 0m',
+          allowances: employee.currentMonth?.totalAllowances || 0,
+          deductions: employee.currentMonth?.totalDeductions || 0,
+          advances: employee.currentMonth?.totalAdvances || 0,
+          payable: employee.currentMonth?.payable || 0
+        }));
     } else if (filter === 'previous') {
-      result = payrollData.map((employee, index) => ({
-        serial: index + 1,
-        ...employee,
-        ...employee.previousMonth,
-        allowances: employee.previousMonth.totalAllowances,
-        deductions: employee.previousMonth.totalDeductions,
-        advances: employee.previousMonth.totalAdvances,
-      }));
+      // Only process employees with previousMonth data
+      result = payrollData
+        .filter(employee => employee.previousMonth)
+        .map((employee, index) => ({
+          serial: index + 1,
+          name: employee.name || '',
+          empId: employee.empId || '',
+          department: employee.department || '',
+          totalDays: employee.previousMonth?.totalDays || 0,
+          workingDays: employee.previousMonth?.workingDays || 0,
+          salary: employee.salary || 0,
+          present: employee.previousMonth?.present || 0,
+          absent: employee.previousMonth?.absent || 0,
+          lateDays: employee.previousMonth?.lateDays || 0,
+          lateTime: employee.previousMonth?.lateTime || '0h 0m',
+          allowances: employee.previousMonth?.totalAllowances || 0,
+          deductions: employee.previousMonth?.totalDeductions || 0,
+          advances: employee.previousMonth?.totalAdvances || 0,
+          payable: employee.previousMonth?.payable || 0
+        }));
     }
 
+    console.log(`Filtered ${filter} month data:`, result);
     setFilteredData(result);
     setCurrentPage(1);
   };
@@ -84,28 +113,30 @@ const PayrollEmployee = () => {
   };
 
   const exportToExcel = () => {
+    const monthLabel = activeFilter === 'current' ? 'Current' : 'Previous';
+    
     const exportData = filteredData.map(item => ({
       'Name': item.name,
       'Employee ID': item.empId,
       'Department': item.department,
-      'Working Days': item.workingDays,
-      'Salary': item.salary,
-      'Present': item.present,
-      'Absent': item.absent,
-      'Late Days': item.lateDays,
-      'Late Mins': item.lateMins,
-      'Allowances': item.allowances,
-      'Deductions': item.deductions,
-      'Advance': item.advances,
-      'Payable': item.payable
+      'Working Days': item.workingDays || 0,
+      'Total Days': item.totalDays || 0,
+      'Salary': item.salary || 0,
+      'Present': item.present || 0,
+      'Absent': item.absent || 0,
+      'Late Days': item.lateDays || 0,
+      'Late Time': item.lateTime || '0h 0m',
+      'Allowances': item.allowances || 0,
+      'Deductions': item.deductions || 0,
+      'Advance': item.advances || 0,
+      'Payable': item.payable || 0
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Payroll Data');
-    XLSX.writeFile(workbook, `Payroll_Data_${new Date().toISOString().split('T')[0]}.xlsx`);
+    XLSX.utils.book_append_sheet(workbook, worksheet, `${monthLabel} Month Payroll`);
+    XLSX.writeFile(workbook, `Payroll_Data_${monthLabel}_Month_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
-
 
   const getMonthName = (monthOffset = 0) => {
     const date = new Date();
@@ -123,7 +154,9 @@ const PayrollEmployee = () => {
   return (
     <div className="bg-white p-6 rounded-lg shadow">
       <div className="flex justify-between items-center mb-4 mt-24">
-        <h1 className="text-2xl font-semibold text-gray-800">Payroll Table</h1>
+        <h1 className="text-2xl font-semibold text-gray-800">
+          Payroll Table - {activeFilter === 'current' ? currentMonthName : previousMonthName}
+        </h1>
         <div className="flex space-x-2">
           <button 
             onClick={handlePreviousMonth} 
@@ -137,7 +170,12 @@ const PayrollEmployee = () => {
           >
             {currentMonthName}
           </button>
-                    <button onClick={exportToExcel} className="bg-green-500 text-white px-4 py-2 rounded">Export Data</button>
+          <button 
+            onClick={exportToExcel} 
+            className="bg-green-500 text-white px-4 py-2 rounded"
+          >
+            Export Data
+          </button>
         </div>
       </div>
 
@@ -153,7 +191,7 @@ const PayrollEmployee = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-white">Present</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-white">Absent</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-white">Late Days</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-white">Late Mins</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-white">Late Time</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-white">Allowances</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-white">Deductions</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-white">Advance</th>
@@ -177,7 +215,7 @@ const PayrollEmployee = () => {
                   <td className="px-6 py-4 text-sm text-gray-900">{row.present}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">{row.absent}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">{row.lateDays}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{row.lateMins}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{row.lateTime}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">{row.allowances}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">{row.deductions}</td>
                   <td className="px-6 py-4 text-sm text-gray-900">{row.advances}</td>
@@ -187,17 +225,53 @@ const PayrollEmployee = () => {
                       onClick={() => handleEdit(row.empId)} 
                       className="text-blue-600 hover:text-blue-900"
                     >
-                       <Edit size={20} />
+                      <Edit size={20} />
                     </button>
                   </td>
                 </tr>
               ))
             ) : (
-              <tr><td colSpan={11} className="px-6 py-4 text-center text-sm text-gray-500">No data available</td></tr>
+              <tr>
+                <td colSpan={14} className="px-6 py-4 text-center text-sm text-gray-500">
+                  No data available for {activeFilter === 'current' ? 'current' : 'previous'} month
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
       </div>
+
+      {/* Pagination controls */}
+      {totalPages > 1 && (
+        <div className="flex justify-between items-center mt-4">
+          <div className="text-sm text-gray-700">
+            Showing {startIndex + 1} to {Math.min(endIndex, filteredData.length)} of {filteredData.length} entries
+          </div>
+          <div className="flex space-x-2">
+            <button
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              className={`px-3 py-1 rounded ${
+                currentPage === 1 ? 'bg-gray-200 text-gray-500' : 'bg-blue-600 text-white'
+              }`}
+            >
+              Previous
+            </button>
+            <span className="px-3 py-1">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className={`px-3 py-1 rounded ${
+                currentPage === totalPages ? 'bg-gray-200 text-gray-500' : 'bg-blue-600 text-white'
+              }`}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

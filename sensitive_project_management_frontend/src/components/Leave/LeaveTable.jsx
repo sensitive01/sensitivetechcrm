@@ -118,7 +118,8 @@ const LeaveTable = () => {
     };
 
 
-    const columns = useMemo(() => [
+    const columns = useMemo(() => {
+        const baseColumns = [
         {
             Header: 'S.No',
             accessor: (row, index) => index + 1,
@@ -208,7 +209,7 @@ const LeaveTable = () => {
         },
 
         {
-            Header: 'Attachments',
+            Header: 'Attachment',
             accessor: 'attachment',
             Cell: ({ value }) => (
                 <div className="whitespace-nowrap">
@@ -285,9 +286,12 @@ const LeaveTable = () => {
                         {new Date(row.statusChangeDate).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })}
                     </span>
                 ) : 'N/A',
-        },
+        }
+    ];
 
-        {
+
+    if (role !== "Superadmin") {
+        baseColumns.push({
             Header: 'Actions',
             accessor: '_id',
             Cell: ({ row }) => (
@@ -308,8 +312,11 @@ const LeaveTable = () => {
                     </button>
                 </div>
             )
-        }
-    ], []);
+        });
+    }
+
+    return baseColumns;
+}, [role]);
 
     const {
         getTableProps,
