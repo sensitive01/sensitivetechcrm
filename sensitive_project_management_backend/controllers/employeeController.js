@@ -401,32 +401,55 @@ const getEmployeeDataById = async (req, res) => {
     };
 
     const fetchPayrollData = async (firstDay, lastDay) => {
-      // Filter payroll records by createdAt timestamp
+      // Fixed bug: Using employee.empId instead of employee.name to match with empId field in Payroll collection
       const allowances = await Payroll.find({ 
-        empId: employee.name, 
+        empId: employee.empId, // Fixed: previously was using employee.name 
         type: "Allowance",
         createdAt: { $gte: firstDay, $lte: lastDay }
       });
       
       const deductions = await Payroll.find({ 
-        empId: employee.name, 
+        empId: employee.empId, // Fixed: previously was using employee.name
         type: "Deductions",
         createdAt: { $gte: firstDay, $lte: lastDay }
       });
       
       const advances = await Payroll.find({ 
-        empId: employee.name, 
+        empId: employee.empId, // Fixed: previously was using employee.name
         type: "Advance",
         createdAt: { $gte: firstDay, $lte: lastDay }
       });
 
-      const totalAllowances = allowances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-      const totalDeductions = deductions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-      const totalAdvances = advances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+      // Parse amounts as floats and handle potential NaN values
+      const totalAllowances = allowances.reduce((sum, item) => {
+        const amount = parseFloat(item.amount || 0);
+        return sum + (isNaN(amount) ? 0 : amount);
+      }, 0);
+      
+      const totalDeductions = deductions.reduce((sum, item) => {
+        const amount = parseFloat(item.amount || 0);
+        return sum + (isNaN(amount) ? 0 : amount);
+      }, 0);
+      
+      const totalAdvances = advances.reduce((sum, item) => {
+        const amount = parseFloat(item.amount || 0);
+        return sum + (isNaN(amount) ? 0 : amount);
+      }, 0);
 
-      const payable = parseFloat(employee.salary || 0) + totalAllowances - totalDeductions - totalAdvances;
+      // Calculate payable amount
+      const salary = parseFloat(employee.salary || 0);
+      const payable = salary + totalAllowances - totalDeductions - totalAdvances;
 
-      return { totalAllowances, totalDeductions, totalAdvances, payable };
+      // Return individual payroll records for detailed view if needed
+      return { 
+        totalAllowances, 
+        totalDeductions, 
+        totalAdvances, 
+        payable,
+        allowanceDetails: allowances,
+        deductionDetails: deductions,
+        advanceDetails: advances
+      };
     };
 
     const fetchLeaveData = async (firstDay, lastDay) => {
@@ -485,6 +508,29 @@ const getEmployeeDataById = async (req, res) => {
   }
 };
 
+// Helper function to get date range for a month
+// This function needs to be defined if not already available
+const getMonthDateRanged = (monthOffset = 0) => {
+  const date = new Date();
+  date.setMonth(date.getMonth() + monthOffset);
+  date.setDate(1); // First day of the month
+  const firstDay = new Date(date);
+  
+  // Last day of the month
+  date.setMonth(date.getMonth() + 1);
+  date.setDate(0);
+  const lastDay = new Date(date);
+  lastDay.setHours(23, 59, 59, 999); // End of the day
+  
+  // Calculate total days in the month
+  const totalDays = lastDay.getDate();
+  
+  return {
+    firstDay,
+    lastDay,
+    totalDays
+  };
+};
 
 // const updateEmployeeDataById = async (req, res) => {
 //   try {
