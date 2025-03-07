@@ -13,7 +13,8 @@ function Leave() {
     employee: "",
     leaveCategory: "",
     leaveType: "",
-    customLeaveType: "",  // Add state for custom leave type
+    customLeaveType: "", 
+    customPermissonType: "",  // Add state for custom leave type
     permissionDate: "",
     startDate: "",
     endDate: "",
@@ -39,7 +40,6 @@ function Leave() {
           setError(null);
 
           if (role !== "Superadmin" && response.data.length > 0) {
-            // Automatically set the employee for Employee and Lead
             setLeave((prev) => ({ ...prev, employee: response.data[0].name }));
           }
         } else {
@@ -58,7 +58,7 @@ function Leave() {
   }, [role, id]);
 
 
-  const leaveTypes = ["Sick Leave", "Casual Leave", "Emergency Leave", "Others"];
+  const leaveTypes = ["Sick Leave", "Casual Leave", "Emergency Leave", "Sick Permission", "Casual Permission", "Emergency Permission", "Others",];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -75,14 +75,27 @@ function Leave() {
     e.preventDefault();
 
     const formData = new FormData();
+
+    // If "Others" is selected, use the custom leave type value
+    const finalLeaveType =
+      leave.leaveType === "Others" ? leave.customLeaveType : leave.leaveType;
+
+    const finalPermissionType =
+      leave.leaveType === "Others" ? leave.customPermissionType : leave.leaveType;
+
+    // Append form data
     Object.keys(leave).forEach((key) => {
-      if (key !== 'attachment') {
-        formData.append(key, leave[key]);
+      if (key !== "attachment") {
+        if (key === "leaveType") {
+          formData.append("leaveType", leave.leaveCategory === "Leave" ? finalLeaveType : finalPermissionType);
+        } else {
+          formData.append(key, leave[key]);
+        }
       }
     });
 
     if (leave.attachment) {
-      formData.append('attachment', leave.attachment);
+      formData.append("attachment", leave.attachment);
     }
 
     try {
@@ -104,6 +117,7 @@ function Leave() {
           leaveCategory: "",
           leaveType: "",
           customLeaveType: "",
+          customPermissionType: "",
           permissionDate: "",
           startDate: "",
           endDate: "",
@@ -120,6 +134,7 @@ function Leave() {
       alert("There was an error submitting the data.");
     }
   };
+
 
 
   if (loading) {
@@ -178,7 +193,7 @@ function Leave() {
 
             {/* Leave or Permission Radio Buttons */}
             <div className="pb-4">
-              <label className="block text-sm font-medium pb-4">Leave or Permission:</label>
+              <label className="block text-sm font-medium pb-4">Category:</label>
               <div className="flex space-x-4">
                 <div>
                   <input
@@ -218,17 +233,17 @@ function Leave() {
                   className="border border-blue-300 p-2 w-full rounded"
                 >
                   <option value="">Select Leave Type</option>
-                  {leaveTypes.map((type, index) => (
-                    <option key={index} value={type}>
-                      {type}
-                    </option>
-                  ))}
+                  {leaveTypes
+                    .filter(type => !type.includes("Permission")) // Hide "Permission" types when Leave is selected
+                    .map((type, index) => (
+                      <option key={index} value={type}>
+                        {type}
+                      </option>
+                    ))}
                 </select>
               </div>
             )}
-
-            {/* Show custom leave type input if "Others" is selected */}
-            {leave.leaveType === "Others" && (
+          {leave.leaveType === "Others" && leave.leaveCategory === "Leave" && (
               <div>
                 <label className="block text-sm font-medium pb-4">Specify Leave Type:</label>
                 <textarea
@@ -239,7 +254,7 @@ function Leave() {
                   placeholder="Enter custom leave type"
                 />
               </div>
-            )}
+            )}  
 
 
             {leave.leaveCategory === "Leave" && (
@@ -268,6 +283,43 @@ function Leave() {
                 </div>
               </div>
             )}
+
+            {leave.leaveCategory === "Permission" && (
+              <div>
+                <label className="block text-sm font-medium pb-4">Permission Type:</label>
+                <select
+                  name="leaveType"
+                  value={leave.leaveType}
+                  onChange={handleChange}
+                  required
+                  className="border border-blue-300 p-2 w-full rounded"
+                >
+                  <option value="">Select Permission Type</option>
+                  {leaveTypes
+                    .filter(type => type.includes("Permission") || type === "Others") // Show only "Permission" types
+                    .map((type, index) => (
+                      <option key={index} value={type}>
+                        {type}
+                      </option>
+                    ))}
+                </select>
+              </div>
+            )}
+
+            {/* Show Custom Permission Type Field if "Others" is selected */}
+            {leave.leaveType === "Others" && leave.leaveCategory === "Permission" && (
+              <div>
+                <label className="block text-sm font-medium pb-4">Specify Permission Type:</label>
+                <textarea
+                  name="customPermissionType"
+                  value={leave.customPermissionType}
+                  onChange={handleChange}
+                  className="border border-blue-300 p-2 w-full rounded"
+                  placeholder="Enter custom permission type"
+                />
+              </div>
+            )}
+
 
             {/* Permission Date Input (only shown if "Permission" is selected) */}
             {leave.leaveCategory === "Permission" && (

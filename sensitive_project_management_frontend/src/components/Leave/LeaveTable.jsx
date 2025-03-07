@@ -114,7 +114,7 @@ const LeaveTable = () => {
             return leaveDate >= start && leaveDate <= end;
         });
 
-        setLeaves(filteredLeaves); 
+        setLeaves(filteredLeaves);
     };
 
 
@@ -122,64 +122,97 @@ const LeaveTable = () => {
         {
             Header: 'S.No',
             accessor: (row, index) => index + 1,
+            Cell: ({ value }) => <span className="whitespace-nowrap">{value}</span>
         },
+        // {
+        //     Header: 'Leave ID',
+        //     accessor: row => row._id,
+        //     id: 'leaveIdColumn',
+        // },
         {
-            Header: 'Leave ID',
-            accessor: row => row._id, // ✅ Use a function instead of direct property
-            id: 'leaveIdColumn',
-        },
-        {
-            Header: 'Name',
+            Header: 'Employee',
             accessor: 'employee',
+            Cell: ({ value }) => <span className="whitespace-nowrap">{value}</span>
         },
         {
-            Header: 'Running Projects',
-            accessor: 'runningProjects',
+            Header: 'Category',
+            accessor: 'leaveCategory',
+            Cell: ({ value }) => <span className="whitespace-nowrap">{value}</span>
         },
         {
-            Header: 'Leave Start Dates',
-            accessor: (row) => row.startDate
-                ? new Date(row.startDate).toLocaleDateString('en-GB')  // Converts to DD/MM/YY format
-                : 'N/A',
+            Header: 'Leave Type',
+            accessor: 'leaveType',
+            Cell: ({ value }) => <span className="whitespace-nowrap">{value}</span>
         },
         {
-            Header: 'Leave End Dates',
-            accessor: (row) => row.endDate
-                ? new Date(row.endDate).toLocaleDateString('en-GB')
-                : 'N/A',
+            Header: 'Applied Date',
+            accessor: (row) =>
+                row.createdAt ? (
+                    <span className="whitespace-nowrap">
+                        {new Date(row.createdAt).toLocaleDateString('en-GB')}<br />
+                        {new Date(row.createdAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
+                    </span>
+                ) : 'N/A',
         },
+        // {
+        //     Header: 'Leave / Permission Range',
+        //     accessor: (row) =>
+        //         row.startDate && row.endDate
+        //             ? `${new Date(row.startDate).toLocaleDateString('en-GB')} to ${new Date(row.endDate).toLocaleDateString('en-GB')}`
+        //             : 'N/A',
+        // },
         {
-            Header: 'Permission Date',
-            accessor: (row) => row.permissionDate
-                ? new Date(row.permissionDate).toLocaleDateString('en-GB')
-                : 'N/A',
+            Header: 'Leave / Permission Range',
+            accessor: (row) => {
+                if (row.leaveCategory === 'Leave') {
+                    return row.startDate && row.endDate
+                        ? (
+                            <div className="text-center">
+                                <span>{new Date(row.startDate).toLocaleDateString('en-GB')} to {new Date(row.endDate).toLocaleDateString('en-GB')}</span>
+                            </div>
+                        )
+                        : 'N/A';
+                } else if (row.leaveCategory === 'Permission') {
+                    if (row.permissionDate && row.startTime && row.endTime) {
+                        const permissionDate = new Date(row.permissionDate).toLocaleDateString('en-GB');
+
+                        const formatTime = (time) => {
+                            const [hours, minutes] = time.split(':');
+                            let formattedHours = parseInt(hours, 10);
+                            const ampm = formattedHours >= 12 ? 'PM' : 'AM';
+                            formattedHours = formattedHours % 12 || 12; // Convert 24h to 12h format
+                            return `${formattedHours}:${minutes} ${ampm}`;
+                        };
+
+                        return (
+                            <div className="flex flex-col ">
+                                <span>{permissionDate}</span>
+                                <span>{formatTime(row.startTime)} to {formatTime(row.endTime)}</span>
+                            </div>
+                        );
+                    }
+                    return 'N/A';
+                }
+                return 'N/A';
+            }
         },
-        {
-            Header: 'Start Time',
-            accessor: (row) => row.startTime
-                ? new Date(`1970-01-01T${row.startTime}`).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
-                : 'N/A',
-        },
-        {
-            Header: 'End Time',
-            accessor: (row) => row.endTime
-                ? new Date(`1970-01-01T${row.endTime}`).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
-                : 'N/A',
-        },
+
         {
             Header: 'Notes',
             accessor: 'remarks',
+            Cell: ({ value }) => (
+                <div className="w-[300px] break-words whitespace-pre-wrap overflow-hidden max-h-[30rem]">
+                    {value}
+                </div>
+            ),
         },
+
         {
-            Header: 'Attachment',
+            Header: 'Attachments',
             accessor: 'attachment',
             Cell: ({ value }) => (
-                <div>
-                    {value ? (
-                        <img src={value} alt="Attachment" className="w-20 h-20 object-cover rounded" />
-                    ) : (
-                        <span>No attachment</span>
-                    )}
+                <div className="whitespace-nowrap">
+                    {value ? <img src={value} alt="Attachment" className="w-12 h-12 object-cover rounded" /> : 'No attachment'}
                 </div>
             ),
         },
@@ -191,9 +224,7 @@ const LeaveTable = () => {
                     value={row.original.status}
                     onChange={(e) => role === "Superadmin" && handleStatusChange(row.original._id, e.target.value)}
                     disabled={role !== "Superadmin"}
-                    className={`
-                        px-3 py-1 rounded text-sm border
-                        ${row.original.status === 'Approved' ? 'bg-green-100 text-green-800 border-green-200' :
+                    className={`whitespace-nowrap px-3 py-1 rounded text-sm border ${row.original.status === 'Approved' ? 'bg-green-100 text-green-800 border-green-200' :
                             row.original.status === 'Pending' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
                                 'bg-red-100 text-red-800 border-red-200'}, ${role !== "Superadmin" ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}
                     `}
@@ -204,53 +235,55 @@ const LeaveTable = () => {
                 </select>
             )
         },
-
+        {
+            Header: 'Running Projects',
+            accessor: 'runningProjects',
+            Cell: ({ value }) => <span className="whitespace-nowrap">{value}</span>
+        },
         {
             Header: 'Approved By',
             accessor: 'approvedBy',
-        },
-        {
-            Header: 'Status Change Date & Time',
-            accessor: (row) =>
-                row.statusChangeDate ? (
-                    <>
-                        {new Date(row.statusChangeDate).toLocaleDateString('en-GB', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: '2-digit',
-                        })}
-                        <br />
-                        {new Date(row.statusChangeDate).toLocaleTimeString('en-GB', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            hour12: true
-                        })}
-                    </>
-                ) : 'N/A',
+            Cell: ({ value }) => <span className="whitespace-nowrap">{value}</span>
         },
 
+        // {
+        //     Header: 'Leave Start Dates',
+        //     accessor: (row) => row.startDate
+        //         ? new Date(row.startDate).toLocaleDateString('en-GB')  // Converts to DD/MM/YY format
+        //         : 'N/A',
+        // },
+        // {
+        //     Header: 'Leave End Dates',
+        //     accessor: (row) => row.endDate
+        //         ? new Date(row.endDate).toLocaleDateString('en-GB')
+        //         : 'N/A',
+        // },
+        // {
+        //     Header: 'Permission Date',
+        //     accessor: (row) => row.permissionDate
+        //         ? new Date(row.permissionDate).toLocaleDateString('en-GB')
+        //         : 'N/A',
+        // },
+        // {
+        //     Header: 'Start Time',
+        //     accessor: (row) => row.startTime
+        //         ? new Date(`1970-01-01T${row.startTime}`).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+        //         : 'N/A',
+        // },
+        // {
+        //     Header: 'End Time',
+        //     accessor: (row) => row.endTime
+        //         ? new Date(`1970-01-01T${row.endTime}`).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+        //         : 'N/A',
+        // },
         {
-            Header: 'Leave Type',
-            accessor: 'leaveType',
-        },
-        {
-            Header: 'Created Date & Time',
+            Header: 'Approved Date & Time',
             accessor: (row) =>
-                row.createdAt ? (
-                    <>
-                        {new Date(row.createdAt).toLocaleDateString('en-GB', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: '2-digit',
-                        })}
-                        <br />
-                        {new Date(row.createdAt).toLocaleTimeString('en-GB', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit',
-                            hour12: true
-                        })}
-                    </>
+                row.statusChangeDate ? (
+                    <span className="whitespace-nowrap">
+                        {new Date(row.statusChangeDate).toLocaleDateString('en-GB')}<br />
+                        {new Date(row.statusChangeDate).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                    </span>
                 ) : 'N/A',
         },
 

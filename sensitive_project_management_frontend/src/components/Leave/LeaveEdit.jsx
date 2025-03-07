@@ -401,7 +401,7 @@ function LeaveEdit() {
                 className="border border-blue-300 p-2 w-full rounded"
               />
             </div>
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium pb-4">Status:</label>
               <select
                 name="status"
@@ -415,7 +415,7 @@ function LeaveEdit() {
                 <option value="Approved">Approved</option>
                 <option value="Rejected">Rejected</option>
               </select>
-            </div>
+            </div> */}
           </div>
         </div>
 
