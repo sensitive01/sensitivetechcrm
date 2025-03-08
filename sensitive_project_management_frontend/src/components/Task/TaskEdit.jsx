@@ -13,7 +13,7 @@ function TaskEdit() {
     timeline: "",
     status: "Pending",
     date: "",
-    attachments: "", // Store as a single string (URL or filename)
+    attachments: "",
   });
   const navigate = useNavigate();
   const id = localStorage.getItem("empId");
@@ -27,8 +27,6 @@ function TaskEdit() {
     const fetchData = async () => {
       try {
         setLoading(true);
-
-        // Fetch employees and project names concurrently
         const [employeesResponse, projectsResponse] = await Promise.all([
           employeename(`${id}`),
           projectname(),
@@ -68,14 +66,13 @@ function TaskEdit() {
           console.log("Fetched Task Data:", fetchedTask);
 
           if (fetchedTask.date) {
-            // Convert ISO date format to DD/MM/YY
             let dateObj = new Date(fetchedTask.date);
             let day = String(dateObj.getDate()).padStart(2, "0");
-            let month = String(dateObj.getMonth() + 1).padStart(2, "0"); // Months are 0-based
-            let year = String(dateObj.getFullYear()).slice(-2); // Get last two digits of year
+            let month = String(dateObj.getMonth() + 1).padStart(2, "0"); 
+            let year = String(dateObj.getFullYear()).slice(-2); 
 
-            fetchedTask.dateFormatted = `${day}/${month}/${year}`; // Store DD/MM/YY for display
-            fetchedTask.date = dateObj.toISOString().split("T")[0]; // Store YYYY-MM-DD for input field
+            fetchedTask.dateFormatted = `${day}/${month}/${year}`; 
+            fetchedTask.date = dateObj.toISOString().split("T")[0]; 
           }
 
           setTask(fetchedTask);
@@ -106,8 +103,8 @@ function TaskEdit() {
 
       setTask((prev) => ({
         ...prev,
-        date: value, // Store YYYY-MM-DD for input field
-        dateFormatted: `${day}/${month}/${year}`, // Store DD/MM/YY for display
+        date: value,
+        dateFormatted: `${day}/${month}/${year}`, 
       }));
     } else {
       setTask((prev) => ({
@@ -119,11 +116,11 @@ function TaskEdit() {
 
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0]; // Only store one file
+    const file = e.target.files[0]; 
     if (file) {
       setTask((prev) => ({
         ...prev,
-        attachments: URL.createObjectURL(file), // Convert file to URL for preview
+        attachments: URL.createObjectURL(file), 
       }));
     }
   };
@@ -133,7 +130,7 @@ function TaskEdit() {
 
     const formData = new FormData();
     Object.keys(task).forEach((key) => {
-      formData.append(key, task[key]); // Attachments as a string
+      formData.append(key, task[key]); 
     });
 
     try {
@@ -161,7 +158,6 @@ function TaskEdit() {
       <h2 className="text-4xl font-bold mb-8 text-center text-gray-800">Task Form</h2>
       <form onSubmit={handleSubmit} className="space-y-8 bg-white p-8 border rounded-lg shadow-lg max-w-4xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Project */}
           <div>
             <label className="block text-sm font-medium pb-2 text-gray-600">Project:</label>
             <select name="project" value={task.project} onChange={handleChange} required className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500">
@@ -171,14 +167,10 @@ function TaskEdit() {
               ))}
             </select>
           </div>
-
-          {/* Task */}
           <div>
             <label className="block text-sm font-medium pb-2 text-gray-600">Task:</label>
             <input type="text" name="task" value={task.task} onChange={handleChange} required className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500" />
           </div>
-
-          {/* Employee */}
           <div>
             <label className="block text-sm font-medium pb-2 text-gray-600">Employee:</label>
             <select name="empId" value={task.empId} onChange={handleChange} required className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500">
@@ -188,15 +180,11 @@ function TaskEdit() {
               ))}
             </select>
           </div>
-
-          {/* Description */}
           <div>
             <label className="block text-sm font-medium pb-2 text-gray-600">Description:</label>
             <textarea name="description" value={task.description} onChange={handleChange} required className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500" rows="4" />
           </div>
         </div>
-
-        {/* Second Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
             <label className="block text-sm font-medium pb-2 text-gray-600">Timeline:</label>
@@ -216,8 +204,6 @@ function TaskEdit() {
             <label className="block text-sm font-medium pb-2 text-gray-600">Date:</label>
             <input type="date" name="date" value={task.date} onChange={handleChange} required className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500" />
           </div>
-
-          {/* Attachments */}
           <div>
             <label className="block text-sm font-medium pb-2 text-gray-600">Attachments:</label>
             {task.attachments && (

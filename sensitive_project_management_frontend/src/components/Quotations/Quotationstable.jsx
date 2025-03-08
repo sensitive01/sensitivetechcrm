@@ -87,8 +87,6 @@ const QuotationTable = () => {
 
         setQuotations(filteredQuotations);
     };
-
-    // Define columns for react-table
     const columns = useMemo(() => [
         { Header: 'S.No', accessor: (row, index) => index + 1 },
         { Header: 'Name', accessor: 'name' },
@@ -109,7 +107,7 @@ const QuotationTable = () => {
                         rel="noopener noreferrer" 
                         className="text-blue-500 underline"
                     >
-                        {value.split('/').pop()} {/* Display the file name */}
+                        {value.split('/').pop()} 
                     </a>
                 ) : 'N/A'
             ),
@@ -130,6 +128,21 @@ const QuotationTable = () => {
                 ),
             id: 'date_time',
         },
+        {
+            Header: 'Created Date & Time',
+            accessor: 'createdAt',
+            Cell: ({ value }) =>
+                value ? (
+                    <>
+                        {new Date(value).toLocaleDateString('en-GB')} <br />
+                        {new Date(value).toLocaleTimeString()}
+                    </>
+                ) : (
+                    'N/A'
+                ),
+            id: 'created_date_time',
+        },
+        
         {
             Header: 'Actions',
             accessor: '_id',
@@ -201,8 +214,6 @@ const QuotationTable = () => {
             <h2 className="text-4xl font-bold mb-10 text-center mt-24">
                 Quotation Table
             </h2>
-
-            {/* Data Table Section */}
             <div className="mt-12">
                 <div className="flex justify-between items-center mb-6">
                     <div className="relative">
@@ -268,7 +279,7 @@ const QuotationTable = () => {
                                             {headerGroup.headers.map(column => (
                                                 <th
                                                     {...column.getHeaderProps(column.getSortByToggleProps())}
-                                                    className="p-4 text-left cursor-pointer"
+                                                    className="p-4 text-left cursor-pointer whitespace-nowrap"
                                                 >
                                                     <div className="flex items-center">
                                                         {column.render('Header')}
@@ -320,7 +331,6 @@ const QuotationTable = () => {
                         </>
                     )}
                 </div>
-                {/* Modal for Viewing Quotation */}
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
                         <div className="bg-white rounded-lg p-8 w-1/2">

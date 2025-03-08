@@ -7,8 +7,8 @@ const EmployeeAttendance = () => {
   const [attendanceDetails, setAttendanceDetails] = useState({
     employeeId: "",
     employeeName: "",
-    date: new Date().toLocaleDateString('en-GB'),  // Set current date in dd/mm/yy format
-    status: "Present",  // Default status as "Present"
+    date: new Date().toLocaleDateString('en-GB'), 
+    status: "Present", 
     logintime: "",
   });
   const [submittedData, setSubmittedData] = useState(null);
@@ -83,15 +83,15 @@ const EmployeeAttendance = () => {
     }
   
     const currentDate = new Date();
-    const formattedDate = currentDate.toISOString().split('T')[0]; // Converts to "yyyy-mm-dd"
+    const formattedDate = currentDate.toISOString().split('T')[0];
     const formattedTime = currentDate.toLocaleTimeString();
   
     const submissionData = {
       photo,
       employeeId: employeeId,
       employeeName: attendanceDetails.employeeName,
-      date: formattedDate,  // Use ISO format for the date
-      status: "Present",  // Status set to "Present"
+      date: formattedDate, 
+      status: "Present", 
       logintime: formattedTime,
     };
   

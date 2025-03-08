@@ -79,16 +79,6 @@ const EmployeeEdit = () => {
       isoDate: dateObj.toISOString().split('T')[0]
     };
   };
-
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData((prevData) => ({
-  //     ...prevData,
-  //     [name]: value
-  //   }));
-  // };
-
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "dob" || name === "doj") {
@@ -102,27 +92,14 @@ const EmployeeEdit = () => {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
-
-  // const handleFileChange = (e) => {
-  //   const { name, files } = e.target;
-  //   setFormData((prevData) => ({
-  //     ...prevData,
-  //     [name]: files[0]
-  //   }));
-  // };
-
   const handleFileChange = (e) => {
     const { name, files } = e.target;
-    
-    // Special handling for profile image
     if (name === 'profileImage') {
       const file = files[0];
       setFormData((prevData) => ({
         ...prevData,
         [name]: file
       }));
-
-      // Create image preview
       if (file) {
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -133,7 +110,6 @@ const EmployeeEdit = () => {
         setProfileImagePreview(null);
       }
     } else {
-      // Existing file change handling for other files
       setFormData((prevData) => ({
         ...prevData,
         [name]: files[0]
@@ -151,13 +127,10 @@ const EmployeeEdit = () => {
       }
     }));
   };
-
-
   useEffect(() => {
-    // Fetch employee data from an API
     const fetchEmployees = async () => {
       try {
-        setLoading(true); // Show loader
+        setLoading(true);
         const response = await axios.get(
           `https://sensitivetechcrm.onrender.com/getemployeesbyid/${id}`
         );
@@ -165,9 +138,6 @@ const EmployeeEdit = () => {
         const employeeData = response.data;
         const { formatted: dobFormatted, isoDate: dobIso } = formatDate(employeeData.dob);
         const { formatted: dojFormatted, isoDate: dojIso } = formatDate(employeeData.doj);
-        // const { formatted: shiftDateFormatted, isoDate: shiftDateIso } = formatDate(employeeData.shiftDate); 
-
-        // Ensure ID Proof Type and Address Proof Type are included in response data
         setFormData((prevData) => ({
           ...prevData,
           ...employeeData,
@@ -175,18 +145,16 @@ const EmployeeEdit = () => {
           dobFormatted,
           doj: dojIso,
           dojFormatted,
-          // shiftDate: shiftDateIso,
-          // shiftDateFormatted,
         }));
       } catch (err) {
         setError(err.message);
       } finally {
-        setLoading(false); // Stop loader
+        setLoading(false); 
       }
     };
 
     fetchEmployees();
-  }, [id]);  // Ensure useEffect re-runs when the `id` parameter changes
+  }, [id]);
 
   const handlePermanentAddressToggle = (e) => {
     setIsPermanentAddressSame(e.target.checked);
@@ -209,42 +177,15 @@ const EmployeeEdit = () => {
       }));
     }
   };
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault(); // Prevent page reload on form submission
-
-  //   console.log(formData);
-  //   try {
-  //     const response = await axios.post(
-  //       "https://sensitivetechcrm.onrender.com/createemployee",
-  //       formData
-  //     );
-  //     console.log("Response:", response.data);
-  //     alert("Form submitted successfully!");
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //     alert("Failed to submit the form.");
-  //   }
-  // };
-
- 
-
- 
  const handleSubmit = async (e) => {
   e.preventDefault();
-
-  // Create a FormData object
   const formDataToSubmit = new FormData();
-
-  // Append all form fields to FormData
   Object.keys(formData).forEach(key => {
     if (key === 'presentAddress' || key === 'permanentAddress') {
-      // Append nested address objects
       Object.keys(formData[key]).forEach(addressKey => {
         formDataToSubmit.append(`${key}[${addressKey}]`, formData[key][addressKey]);
       });
     } else if (formData[key] instanceof File) {
-      // Handle file uploads
       formDataToSubmit.append(key, formData[key]);
     } else {
       formDataToSubmit.append(key, formData[key]);
@@ -265,8 +206,6 @@ const EmployeeEdit = () => {
     console.log("Response:", response.data);
     alert("Form submitted successfully!");
     navigate("/employee-table");
-
-    // Store user details in localStorage
     localStorage.setItem("empName", formData.name);
     localStorage.setItem("empEmail", formData.email);
     localStorage.setItem("empPassword", formData.password);
@@ -469,7 +408,7 @@ const EmployeeEdit = () => {
               <label className="block font-semibold">ID Proof Type</label>
               <select
                 name="idProofType"
-                value={formData.idProofType}  // Ensure the value is bound to formData.idProofType
+                value={formData.idProofType}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               >
@@ -499,9 +438,8 @@ const EmployeeEdit = () => {
               <label className="block font-semibold">Upload ID Proof</label>
               {formData.idProofFile ? (
                 <div>
-                  {/* Assuming resume is an image */}
                   <img
-                    src={formData.idProofFile} // URL of the resume file from the backend
+                    src={formData.idProofFile}
                     alt="idProofFile"
                     className="w-32 h-32 object-cover"
                   />
@@ -576,9 +514,8 @@ const EmployeeEdit = () => {
               <label className="block font-semibold">Resume</label>
               {formData.resume ? (
                 <div>
-                  {/* Assuming resume is an image */}
                   <img
-                    src={formData.resume} // URL of the resume file from the backend
+                    src={formData.resume} 
                     alt="Resume"
                     className="w-32 h-32 object-cover"
                   />
@@ -629,17 +566,6 @@ const EmployeeEdit = () => {
               <label className="block font-semibold ">Shift Date and Time</label>
               <div className="border border-gray-300 p-4 rounded-md mt-2 w-1/2">
                 <div className="flex items-center space-x-4">
-                  {/* <div className="flex-1">
-                    <label className="block">Shift Date</label>
-                    <input
-                      type="date"
-                      name="shiftDate"
-                      value={formData.shiftDate}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border rounded-md"
-                      required
-                    />
-                  </div> */}
                   <div className="flex-1">
                     <label className="block">Shift Time</label>
                     <div className="flex space-x-2">
@@ -786,7 +712,7 @@ const EmployeeEdit = () => {
               <label className="block font-semibold">Address Proof Type</label>
               <select
                 name="addressProofType"
-                value={formData.addressProofType}  // Ensure the value is bound to formData.addressProofType
+                value={formData.addressProofType}
                 onChange={handleChange}
                 className="w-full px-4 py-2 border rounded-md"
               >
@@ -817,9 +743,8 @@ const EmployeeEdit = () => {
               <label className="block font-semibold">Upload Address Proof</label>
               {formData.addressProofFile ? (
                 <div>
-                  {/* Assuming resume is an image */}
                   <img
-                    src={formData.addressProofFile} // URL of the resume file from the backend
+                    src={formData.addressProofFile} 
                     alt="idProofFile"
                     className="w-32 h-32 object-cover"
                   />
@@ -839,7 +764,7 @@ const EmployeeEdit = () => {
               <label className="block font-semibold mb-2">Password</label>
               <div className="relative">
                 <input
-                  type={showPassword ? "text" : "password"} // Dynamically toggle the type
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
@@ -848,10 +773,10 @@ const EmployeeEdit = () => {
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword((prev) => !prev)} // Toggle visibility
+                  onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute right-3 top-3 text-gray-500"
                 >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />} {/* Icon */}
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>

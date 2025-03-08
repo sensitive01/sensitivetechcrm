@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";  // Import axios for HTTP requests
+import axios from "axios";
 import { employeename } from "../../api/services/projectServices";
 import { useNavigate } from "react-router-dom";
 
@@ -67,7 +67,7 @@ function Leave() {
 
   const handleFileChange = (e) => {
     const { name, files } = e.target;
-    setLeave((prev) => ({ ...prev, [name]: files[0] })); // Store the file object in the state
+    setLeave((prev) => ({ ...prev, [name]: files[0] }));
   };
 
 
@@ -75,15 +75,11 @@ function Leave() {
     e.preventDefault();
 
     const formData = new FormData();
-
-    // If "Others" is selected, use the custom leave type value
     const finalLeaveType =
       leave.leaveType === "Others" ? leave.customLeaveType : leave.leaveType;
 
     const finalPermissionType =
       leave.leaveType === "Others" ? leave.customPermissionType : leave.leaveType;
-
-    // Append form data
     Object.keys(leave).forEach((key) => {
       if (key !== "attachment") {
         if (key === "leaveType") {
@@ -157,7 +153,6 @@ function Leave() {
     <div className="container mx-auto p-6 mt-12">
       <h2 className="text-4xl font-bold mb-10 text-center mt-20">Leave Application Form</h2>
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
-        {/* Form Fields */}
         <div className="border border-blue-500 p-6 rounded-lg">
           <div className="space-y-8 pb-4">
             {role === "Superadmin" ? (
@@ -189,9 +184,6 @@ function Leave() {
                 />
               </div>
             )}
-
-
-            {/* Leave or Permission Radio Buttons */}
             <div className="pb-4">
               <label className="block text-sm font-medium pb-4">Category:</label>
               <div className="flex space-x-4">
@@ -234,7 +226,7 @@ function Leave() {
                 >
                   <option value="">Select Leave Type</option>
                   {leaveTypes
-                    .filter(type => !type.includes("Permission")) // Hide "Permission" types when Leave is selected
+                    .filter(type => !type.includes("Permission"))
                     .map((type, index) => (
                       <option key={index} value={type}>
                         {type}
@@ -296,7 +288,7 @@ function Leave() {
                 >
                   <option value="">Select Permission Type</option>
                   {leaveTypes
-                    .filter(type => type.includes("Permission") || type === "Others") // Show only "Permission" types
+                    .filter(type => type.includes("Permission") || type === "Others")
                     .map((type, index) => (
                       <option key={index} value={type}>
                         {type}
@@ -305,8 +297,6 @@ function Leave() {
                 </select>
               </div>
             )}
-
-            {/* Show Custom Permission Type Field if "Others" is selected */}
             {leave.leaveType === "Others" && leave.leaveCategory === "Permission" && (
               <div>
                 <label className="block text-sm font-medium pb-4">Specify Permission Type:</label>
@@ -319,9 +309,6 @@ function Leave() {
                 />
               </div>
             )}
-
-
-            {/* Permission Date Input (only shown if "Permission" is selected) */}
             {leave.leaveCategory === "Permission" && (
               <div>
                 <label className="block text-sm font-medium pb-4">Permission Date:</label>
@@ -336,8 +323,6 @@ function Leave() {
                 />
               </div>
             )}
-
-            {/* Time Range Input (only shown if "Permission" is selected) */}
             {leave.leaveCategory === "Permission" && (
               <div>
                 <label className="block text-sm font-medium pb-4">Time Range:</label>
@@ -364,8 +349,6 @@ function Leave() {
             )}
           </div>
         </div>
-
-        {/* Second Column */}
         <div className="border border-blue-500 p-6 rounded-lg">
           <div className="space-y-8 pb-4">
             <div>
@@ -384,7 +367,7 @@ function Leave() {
               <input
                 type="file"
                 name="attachment"
-                onChange={handleFileChange}  // Use the handleFileChange function here
+                onChange={handleFileChange}
                 className="border border-blue-300 p-2 w-full rounded"
               />
             </div>
@@ -392,8 +375,6 @@ function Leave() {
 
           </div>
         </div>
-
-        {/* Submit Button */}
         <div className="col-span-2 flex justify-center mt-6">
           <button
             type="submit"

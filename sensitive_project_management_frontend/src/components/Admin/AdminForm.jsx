@@ -6,11 +6,11 @@ const AdminForm = () => {
     name: '',
     officeEmail: '',
     password: '',
-    adminType: '', // New field for admin type
+    adminType: '', 
   });
 
-  const [loading, setLoading] = useState(false); // Track loading state
-  const [message, setMessage] = useState(''); // To show success or error messages
+  const [loading, setLoading] = useState(false); 
+  const [message, setMessage] = useState(''); 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,22 +21,16 @@ const AdminForm = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent page reload on form submission
-
-    // Check if any field is empty
+    e.preventDefault(); 
     if (!formData.name || !formData.officeEmail || !formData.password || !formData.adminType) {
       setMessage('Please fill all the fields');
       return;
     }
-
-    // Start loading
     setLoading(true);
-    setMessage(''); // Clear previous message
+    setMessage('');
 
     try {
       const response = await axios.post('https://sensitivetechcrm.onrender.com/super-admin/createsuperadmin', formData);
-
-      // Handle success
       console.log('Response:', response.data);
       setMessage('Admin form submitted successfully!');
       setFormData({
@@ -44,13 +38,11 @@ const AdminForm = () => {
         officeEmail: '',
         password: '',
         adminType: '',
-      }); // Clear the form after submission
+      }); 
     } catch (error) {
-      // Handle error
       console.error('Error:', error);
       setMessage('Failed to submit the form. Please try again.');
     } finally {
-      // Stop loading
       setLoading(false);
     }
   };
@@ -116,7 +108,7 @@ const AdminForm = () => {
               <button
                 type="submit"
                 className="px-6 py-3 bg-blue-500 text-white font-semibold rounded-md"
-                disabled={loading} // Disable the button while submitting
+                disabled={loading}
               >
                 {loading ? 'Submitting...' : 'Submit'}
               </button>

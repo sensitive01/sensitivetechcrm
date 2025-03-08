@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { createPayment, getPaymentById, projectname, updatePaymentById } from "../../api/services/projectServices";
-import { useParams, Link,useNavigate } from "react-router-dom"; // Just for the expenseId in the URL
+import { useParams, Link, useNavigate } from "react-router-dom";
 
 function PaymentEdit() {
-    const { id } = useParams(); // Get expenseId from the URL
+    const { id } = useParams();
     console.log("Payment ID from URL:", id);
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     const [payment, setPayment] = useState({
         project: "",
@@ -28,8 +28,6 @@ function PaymentEdit() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-
-                // Fetch projects
                 const projectResponse = await projectname();
                 console.log("Projects Response:", projectResponse);
                 if (projectResponse?.data) {
@@ -44,13 +42,10 @@ function PaymentEdit() {
                 } else {
                     throw new Error("Failed to fetch projects.");
                 }
-
-                // Fetch the payment data if paymentId is available
                 if (id) {
                     const paymentResponse = await getPaymentById(id);
                     console.log("Payment Response:", paymentResponse);
                     if (paymentResponse?.data) {
-                        // Assuming response data structure, adjust if necessary
                         setPayment({
                             project: paymentResponse.data.payment.project || "",
                             amount: paymentResponse.data.payment.amount || "",
@@ -64,16 +59,15 @@ function PaymentEdit() {
                             paymentProof: paymentResponse.data.payment.paymentProof || "",
                             notes: paymentResponse.data.payment.notes || "",
                         });
-                        let fetchedPayment =paymentResponse.data.payment
+                        let fetchedPayment = paymentResponse.data.payment
                         if (fetchedPayment.date) {
-                            // Convert ISO date format to DD/MM/YY
                             let dateObj = new Date(fetchedPayment.date);
                             let day = String(dateObj.getDate()).padStart(2, "0");
-                            let month = String(dateObj.getMonth() + 1).padStart(2, "0"); // Months are 0-based
-                            let year = String(dateObj.getFullYear()).slice(-2); // Get last two digits of year
+                            let month = String(dateObj.getMonth() + 1).padStart(2, "0");
+                            let year = String(dateObj.getFullYear()).slice(-2);
 
-                            fetchedPayment.dateFormatted = `${day}/${month}/${year}`; // Store DD/MM/YY for display
-                            fetchedPayment.date = dateObj.toISOString().split("T")[0]; // Store YYYY-MM-DD for input field
+                            fetchedPayment.dateFormatted = `${day}/${month}/${year}`;
+                            fetchedPayment.date = dateObj.toISOString().split("T")[0];
                         }
 
                         setPayment(fetchedPayment);
@@ -102,8 +96,8 @@ function PaymentEdit() {
             let year = String(dateObj.getFullYear()).slice(-2);
             setPayment((prev) => ({
                 ...prev,
-                date: value, // Store YYYY-MM-DD for input field
-                dateFormatted: `${day}/${month}/${year}`, // Store DD/MM/YY for display
+                date: value,
+                dateFormatted: `${day}/${month}/${year}`,
             }));
         } else {
             setPayment((prev) => ({ ...prev, [name]: value }));
@@ -113,21 +107,21 @@ function PaymentEdit() {
 
     const handleFileChange = (e) => {
         const { name, files } = e.target;
-        setPayment((prev) => ({ ...prev, [name]: files[0] })); // Save the first file from the input
+        setPayment((prev) => ({ ...prev, [name]: files[0] }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const formData = new FormData();
         Object.keys(payment).forEach((key) => {
-            console.log(`${key}:`, payment[key]); // Debugging line
+            console.log(`${key}:`, payment[key]);
             formData.append(key, payment[key]);
         });
-    
+
         try {
             const response = await updatePaymentById(id, formData);
             if (response.status === 200 || response.status === 201) {
-                alert("Payment updated successfully!"); // Alert message
+                alert("Payment updated successfully!");
                 navigate("/payments-table");
             } else {
                 console.error("Failed to update payment", response);
@@ -138,7 +132,7 @@ function PaymentEdit() {
             alert("An error occurred while updating. Please try again.");
         }
     };
-    
+
 
     if (loading) {
         return (
@@ -163,9 +157,7 @@ function PaymentEdit() {
                 onSubmit={handleSubmit}
                 className="grid grid-cols-2 gap-6 p-4 rounded bg-[#eff6ff] shadow-lg border border-gray-300 hover:border-gray-500 transition-all"
             >
-                {/* Left Column */}
                 <div className="flex flex-col space-y-4">
-                    {/* Select Project */}
                     <div className="flex flex-col">
                         <label className="block text-sm font-medium pb-1">Select Project:</label>
                         <select
@@ -183,8 +175,6 @@ function PaymentEdit() {
                             ))}
                         </select>
                     </div>
-
-                    {/* Payment Type */}
                     <div className="flex flex-col">
                         <label className="block text-sm font-medium pb-1">Payment Type:</label>
                         <input
@@ -196,8 +186,6 @@ function PaymentEdit() {
                             className="border border-blue-300 p-2 rounded"
                         />
                     </div>
-
-                    {/* Amount */}
                     <div className="flex flex-col">
                         <label className="block text-sm font-medium pb-1">Amount:</label>
                         <input
@@ -209,8 +197,6 @@ function PaymentEdit() {
                             className="border border-blue-300 p-2 rounded"
                         />
                     </div>
-
-                    {/* Payment Mode */}
                     <div className="flex flex-col">
                         <label className="block text-sm font-medium pb-1">Payment Mode:</label>
                         <select
@@ -240,8 +226,6 @@ function PaymentEdit() {
                             />
                         )}
                     </div>
-
-                    {/* Date */}
                     <div className="flex flex-col">
                         <label className="block text-sm font-medium pb-1">Date:</label>
                         <input
@@ -254,10 +238,7 @@ function PaymentEdit() {
                         />
                     </div>
                 </div>
-
-                {/* Right Column */}
-                <div className="flex flex-col space-y-4 lg:mt-6"> {/* Add margin-top to align */}
-                    {/* TDS Applicable */}
+                <div className="flex flex-col space-y-4 lg:mt-6">
                     <div className="flex flex-col">
                         <label className="block text-sm font-medium pb-1">TDS Applicable:</label>
                         <div className="flex items-center gap-4">
@@ -285,8 +266,6 @@ function PaymentEdit() {
                             </label>
                         </div>
                     </div>
-
-                    {/* Tax Applicable */}
                     <div className="flex flex-col">
                         <label className="block text-sm font-medium pb-1">Tax Applicable:</label>
                         <div className="flex items-center gap-4">
@@ -314,8 +293,6 @@ function PaymentEdit() {
                             </label>
                         </div>
                     </div>
-
-                    {/* Payment Reference Number */}
                     <div className="flex flex-col">
                         <label className="block text-sm font-medium pb-1">
                             Payment Reference Number:
@@ -329,8 +306,6 @@ function PaymentEdit() {
                             className="border border-blue-300 p-2 rounded"
                         />
                     </div>
-
-                    {/* Payment Quotation */}
                     <div className="flex flex-col">
                         <label className="block text-sm font-medium pb-1">
                             Payment Quotation (Optional):
@@ -352,8 +327,6 @@ function PaymentEdit() {
                             className="border border-blue-300 p-2 rounded"
                         />
                     </div>
-
-                    {/* Payment Proof */}
                     <div className="flex flex-col">
                         <label className="block text-sm font-medium pb-1">
                             Payment Proof (Optional):
@@ -374,8 +347,6 @@ function PaymentEdit() {
                         />
                     </div>
                 </div>
-
-                {/* Notes - Single Row */}
                 <div className="col-span-2 flex flex-col">
                     <label className="block text-sm font-medium pb-1">Notes:</label>
                     <textarea
@@ -386,8 +357,6 @@ function PaymentEdit() {
                         className="border border-blue-300 p-2 rounded"
                     />
                 </div>
-
-                {/* Submit Button */}
                 <div className="col-span-2 text-right">
                     <button
                         type="submit"

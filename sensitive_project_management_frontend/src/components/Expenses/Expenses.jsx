@@ -62,7 +62,6 @@ function Expenses() {
         });
 
         try {
-            // Assume createExpense is an API call to submit the form data
             const response = await createExpense(formData);
             if (response.status === 201) {
                 alert("Expense data submitted successfully!");
@@ -106,7 +105,6 @@ function Expenses() {
                 onSubmit={handleSubmit}
                 className="grid grid-cols-2 gap-6 p-4 rounded bg-[#eff6ff] shadow-lg border border-gray-300 hover:border-gray-500 transition-all"
             >
-                {/* Type */}
                 <div className="flex flex-col">
                     <label className="block text-sm font-medium pb-1">Type:</label>
                     <select
@@ -136,8 +134,6 @@ function Expenses() {
                         />
                     )}
                 </div>
-
-                {/* Select Project */}
                 <div className="flex flex-col">
                     <label className="block text-sm font-medium pb-1">Select Project (Optional):</label>
                     <select
@@ -157,8 +153,6 @@ function Expenses() {
                         ))}
                     </select>
                 </div>
-
-                {/* Amount */}
                 <div className="flex flex-col">
                     <label className="block text-sm font-medium pb-1">Amount:</label>
                     <input
@@ -170,8 +164,6 @@ function Expenses() {
                         className="border border-blue-300 p-2 rounded"
                     />
                 </div>
-
-                {/* Attachments */}
                 <div className="flex flex-col">
                     <label className="block text-sm font-medium pb-1">Attachments:</label>
                     <input
@@ -181,8 +173,6 @@ function Expenses() {
                         className="border border-blue-300 p-2 rounded"
                     />
                 </div>
-
-                {/* Notes */}
                 <div className="col-span-2 flex flex-col">
                     <label className="block text-sm font-medium pb-1">Notes:</label>
                     <textarea
@@ -193,8 +183,6 @@ function Expenses() {
                         className="border border-blue-300 p-2 rounded"
                     />
                 </div>
-
-                {/* Submit Button */}
                 <div className="col-span-2 text-right">
                     <button
                         type="submit"

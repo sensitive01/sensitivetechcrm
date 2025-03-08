@@ -65,27 +65,14 @@ const EmployeeForm = () => {
       [name]: value
     }));
   };
-
-  // const handleFileChange = (e) => {
-  //   const { name, files } = e.target;
-  //   setFormData((prevData) => ({
-  //     ...prevData,
-  //     [name]: files[0]
-  //   }));
-  // };
-
   const handleFileChange = (e) => {
     const { name, files } = e.target;
-
-    // Special handling for profile image
     if (name === 'profileImage') {
       const file = files[0];
       setFormData((prevData) => ({
         ...prevData,
         [name]: file
       }));
-
-      // Create image preview
       if (file) {
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -96,7 +83,6 @@ const EmployeeForm = () => {
         setProfileImagePreview(null);
       }
     } else {
-      // Existing file change handling for other files
       setFormData((prevData) => ({
         ...prevData,
         [name]: files[0]
@@ -183,46 +169,15 @@ const EmployeeForm = () => {
       }));
     }
   };
-
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault(); 
-
-  //   console.log(formData);
-  //   try {
-  //     const response = await axios.post(
-  //       "https://sensitivetechcrm.onrender.com/createemployee",
-  //       formData
-  //     );
-  //     console.log("Response:", response.data);
-  //     alert("Form submitted successfully!");
-
-  //     localStorage.setItem("empName", formData.name);
-  //     localStorage.setItem("empEmail", formData.email);
-  //     localStorage.setItem("empPassword", formData.password);
-  //     localStorage.setItem("role", formData.role);  // Optional: Store role if needed
-
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //     alert("Failed to submit the form.");
-  //   }
-  // };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Create a FormData object
     const formDataToSubmit = new FormData();
-
-    // Append all form fields to FormData
     Object.keys(formData).forEach(key => {
       if (key === 'presentAddress' || key === 'permanentAddress') {
-        // Append nested address objects
         Object.keys(formData[key]).forEach(addressKey => {
           formDataToSubmit.append(`${key}[${addressKey}]`, formData[key][addressKey]);
         });
       } else if (formData[key] instanceof File) {
-        // Handle file uploads
         formDataToSubmit.append(key, formData[key]);
       } else {
         formDataToSubmit.append(key, formData[key]);
@@ -243,8 +198,6 @@ const EmployeeForm = () => {
       console.log("Response:", response.data);
       alert("Form submitted successfully!");
       navigate("/employee-table");
-
-      // Store user details in localStorage
       localStorage.setItem("empName", formData.name);
       localStorage.setItem("empEmail", formData.email);
       localStorage.setItem("empPassword", formData.password);
@@ -393,19 +346,6 @@ const EmployeeForm = () => {
                 className="w-full px-4 py-2 border rounded-md"
               />
             </div>
-            {/* 
-            <div>
-              <label className="block font-semibold">Role</label>
-              <input
-                type="text"
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border rounded-md"
-                required
-              />
-            </div> */}
-
             <div>
               <label className="block font-semibold">Role</label>
               <select
@@ -791,7 +731,7 @@ const EmployeeForm = () => {
               <label className="block font-semibold mb-2">Password</label>
               <div className="relative">
                 <input
-                  type={showPassword ? "text" : "password"} // Dynamically toggle the type
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
@@ -800,10 +740,10 @@ const EmployeeForm = () => {
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword((prev) => !prev)} // Toggle visibility
+                  onClick={() => setShowPassword((prev) => !prev)}
                   className="absolute right-3 top-3 text-gray-500"
                 >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />} {/* Icon */}
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>

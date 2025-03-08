@@ -40,24 +40,18 @@ const MoM = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Create a FormData instance
     const formData = new FormData();
-  
-    // Append all meeting details to formData
     for (const key in meetingDetails) {
       if (key !== 'agendaFile' && key !== 'discussionFile' && key !== 'actionFile') {
         formData.append(key, meetingDetails[key]);
       }
     }
-  
-    // Append the files
     if (meetingDetails.agendaFile) formData.append('agendaFile', meetingDetails.agendaFile);
     if (meetingDetails.discussionFile) formData.append('discussionFile', meetingDetails.discussionFile);
     if (meetingDetails.actionFile) formData.append('actionFile', meetingDetails.actionFile);
   
     try {
-      const response = await createMoM(formData);  // Update the API to accept FormData
+      const response = await createMoM(formData);
       console.log('Meeting saved:', response.data);
       alert('Meeting saved successfully!');
       navigate("/momdetails");
@@ -82,10 +76,7 @@ const MoM = () => {
               onChange={(e) => handleChange(e.target.value, 'title')}
             />
           </div>
-
-          {/* Updated Date, Time, Location, Attendees Fields */}
           <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Date Input */}
             <div className="relative">
               <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                 <Calendar className="h-4 w-4 text-gray-400" />
@@ -97,8 +88,6 @@ const MoM = () => {
                 onChange={(e) => handleChange(e.target.value, 'date')}
               />
             </div>
-
-             {/* Location Input */}
              <div className="relative">
               <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                 <Calendar className="h-4 w-4 text-gray-400" />
@@ -111,8 +100,6 @@ const MoM = () => {
                 onChange={(e) => handleChange(e.target.value, 'location')}
               />
             </div>
-
-            {/* Start Time Input */}
             <div className="relative">
               <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                 <Clock className="h-4 w-4 text-gray-400" />
@@ -124,8 +111,6 @@ const MoM = () => {
                 onChange={(e) => handleChange(e.target.value, 'startTime')}
               />
             </div>
-
-            {/* End Time Input */}
             <div className="relative">
               <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                 <Clock className="h-4 w-4 text-gray-400" />
@@ -137,9 +122,6 @@ const MoM = () => {
                 onChange={(e) => handleChange(e.target.value, 'endTime')}
               />
             </div>
-
-
-            {/* Attendees Input */}
             <div className="relative col-span-2">
               <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                 <Users className="h-4 w-4 text-gray-400" />
@@ -153,8 +135,6 @@ const MoM = () => {
               />
             </div>
           </div>
-
-          {/* Agenda Section */}
           <div className="mb-8">
             <h2 className="text-lg font-semibold text-gray-800 mb-3">Agenda</h2>
             <textarea
@@ -168,8 +148,6 @@ const MoM = () => {
               <input type="file" onChange={(e) => handleFileChange(e, 'agendaFile')} />
             </label>
           </div>
-
-          {/* Discussion Notes Section */}
           <div className="mb-8">
             <h2 className="text-lg font-semibold text-gray-800 mb-3">Discussion Notes</h2>
             <ReactQuill
@@ -185,8 +163,6 @@ const MoM = () => {
               <Paperclip className="w-5 h-5 text-blue-500" />
               <input type="file" onChange={(e) => handleFileChange(e, 'discussionFile')} />
             </label>
-
-          {/* Action Items Section */}
           <div className="mb-8">
             <h2 className="text-lg font-semibold text-gray-800 mb-3">Action Items</h2>
             <textarea
@@ -200,8 +176,6 @@ const MoM = () => {
               <input type="file" onChange={(e) => handleFileChange(e, 'actionFile')} />
             </label> 
           </div>
-
-          {/* Save Button */}
           <div className="flex justify-end">
             <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
               Save Minutes

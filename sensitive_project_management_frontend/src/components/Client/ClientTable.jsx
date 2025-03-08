@@ -228,8 +228,6 @@ const ClientTable = () => {
           </Link>
         </div>
       </div>
-
-      {/* Table Container */}
       <div className="overflow-x-auto bg-white shadow-md rounded-lg">
         {clients.length === 0 ? (
           <p className="text-center p-4">No client records found.</p>
@@ -266,9 +264,6 @@ const ClientTable = () => {
                 })}
               </tbody>
             </table>
-
-
-            {/* Pagination Controls */}
             <div className="flex justify-between items-center p-4">
               <div>
                 <span>

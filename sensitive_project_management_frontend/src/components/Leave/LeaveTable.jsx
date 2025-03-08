@@ -120,203 +120,165 @@ const LeaveTable = () => {
 
     const columns = useMemo(() => {
         const baseColumns = [
-        {
-            Header: 'S.No',
-            accessor: (row, index) => index + 1,
-            Cell: ({ value }) => <span className="whitespace-nowrap">{value}</span>
-        },
-        // {
-        //     Header: 'Leave ID',
-        //     accessor: row => row._id,
-        //     id: 'leaveIdColumn',
-        // },
-        {
-            Header: 'Employee',
-            accessor: 'employee',
-            Cell: ({ value }) => <span className="whitespace-nowrap">{value}</span>
-        },
-        {
-            Header: 'Category',
-            accessor: 'leaveCategory',
-            Cell: ({ value }) => <span className="whitespace-nowrap">{value}</span>
-        },
-        {
-            Header: 'Leave Type',
-            accessor: 'leaveType',
-            Cell: ({ value }) => <span className="whitespace-nowrap">{value}</span>
-        },
-        {
-            Header: 'Applied Date',
-            accessor: (row) =>
-                row.createdAt ? (
-                    <span className="whitespace-nowrap">
-                        {new Date(row.createdAt).toLocaleDateString('en-GB')}<br />
-                        {new Date(row.createdAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
-                    </span>
-                ) : 'N/A',
-        },
-        // {
-        //     Header: 'Leave / Permission Range',
-        //     accessor: (row) =>
-        //         row.startDate && row.endDate
-        //             ? `${new Date(row.startDate).toLocaleDateString('en-GB')} to ${new Date(row.endDate).toLocaleDateString('en-GB')}`
-        //             : 'N/A',
-        // },
-        {
-            Header: 'Leave / Permission Range',
-            accessor: (row) => {
-                if (row.leaveCategory === 'Leave') {
-                    return row.startDate && row.endDate
-                        ? (
-                            <div className="text-center">
-                                <span>{new Date(row.startDate).toLocaleDateString('en-GB')} to {new Date(row.endDate).toLocaleDateString('en-GB')}</span>
-                            </div>
-                        )
-                        : 'N/A';
-                } else if (row.leaveCategory === 'Permission') {
-                    if (row.permissionDate && row.startTime && row.endTime) {
-                        const permissionDate = new Date(row.permissionDate).toLocaleDateString('en-GB');
+            {
+                Header: 'S.No',
+                accessor: (row, index) => index + 1,
+                Cell: ({ value }) => <span className="whitespace-nowrap">{value}</span>
+            },
+            // {
+            //     Header: 'Leave ID',
+            //     accessor: row => row._id,
+            //     id: 'leaveIdColumn',
+            // },
+            {
+                Header: 'Employee',
+                accessor: 'employee',
+                Cell: ({ value }) => <span className="whitespace-nowrap">{value}</span>
+            },
+            {
+                Header: 'Category',
+                accessor: 'leaveCategory',
+                Cell: ({ value }) => <span className="whitespace-nowrap">{value}</span>
+            },
+            {
+                Header: 'Leave Type',
+                accessor: 'leaveType',
+                Cell: ({ value }) => <span className="whitespace-nowrap">{value}</span>
+            },
+            {
+                Header: 'Applied Date',
+                accessor: (row) =>
+                    row.createdAt ? (
+                        <span className="whitespace-nowrap">
+                            {new Date(row.createdAt).toLocaleDateString('en-GB')}<br />
+                            {new Date(row.createdAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
+                        </span>
+                    ) : 'N/A',
+            },
+            {
+                Header: 'Leave / Permission Range',
+                accessor: (row) => {
+                    if (row.leaveCategory === 'Leave') {
+                        return row.startDate && row.endDate
+                            ? (
+                                <div className="text-center">
+                                    <span>{new Date(row.startDate).toLocaleDateString('en-GB')} to {new Date(row.endDate).toLocaleDateString('en-GB')}</span>
+                                </div>
+                            )
+                            : 'N/A';
+                    } else if (row.leaveCategory === 'Permission') {
+                        if (row.permissionDate && row.startTime && row.endTime) {
+                            const permissionDate = new Date(row.permissionDate).toLocaleDateString('en-GB');
 
-                        const formatTime = (time) => {
-                            const [hours, minutes] = time.split(':');
-                            let formattedHours = parseInt(hours, 10);
-                            const ampm = formattedHours >= 12 ? 'PM' : 'AM';
-                            formattedHours = formattedHours % 12 || 12; // Convert 24h to 12h format
-                            return `${formattedHours}:${minutes} ${ampm}`;
-                        };
+                            const formatTime = (time) => {
+                                const [hours, minutes] = time.split(':');
+                                let formattedHours = parseInt(hours, 10);
+                                const ampm = formattedHours >= 12 ? 'PM' : 'AM';
+                                formattedHours = formattedHours % 12 || 12; 
+                                return `${formattedHours}:${minutes} ${ampm}`;
+                            };
 
-                        return (
-                            <div className="flex flex-col ">
-                                <span>{permissionDate}</span>
-                                <span>{formatTime(row.startTime)} to {formatTime(row.endTime)}</span>
-                            </div>
-                        );
+                            return (
+                                <div className="flex flex-col ">
+                                    <span>{permissionDate}</span>
+                                    <span>{formatTime(row.startTime)} to {formatTime(row.endTime)}</span>
+                                </div>
+                            );
+                        }
+                        return 'N/A';
                     }
                     return 'N/A';
                 }
-                return 'N/A';
-            }
-        },
+            },
 
-        {
-            Header: 'Notes',
-            accessor: 'remarks',
-            Cell: ({ value }) => (
-                <div className="w-[300px] break-words whitespace-pre-wrap overflow-hidden max-h-[30rem]">
-                    {value}
-                </div>
-            ),
-        },
+            {
+                Header: 'Notes',
+                accessor: 'remarks',
+                Cell: ({ value }) => (
+                    <div className="w-[300px] break-words whitespace-pre-wrap overflow-hidden max-h-[30rem]">
+                        {value}
+                    </div>
+                ),
+            },
 
-        {
-            Header: 'Attachment',
-            accessor: 'attachment',
-            Cell: ({ value }) => (
-                <div className="whitespace-nowrap">
-                    {value ? <img src={value} alt="Attachment" className="w-12 h-12 object-cover rounded" /> : 'No attachment'}
-                </div>
-            ),
-        },
-        {
-            Header: 'Status',
-            accessor: 'status',
-            Cell: ({ row }) => (
-                <select
-                    value={row.original.status}
-                    onChange={(e) => role === "Superadmin" && handleStatusChange(row.original._id, e.target.value)}
-                    disabled={role !== "Superadmin"}
-                    className={`whitespace-nowrap px-3 py-1 rounded text-sm border ${row.original.status === 'Approved' ? 'bg-green-100 text-green-800 border-green-200' :
+            {
+                Header: 'Attachment',
+                accessor: 'attachment',
+                Cell: ({ value }) => (
+                    <div className="whitespace-nowrap">
+                        {value ? <img src={value} alt="Attachment" className="w-12 h-12 object-cover rounded" /> : 'No attachment'}
+                    </div>
+                ),
+            },
+            {
+                Header: 'Status',
+                accessor: 'status',
+                Cell: ({ row }) => (
+                    <select
+                        value={row.original.status}
+                        onChange={(e) => role === "Superadmin" && handleStatusChange(row.original._id, e.target.value)}
+                        disabled={role !== "Superadmin"}
+                        className={`whitespace-nowrap px-3 py-1 rounded text-sm border ${row.original.status === 'Approved' ? 'bg-green-100 text-green-800 border-green-200' :
                             row.original.status === 'Pending' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
                                 'bg-red-100 text-red-800 border-red-200'}, ${role !== "Superadmin" ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}
                     `}
-                >
-                    <option value="Pending">Pending</option>
-                    <option value="Approved">Approved</option>
-                    <option value="Rejected">Rejected</option>
-                </select>
-            )
-        },
-        {
-            Header: 'Running Projects',
-            accessor: 'runningProjects',
-            Cell: ({ value }) => <span className="whitespace-nowrap">{value}</span>
-        },
-        {
-            Header: 'Approved By',
-            accessor: 'approvedBy',
-            Cell: ({ value }) => <span className="whitespace-nowrap">{value}</span>
-        },
+                    >
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+                    </select>
+                )
+            },
+            {
+                Header: 'Running Projects',
+                accessor: 'runningProjects',
+                Cell: ({ value }) => <span className="whitespace-nowrap">{value}</span>
+            },
+            {
+                Header: 'Approved By',
+                accessor: 'approvedBy',
+                Cell: ({ value }) => <span className="whitespace-nowrap">{value}</span>
+            },
+            {
+                Header: 'Approved Date & Time',
+                accessor: (row) =>
+                    row.statusChangeDate ? (
+                        <span className="whitespace-nowrap">
+                            {new Date(row.statusChangeDate).toLocaleDateString('en-GB')}<br />
+                            {new Date(row.statusChangeDate).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                        </span>
+                    ) : 'N/A',
+            }
+        ];
 
-        // {
-        //     Header: 'Leave Start Dates',
-        //     accessor: (row) => row.startDate
-        //         ? new Date(row.startDate).toLocaleDateString('en-GB')  // Converts to DD/MM/YY format
-        //         : 'N/A',
-        // },
-        // {
-        //     Header: 'Leave End Dates',
-        //     accessor: (row) => row.endDate
-        //         ? new Date(row.endDate).toLocaleDateString('en-GB')
-        //         : 'N/A',
-        // },
-        // {
-        //     Header: 'Permission Date',
-        //     accessor: (row) => row.permissionDate
-        //         ? new Date(row.permissionDate).toLocaleDateString('en-GB')
-        //         : 'N/A',
-        // },
-        // {
-        //     Header: 'Start Time',
-        //     accessor: (row) => row.startTime
-        //         ? new Date(`1970-01-01T${row.startTime}`).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
-        //         : 'N/A',
-        // },
-        // {
-        //     Header: 'End Time',
-        //     accessor: (row) => row.endTime
-        //         ? new Date(`1970-01-01T${row.endTime}`).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
-        //         : 'N/A',
-        // },
-        {
-            Header: 'Approved Date & Time',
-            accessor: (row) =>
-                row.statusChangeDate ? (
-                    <span className="whitespace-nowrap">
-                        {new Date(row.statusChangeDate).toLocaleDateString('en-GB')}<br />
-                        {new Date(row.statusChangeDate).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })}
-                    </span>
-                ) : 'N/A',
+
+        if (role !== "Superadmin") {
+            baseColumns.push({
+                Header: 'Actions',
+                accessor: '_id',
+                Cell: ({ row }) => (
+                    <div className="flex justify-center space-x-2">
+                        <button
+                            className="text-green-500 hover:bg-green-100 p-2 rounded-full transition-colors"
+                            title="Edit Leave"
+                            onClick={() => handleEdit(row.original._id)}
+                        >
+                            <Edit size={20} />
+                        </button>
+                        <button
+                            className="text-red-500 hover:bg-red-100 p-2 rounded-full transition-colors"
+                            title="Delete Leave"
+                            onClick={() => handleDelete(row.original._id)}
+                        >
+                            <Trash2 size={20} />
+                        </button>
+                    </div>
+                )
+            });
         }
-    ];
 
-
-    if (role !== "Superadmin") {
-        baseColumns.push({
-            Header: 'Actions',
-            accessor: '_id',
-            Cell: ({ row }) => (
-                <div className="flex justify-center space-x-2">
-                    <button
-                        className="text-green-500 hover:bg-green-100 p-2 rounded-full transition-colors"
-                        title="Edit Leave"
-                        onClick={() => handleEdit(row.original._id)}
-                    >
-                        <Edit size={20} />
-                    </button>
-                    <button
-                        className="text-red-500 hover:bg-red-100 p-2 rounded-full transition-colors"
-                        title="Delete Leave"
-                        onClick={() => handleDelete(row.original._id)}
-                    >
-                        <Trash2 size={20} />
-                    </button>
-                </div>
-            )
-        });
-    }
-
-    return baseColumns;
-}, [role]);
+        return baseColumns;
+    }, [role]);
 
     const {
         getTableProps,
@@ -446,7 +408,7 @@ const LeaveTable = () => {
                                         {headerGroup.headers.map((column) => (
                                             <th
                                                 {...column.getHeaderProps(column.getSortByToggleProps())}
-                                                className="p-4 text-left cursor-pointer whitespace-nowrap" // Added whitespace-nowrap
+                                                className="p-4 text-left cursor-pointer whitespace-nowrap"
                                             >
                                                 <div className="flex items-center">
                                                     {column.render("Header")}

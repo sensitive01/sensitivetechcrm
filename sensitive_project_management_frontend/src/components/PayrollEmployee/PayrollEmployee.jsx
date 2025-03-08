@@ -26,7 +26,7 @@ const PayrollEmployee = () => {
     try {
       const response = await axios.get('https://sensitivetechcrm.onrender.com/allemployeesdata');
       if (response.data.success) {
-        console.log('Raw API data:', response.data.data); // Debug: log raw data
+        console.log('Raw API data:', response.data.data);
         setPayrollData(response.data.data);
       }
     } catch (error) {
@@ -35,11 +35,9 @@ const PayrollEmployee = () => {
   };
 
   const applyMonthFilter = (filter) => {
-    // We'll create a completely separate processing logic for each month
     let result = [];
 
     if (filter === 'current') {
-      // Only process employees with currentMonth data
       result = payrollData
         .filter(employee => employee.currentMonth)
         .map((employee, index) => ({
@@ -60,7 +58,6 @@ const PayrollEmployee = () => {
           payable: employee.currentMonth?.payable || 0
         }));
     } else if (filter === 'previous') {
-      // Only process employees with previousMonth data
       result = payrollData
         .filter(employee => employee.previousMonth)
         .map((employee, index) => ({
@@ -240,8 +237,6 @@ const PayrollEmployee = () => {
           </tbody>
         </table>
       </div>
-
-      {/* Pagination controls */}
       {totalPages > 1 && (
         <div className="flex justify-between items-center mt-4">
           <div className="text-sm text-gray-700">

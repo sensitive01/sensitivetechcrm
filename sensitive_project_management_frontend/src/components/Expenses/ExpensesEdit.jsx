@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { createExpense, projectname, updateExpenseById, getExpenseById } from "../../api/services/projectServices";
-import { useParams,useNavigate } from "react-router-dom"; // Just for the expenseId in the URL
+import { useParams,useNavigate } from "react-router-dom";
 
 function ExpensesEdit() {
-    const { id } = useParams(); // Get expenseId from the URL
+    const { id } = useParams();
     console.log(id);
 
     const [expenses, setExpenses] = useState({
@@ -22,10 +22,8 @@ function ExpensesEdit() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-
-                // Fetch projects
                 const response = await projectname();
-                console.log('Projects Response:', response); // Add logging here
+                console.log('Projects Response:', response);
                 if (response && response.data) {
                     const flattenedProjects = response.data.flatMap(project =>
                         project.projectDetails.map(detail => ({
@@ -38,11 +36,9 @@ function ExpensesEdit() {
                 } else {
                     throw new Error("Failed to fetch projects.");
                 }
-
-                // Fetch the expense data if expenseId is available
                 if (id) {
-                    const expenseResponse = await getExpenseById(id, null); // Pass `null` or `{}` if no form data is required
-                    console.log('Expense Response:', expenseResponse); // Add logging here
+                    const expenseResponse = await getExpenseById(id, null);
+                    console.log('Expense Response:', expenseResponse);
                     if (expenseResponse?.data) {
                         setExpenses(expenseResponse.data);
                     } else {
@@ -133,7 +129,6 @@ function ExpensesEdit() {
                 onSubmit={handleSubmit}
                 className="grid grid-cols-2 gap-6 p-4 rounded bg-[#eff6ff] shadow-lg border border-gray-300 hover:border-gray-500 transition-all"
             >
-                {/* Type */}
                 <div className="flex flex-col">
                     <label className="block text-sm font-medium pb-1">Type:</label>
                     <select
@@ -163,8 +158,6 @@ function ExpensesEdit() {
                         />
                     )}
                 </div>
-
-                {/* Select Project */}
                 <div className="flex flex-col">
                     <label className="block text-sm font-medium pb-1">Select Project (Optional):</label>
                     <select
@@ -184,8 +177,6 @@ function ExpensesEdit() {
                         ))}
                     </select>
                 </div>
-
-                {/* Amount */}
                 <div className="flex flex-col">
                     <label className="block text-sm font-medium pb-1">Amount:</label>
                     <input
@@ -197,8 +188,6 @@ function ExpensesEdit() {
                         className="border border-blue-300 p-2 rounded"
                     />
                 </div>
-
-                {/* Attachments */}
                 <div className="flex flex-col">
                     <label className="block text-sm font-medium pb-1">Attachments:</label>
                     {typeof expenses.attachments === "string" && (
@@ -217,8 +206,6 @@ function ExpensesEdit() {
                         className="border border-blue-300 p-2 rounded"
                     />
                 </div>
-
-                {/* Notes */}
                 <div className="col-span-2 flex flex-col">
                     <label className="block text-sm font-medium pb-1">Notes:</label>
                     <textarea
@@ -229,8 +216,6 @@ function ExpensesEdit() {
                         className="border border-blue-300 p-2 rounded"
                     />
                 </div>
-
-                {/* Submit Button */}
                 <div className="col-span-2 text-right">
                     <button
                         type="submit"

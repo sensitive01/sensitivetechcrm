@@ -27,11 +27,9 @@ const AttendanceTable = () => {
                     throw new Error("Failed to fetch attendance data.");
                 }
                 const data = await response.json();
-                
-                // Sort data by date (descending)
                 data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     
-                setAllAttendanceRecords(data); // Store full dataset
+                setAllAttendanceRecords(data);
     
                 const today = new Date().toISOString().split("T")[0];
     
@@ -252,7 +250,7 @@ const AttendanceTable = () => {
                     <input
                         type="text"
                         value={globalFilter || ''}
-                        onChange={(e) => handleSearch(e.target.value)} // Use modified search function
+                        onChange={(e) => handleSearch(e.target.value)}
                         placeholder="Search records..."
                         className="border border-blue-500 p-2 rounded w-64 pl-8"
                     />

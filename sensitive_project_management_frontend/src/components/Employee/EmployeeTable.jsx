@@ -1,4 +1,3 @@
-// EmployeeTable.jsx
 import React, { useState, useMemo, useEffect } from "react";
 import { Eye, Edit, Trash2, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,8 +5,6 @@ import { FaPlus, FaFileDownload, FaFilter } from "react-icons/fa";
 import axios from "axios";
 import * as XLSX from "xlsx";
 import { useTable, useGlobalFilter, useSortBy, usePagination } from "react-table";
-
-// Custom Modal Component
 const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
@@ -19,8 +16,6 @@ const Modal = ({ isOpen, onClose, children }) => {
     </div>
   );
 };
-
-// Employee Details Modal Component
 const EmployeeDetailsModal = ({ isOpen, onClose, employee }) => {
   if (!employee) return null;
   const combinedShiftTime = `${employee.shiftStartTime} to ${employee.shiftEndTime}`;
@@ -58,7 +53,7 @@ const EmployeeDetailsModal = ({ isOpen, onClose, employee }) => {
               <DetailItem label="Status" value={employee.status} />
               <DetailItem label="Created Date" value={formatDateTime(employee.createdAt)} />
               <DetailItem label="Shift Date" value={formatDate(employee.shiftDate)} />
-              <DetailItem label="Shift Time" value={combinedShiftTime} /> {/* Combined Shift Time */}
+              <DetailItem label="Shift Time" value={combinedShiftTime} /> 
             </div>
           </div>
         </div>
@@ -66,8 +61,6 @@ const EmployeeDetailsModal = ({ isOpen, onClose, employee }) => {
     </Modal>
   );
 };
-
-// Detail Item Component for Modal
 const DetailItem = ({ label, value }) => (
   <div className="bg-gray-50 p-4 rounded-lg">
     <p className="text-sm text-gray-600">{label}</p>
@@ -82,7 +75,7 @@ const formatDate = (dateString) => {
 };
 const formatDateTime = (dateString) => {
   if (!dateString || isNaN(new Date(dateString).getTime())) {
-    return "N/A"; // Handle missing or invalid date values
+    return "N/A";
   }
   const date = new Date(dateString);
   return date.toLocaleDateString("en-GB", {
@@ -96,9 +89,6 @@ const formatDateTime = (dateString) => {
   });
 };
 ;
-
-
-// Main EmployeeTable Component
 const EmployeeTable = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -125,9 +115,6 @@ const EmployeeTable = () => {
 
     fetchEmployees();
   }, []);
-
-
-  // Define table columns
   const columns = useMemo(
     () => [
       {
@@ -154,8 +141,8 @@ const EmployeeTable = () => {
         accessor: "name",
       },
       {
-        Header: "Role",  // New Role Column
-        accessor: "role",  // Make sure the role field exists in your data
+        Header: "Role",
+        accessor: "role",
       },
       {
         Header: "Designation",
@@ -193,7 +180,7 @@ const EmployeeTable = () => {
       },
       {
         Header: "Created Date",
-        accessor: "createdAt", // This references the automatically generated createdAt field
+        accessor: "createdAt",
         Cell: ({ value }) => formatDateTime(value),
       },
 
@@ -232,8 +219,6 @@ const EmployeeTable = () => {
     ],
     []
   );
-
-  // Initialize react-table
   const {
     getTableProps,
     getTableBodyProps,
@@ -259,8 +244,6 @@ const EmployeeTable = () => {
   );
 
   const { globalFilter, pageIndex } = state;
-
-  // Handle employee deletion
   const handleEmployeeDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this employee?")) {
       try {
@@ -274,8 +257,6 @@ const EmployeeTable = () => {
       }
     }
   };
-
-  // Export data to Excel
   const exportToExcel = () => {
     const exportData = employees.map((employee, index) => ({
       "S.No": index + 1,
@@ -300,8 +281,6 @@ const EmployeeTable = () => {
       alert('Please select both start and end dates.');
       return;
     }
-
-    // Convert dates to Date objects for comparison
     const start = new Date(startDate);
     const end = new Date(endDate);
 
@@ -326,8 +305,6 @@ const EmployeeTable = () => {
       <h2 className="text-4xl font-bold mb-10 text-center mt-20">
         Employee Details
       </h2>
-
-      {/* Action Buttons Section */}
       <div className="flex justify-between items-center mb-4">
         <div className="relative">
           <input
@@ -389,8 +366,6 @@ const EmployeeTable = () => {
           </Link>
         </div>
       </div>
-
-      {/* Table Section */}
       <div className="overflow-x-auto bg-white shadow-lg rounded-lg border">
         <table {...getTableProps()} className="w-full table-auto">
           <thead className="bg-[#2563eb] text-white border-b">
@@ -399,7 +374,7 @@ const EmployeeTable = () => {
                 {headerGroup.headers.map((column) => (
                   <th
                     {...column.getHeaderProps(column.getSortByToggleProps())}
-                    className="p-4 text-left font-semibold text-white whitespace-nowrap" // Added whitespace-nowrap
+                    className="p-4 text-left font-semibold text-white whitespace-nowrap"
                   >
                     <div className="flex items-center">
                       {column.render("Header")}
@@ -416,8 +391,6 @@ const EmployeeTable = () => {
               </tr>
             ))}
           </thead>
-
-
           <tbody {...getTableBodyProps()}>
             {page.map((row) => {
               prepareRow(row);
@@ -433,8 +406,6 @@ const EmployeeTable = () => {
             })}
           </tbody>
         </table>
-
-        {/* Pagination Controls */}
         <div className="flex justify-between items-center p-4">
           <div>
             <span>
@@ -462,8 +433,6 @@ const EmployeeTable = () => {
           </div>
         </div>
       </div>
-
-      {/* Employee Details Modal */}
       <EmployeeDetailsModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

@@ -29,7 +29,7 @@ const QuotationForm = () => {
     const handleFileChange = (e) => {
         setFormData({
             ...formData,
-            quotation: e.target.files[0] // Store the selected file
+            quotation: e.target.files[0]
         });
     };
 
@@ -37,11 +37,7 @@ const QuotationForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-
-        // Create a FormData object
         const formDataToSubmit = new FormData();
-
-        // Append all form fields to the FormData object
         for (const key in formData) {
             formDataToSubmit.append(key, formData[key]);
         }
@@ -68,7 +64,6 @@ const QuotationForm = () => {
 
             <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {/* Client Information */}
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
                             Name
@@ -100,8 +95,6 @@ const QuotationForm = () => {
                             placeholder="Email or phone number"
                         />
                     </div>
-
-                    {/* Project Requirements */}
                     <div className="mb-4 md:col-span-2">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="requirement">
                             Requirements

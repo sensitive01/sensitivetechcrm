@@ -17,7 +17,6 @@ const ProjectDetailsModal = ({ project, onClose, onEdit }) => {
       <div className="bg-white rounded-lg p-4 w-full sm:w-2/3 md:w-1/2 lg:w-1/3 max-h-[500px] overflow-auto flex flex-col">
         <h2 className="text-2xl font-semibold mb-4">Project Details</h2>
         <div className="flex flex-row justify-between">
-          {/* Left Side - Project Info */}
           <div className="w-1/2 pr-4">
             <section>
               <h3 className="text-lg font-semibold mb-2">Project Information:</h3>
@@ -33,8 +32,6 @@ const ProjectDetailsModal = ({ project, onClose, onEdit }) => {
               </div>
             </section>
           </div>
-
-          {/* Right Side - Additional Details */}
           <div className="w-1/2 pl-4">
             <section>
               <h3 className="text-lg font-semibold mb-2">Additional Details:</h3>
@@ -52,8 +49,6 @@ const ProjectDetailsModal = ({ project, onClose, onEdit }) => {
             </section>
           </div>
         </div>
-
-        {/* Modal Buttons */}
         <div className="mt-4 flex justify-between">
           <button
             onClick={() => onEdit(project)}
@@ -84,7 +79,7 @@ const ProjectManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
-  const ITEMS_PER_PAGE = 10; // Increased to match payment table
+  const ITEMS_PER_PAGE = 10; 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
@@ -295,8 +290,6 @@ const ProjectManager = () => {
       <h2 className="text-4xl font-bold mb-10 text-center mt-24">
         Project List
       </h2>
-
-      {/* Data Table Section */}
       <div className="mt-12">
         <div className="flex justify-between items-center mb-6">
           <div className="relative">

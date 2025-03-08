@@ -12,12 +12,10 @@ const ExpenseTable = () => {
     const [error, setError] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedExpense, setSelectedExpense] = useState(null);
-      const [startDate, setStartDate] = useState("");
-        const [endDate, setEndDate] = useState("");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
 
-    const navigate = useNavigate(); // Initialize useNavigate hook
-
-    // Fetch expense data
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchExpenseData = async () => {
             try {
@@ -36,16 +34,6 @@ const ExpenseTable = () => {
         };
         fetchExpenseData();
     }, []);
-
-    // Handle delete action
-    // const handleDelete = (expenseId) => {
-    //     if (window.confirm('Are you sure you want to delete this expense?')) {
-    //         // Call your delete API endpoint here
-    //         const updatedExpenses = expenses.filter((expense) => expense._id !== expenseId);
-    //         setExpenses(updatedExpenses);
-    //     }
-    // };
-
     const handleEdit = (expenseId) => {
         navigate(`/expense-edit/${expenseId}`);
     };
@@ -59,8 +47,6 @@ const ExpenseTable = () => {
         setIsModalOpen(false);
         setSelectedExpense(null);
     };
-
-    // Download table as Excel file
     const downloadExcel = () => {
         const worksheet = XLSX.utils.json_to_sheet(expenses);
         const workbook = XLSX.utils.book_new();
@@ -73,21 +59,16 @@ const ExpenseTable = () => {
             alert('Please select both start and end dates.');
             return;
         }
-    
-        // Convert dates to Date objects for comparison
         const start = new Date(startDate);
         const end = new Date(endDate);
-    
+
         const filteredExpenses = expenses.filter((expense) => {
             const expenseDate = new Date(expense.createdAt);
             return expenseDate >= start && expenseDate <= end;
         });
-    
-        setExpenses(filteredExpenses);  // Update expenses state with filtered data
-    };
-    
 
-    // Define columns for react-table
+        setExpenses(filteredExpenses);
+    };
     const columns = useMemo(() => [
         { Header: 'S.No', accessor: (row, index) => index + 1 },
         { Header: 'Type', accessor: 'type' },
@@ -122,25 +103,6 @@ const ExpenseTable = () => {
                 ),
             id: 'created_date_time',
         },
-        
-        // {
-        //     Header: 'Create Time',
-        //     accessor: 'createdAt',
-        //     Cell: ({ value }) => new Date(value).toLocaleTimeString(),
-        //     id: 'time',
-        // },
-        // {
-        //     Header: 'Update Date',
-        //     accessor: 'updatedAt',
-        //     Cell: ({ value }) => (value ? new Date(value).toLocaleDateString('en-GB') : 'N/A'),
-        //     id: 'updateDate',
-        // },
-        // {
-        //     Header: 'Update Time',
-        //     accessor: 'updatedAt',
-        //     Cell: ({ value }) => (value ? new Date(value).toLocaleTimeString() : 'N/A'),
-        //     id: 'updateTime',
-        // },
         {
             Header: 'Actions',
             accessor: '_id',
@@ -153,19 +115,10 @@ const ExpenseTable = () => {
                     >
                         <Eye size={20} />
                     </button>
-                    {/* <button
-                        className="text-red-500 hover:bg-red-100 p-2 rounded-full"
-                        title="Delete Expense"
-                        onClick={() => handleDelete(row.original._id)}
-                    >
-                        <Trash2 size={20} />
-                    </button> */}
                 </div>
             ),
         },
     ], [expenses]);
-    
-    // Initialize react-table
     const {
         getTableProps,
         getTableBodyProps,
@@ -213,8 +166,6 @@ const ExpenseTable = () => {
             <h2 className="text-4xl font-bold mb-10 text-center mt-24">
                 Expense Table
             </h2>
-
-            {/* Data Table Section */}
             <div className="mt-12">
                 <div className="flex justify-between items-center mb-6">
                     <div className="relative">
@@ -229,36 +180,36 @@ const ExpenseTable = () => {
                     </div>
 
                     <div className="flex space-x-4 items-center -mt-6">
-                    <div>
-                        <label htmlFor="startDate" className="block">Start Date</label>
-                        <input
-                            type="date"
-                            id="startDate"
-                            value={startDate}
-                            onChange={(e) => setStartDate(e.target.value)}
-                           
-                            className="border border-blue-500 p-2 rounded w-32"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="endDate" className="block">End Date</label>
-                        <input
-                            type="date"
-                            id="endDate"
-                            value={endDate}
-                            onChange={(e) => setEndDate(e.target.value)}
-                           
-                            className="border border-blue-500 p-2 rounded w-32"
-                        />
-                    </div>
-                    <button
+                        <div>
+                            <label htmlFor="startDate" className="block">Start Date</label>
+                            <input
+                                type="date"
+                                id="startDate"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
 
-                        onClick={applyDateFilter}
-                        className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
-                    >
-                        Apply Filter
-                    </button>
-                </div>
+                                className="border border-blue-500 p-2 rounded w-32"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="endDate" className="block">End Date</label>
+                            <input
+                                type="date"
+                                id="endDate"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+
+                                className="border border-blue-500 p-2 rounded w-32"
+                            />
+                        </div>
+                        <button
+
+                            onClick={applyDateFilter}
+                            className="bg-blue-500 text-white px-6 py-2 rounded h-10 w-auto text-sm mt-6"
+                        >
+                            Apply Filter
+                        </button>
+                    </div>
                     <div className="flex space-x-4">
                         <button
                             onClick={() => navigate('/expense-form')}
@@ -335,7 +286,6 @@ const ExpenseTable = () => {
                         </>
                     )}
                 </div>
-                {/* Modal for Viewing Expense */}
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
                         <div className="bg-white rounded-lg p-8 w-1/2">

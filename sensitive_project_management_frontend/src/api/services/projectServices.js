@@ -3,36 +3,12 @@ import { projectServices } from "../axios/axiosInstance";
 
 export const verifyLogin = async (formData) => {
   try {
-    const response = await projectServices.post(`/employee-login/login`, 
-        formData,
-    );
+    const response = await projectServices.post(`/employee-login/login`, formData);
     return response;
   } catch (err) {
-    return err;
+    throw err;
   }
 };
-
-// export const verifyLoginAdmin = async (formData) => {
-//   try {
-//     const response = await projectServices.post(`/super-admin/admin-login/adminlogin`, 
-//         formData,
-//     );
-//     return response;
-//   } catch (err) {
-//     return err;
-//   }
-// };
-
-
-// export const  getAllProject = async (_id) => {
-//   try {
-//       const response = await projectServices.get(`/project/getallprojects/${_id}`);
-//       return response;
-//   } catch (err) {
-//       return err;
-//   }
-// };
-
 
   export const getTheProject=async(projectId) => {
     try {
@@ -117,7 +93,7 @@ export const createTask = async (formData) => {
   try {
     const response = await projectServices.post(`/task/createtask`, formData, {
       headers: {
-        "Content-Type": "multipart/form-data", // Important for file uploads
+        "Content-Type": "multipart/form-data",
       },
     });
     return response;
@@ -143,7 +119,7 @@ export const updateTheTask = async (taskId, formData) => {
   try {
     const response = await projectServices.put(`/task/updatetask/${taskId}`, formData, {
       headers: {
-        "Content-Type": "multipart/form-data", // Let the browser set the boundary automatically
+        "Content-Type": "multipart/form-data", 
       },
     });
     return response.data; 
@@ -294,13 +270,11 @@ export const createPayment = async (formData) => {
   try {
     const response = await projectServices.post(`/payments/createpayment`, formData, {
       headers: {
-        // No need to set "Content-Type" manually for FormData
       },
     });
-    return response; // Return the successful response
+    return response;
   } catch (error) {
     console.error("Error in createPayment API:", error);
-    // Re-throw the error to handle it properly in `handleSubmit`
     throw error;
   }
 };
@@ -436,7 +410,7 @@ export const updateMoM = async (id, formData) => {
 
 export const deleteMoM = async (id) => {
   try {
-      const response = await projectServices.delete(`/mom/deletemom/${id}`); // Update with the correct API endpoint
+      const response = await projectServices.delete(`/mom/deletemom/${id}`);
       return response.data;
   } catch (err) {
       console.error('Error deleting MoM:', err);

@@ -81,7 +81,7 @@ function AdjustmentEdit({payrollId}) {
     
         try {
             for (const formData of payrolls) {
-                const response = await updatePayroll(id, formData); // Update the payroll
+                const response = await updatePayroll(id, formData);
                 if (response.status === 200) {
                     alert("Adjustment updated successfully!");
                     navigate("/adjustment-table"); 

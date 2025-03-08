@@ -108,7 +108,7 @@ const ProjectEdit = () => {
             };
 
             try {
-                const response = await updatetheProject(projectId, projectData); // Pass projectData here
+                const response = await updatetheProject(projectId, projectData);
                 if (response) {
                     alert("Project updated successfully!");
                     navigate("/project");

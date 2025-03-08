@@ -51,7 +51,7 @@ const TaskList = () => {
                         const minutes = createdAtObj.getMinutes().toString().padStart(2, '0');
                         const seconds = createdAtObj.getSeconds().toString().padStart(2, '0');
                         const ampm = hours >= 12 ? 'PM' : 'AM';
-                        hours = hours % 12 || 12; // Convert 0 to 12 for 12-hour format
+                        hours = hours % 12 || 12;
                         task.createDate = `${createdAtObj.getDate().toString().padStart(2, '0')}/${(createdAtObj.getMonth() + 1).toString().padStart(2, '0')}/${createdAtObj.getFullYear()}`;
                         task.createTime = `${hours}:${minutes}:${seconds} ${ampm}`;
                     }
@@ -120,10 +120,10 @@ const TaskList = () => {
     };
 
     const filteredTasks = useMemo(() => {
-        if (!Array.isArray(tasks)) return []; // Ensure it's always an array
+        if (!Array.isArray(tasks)) return []; 
         return tasks.filter(task => {
             if (role === "Superadmin") return true;
-            return task.status?.toLowerCase() === "pending"; // Only show pending tasks for employees/leads
+            return task.status?.toLowerCase() === "pending";
         }).filter(task =>
             task.task.toLowerCase().includes(searchTerm.toLowerCase()) ||
             task.status.toLowerCase().includes(searchTerm.toLowerCase())
@@ -136,8 +136,6 @@ const TaskList = () => {
             alert('Please select both start and end dates.');
             return;
         }
-
-        // Convert dates to Date objects for comparison
         const start = new Date(startDate.split('/').reverse().join('/'));
         const end = new Date(endDate.split('/').reverse().join('/'));
 
@@ -188,12 +186,9 @@ const TaskList = () => {
                     const updatedStatus = e.target.value;
                     try {
                         const taskId = row.original._id;
-                        // Update the task status in the backend
                         await axios.put(`https://sensitivetechcrm.onrender.com/task/update-status/${taskId}`, {
                             status: updatedStatus,
                         });
-
-                        // Update the status locally in the state
                         row.original.status = updatedStatus;
                         setTasks([...tasks]);
                     } catch (err) {
@@ -215,9 +210,8 @@ const TaskList = () => {
 
                 return (
                     <select
-                        value={row.original.status || "Pending"}  // Default to "Pending"
+                        value={row.original.status || "Pending"} 
                         onChange={handleStatusChange}
-                        // disabled={role !== "Superadmin"}
                         className={`border p-2 rounded w-32 ${getStatusStyle(row.original.status)} `}
                     >
                         <option value="Pending">Pending</option>
@@ -228,7 +222,7 @@ const TaskList = () => {
             },
         },
         {
-            Header: 'Attachment',  // New column for attachments
+            Header: 'Attachment', 
             accessor: 'attachments',
             Cell: ({ value }) => {
                 if (value) {
@@ -243,7 +237,7 @@ const TaskList = () => {
         },
         {
             Header: 'Created Date & Time',
-            accessor: 'createDate', // Assuming createDate and createTime are stored separately
+            accessor: 'createDate', 
             Cell: ({ row }) =>
                 row.original.createDate && row.original.createTime ? (
                     <>
@@ -256,11 +250,6 @@ const TaskList = () => {
                 ),
             id: 'created_date_time',
         },
-
-        // {
-        //     Header: 'Created Time',
-        //     accessor: 'createTime',
-        // },
         {
             Header: 'Actions',
             accessor: '_id',
@@ -478,8 +467,6 @@ const TaskList = () => {
                     </>
                 )}
             </div>
-
-            {/* Modal for Viewing Task */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
                     <div className="bg-white p-6 rounded-lg shadow-lg w-[500px]">

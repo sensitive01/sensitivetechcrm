@@ -282,7 +282,7 @@ const ProjectForm = () => {
                               <option value="">Select User</option>
                               {employees.map((employee) => (
                                 <option key={employee._id} value={employee.name}>
-                                  {employee.name}  {/* Adjust the property name based on your API response */}
+                                  {employee.name}
                                 </option>
                               ))}
                             </select>
@@ -321,8 +321,6 @@ const ProjectForm = () => {
                       )
                     ))}
                   </div>
-
-                  {/* Only render task field in Project Details section */}
                   {section === "projectDetails" && (
                     <div className="w-full mt-4">
                       <label className="block text-gray-600 mb-1 font-medium">

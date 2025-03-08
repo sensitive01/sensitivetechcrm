@@ -1,4 +1,3 @@
-// Preloader.js
 import React from 'react';
 
 const Preloader = () => {
@@ -7,7 +6,7 @@ const Preloader = () => {
       <img
         src="/preloader.gif"
         alt="Loading..."
-        className="w-24 h-24 rounded-[30px]" // Add border-radius here
+        className="w-24 h-24 rounded-[30px]"
       />
     </div>
   );

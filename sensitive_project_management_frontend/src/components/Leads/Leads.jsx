@@ -122,8 +122,6 @@ const LeadForm = () => {
             </div>
           </div>
         </div>
-
-        {/* Second Column */}
         <div className="border border-blue-500 p-6 rounded-lg">
           <div className="space-y-8 pb-4">
             <div>

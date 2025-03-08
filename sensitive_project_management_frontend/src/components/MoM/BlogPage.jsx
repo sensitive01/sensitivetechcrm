@@ -54,8 +54,6 @@ const BlogPage = () => {
             alert('Please select both start and end dates.');
             return;
         }
-
-        // Convert dates to Date objects for comparison
         const start = new Date(startDate.split('/').reverse().join('/'));
         const end = new Date(endDate.split('/').reverse().join('/'));
 
@@ -198,8 +196,6 @@ const BlogPage = () => {
                             <p className="mt-4 text-gray-600 line-clamp-3"><strong>Discussion Notes:</strong> {meeting.discussionNotes}</p>
                             <p className="mt-4 text-gray-600 line-clamp-3"><strong>Agenda:</strong> {meeting.agenda}</p>
                             <p className="mt-4 text-gray-600 line-clamp-3"><strong>Action Items:</strong> {meeting.actionItems}</p>
-
-                            {/* Display Files (agendaFile, discussionFile, actionFile) */}
                             {meeting.agendaFile && (
                                 <div className="mt-2">
                                     <a href={meeting.agendaFile} target="_blank" rel="noopener noreferrer" className="text-blue-500">
@@ -250,7 +246,7 @@ const BlogPage = () => {
                                         Edit
                                     </button>
                                     <button
-                                        onClick={() => handleDelete(meeting._id)}  // Use _id to pass the correct value
+                                        onClick={() => handleDelete(meeting._id)}
                                         className="w-full flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-gray-100 transition-colors"
                                     >
                                         <Trash size={16} />
@@ -262,8 +258,6 @@ const BlogPage = () => {
                     </div>
                 ))}
             </div>
-
-            {/* View Modal */}
             {isModalOpen && selectedMeeting && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
@@ -304,8 +298,6 @@ const BlogPage = () => {
                                     <h3 className="font-semibold text-gray-800 mb-2">Action Items</h3>
                                     <p className="text-gray-600 whitespace-pre-line">{selectedMeeting.actionItems}</p>
                                 </div>
-
-                                {/* File Attachments */}
                                 {selectedMeeting.agendaFile && (
                                     <div className="mt-2">
                                         <a href={selectedMeeting.agendaFile} target="_blank" rel="noopener noreferrer" className="text-blue-500">

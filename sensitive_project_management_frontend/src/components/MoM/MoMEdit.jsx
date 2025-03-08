@@ -99,7 +99,6 @@ const MoMEdit = () => {
         ...prev,
         [field]: file
       }));
-      // Clear existing file when new file is selected
       setExistingFiles(prev => ({
         ...prev,
         [field]: null
@@ -122,15 +121,11 @@ const MoMEdit = () => {
 
     try {
       const formData = new FormData();
-
-      // Append all non-file fields
       Object.keys(meetingDetails).forEach(key => {
         if (!key.includes('File')) {
           formData.append(key, meetingDetails[key]);
         }
       });
-
-      // Append new files if they exist
       if (meetingDetails.agendaFile instanceof File) {
         formData.append('agendaFile', meetingDetails.agendaFile);
       }
@@ -219,10 +214,7 @@ const MoMEdit = () => {
               onChange={(e) => handleChange(e.target.value, 'title')}
             />
           </div>
-
-          {/* Meeting Details Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Date */}
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Date
@@ -235,8 +227,6 @@ const MoMEdit = () => {
                 onChange={(e) => handleChange(e.target.value, 'date')}
               />
             </div>
-
-            {/* Location */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Location
@@ -249,8 +239,6 @@ const MoMEdit = () => {
                 onChange={(e) => handleChange(e.target.value, 'location')}
               />
             </div>
-
-            {/* Start Time */}
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Start Time
@@ -263,8 +251,6 @@ const MoMEdit = () => {
                 onChange={(e) => handleChange(e.target.value, 'startTime')}
               />
             </div>
-
-            {/* End Time */}
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 End Time
@@ -278,8 +264,6 @@ const MoMEdit = () => {
               />
             </div>
           </div>
-
-          {/* Attendees */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Attendees
@@ -295,8 +279,6 @@ const MoMEdit = () => {
               />
             </div>
           </div>
-
-          {/* Agenda */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Agenda
@@ -316,8 +298,6 @@ const MoMEdit = () => {
               />
             </label>
           </div>
-
-          {/* Discussion Notes */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Discussion Notes
@@ -330,7 +310,7 @@ const MoMEdit = () => {
               className="bg-white"
               style={{ height: '200px' }}
             />
-            <div className="h-12"></div> {/* Spacing for Quill editor */}
+            <div className="h-12"></div>
           </div>
           <label className="flex items-center gap-2 mt-12">
             <Paperclip className="w-5 h-5 text-blue-500" />
@@ -339,8 +319,6 @@ const MoMEdit = () => {
               label="Attach discussion file"
             />
           </label>
-
-          {/* Action Items */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Action Items
@@ -360,8 +338,6 @@ const MoMEdit = () => {
               />
             </label>
           </div>
-
-          {/* Submit Button */}
           <div className="flex justify-end pt-6">
             <button
               type="submit"

@@ -29,8 +29,6 @@ function TaskForm() {
     const fetchData = async () => {
       try {
         setLoading(true);
-
-        // Fetch employees and project names concurrently using Promise.all
         const [employeesResponse, projectsResponse] = await Promise.all([
           employeename(`${id}`),
           projectname()
@@ -40,14 +38,14 @@ function TaskForm() {
         console.log("Projects fetched:", projectsResponse);
 
         if (employeesResponse && projectsResponse) {
-          setEmployees(employeesResponse.data); // Set employees
+          setEmployees(employeesResponse.data); 
           const flattenedProjects = projectsResponse.data.flatMap(project =>
             project.projectDetails.map(detail => ({
               _id: project._id,
-              projectName: detail.projectName // Flatten and extract project name
+              projectName: detail.projectName 
             }))
           );
-          setprojects(flattenedProjects); // Set project names
+          setprojects(flattenedProjects); 
           setError(null);
         } else {
           throw new Error("Failed to fetch employees or projects.");
@@ -117,14 +115,12 @@ function TaskForm() {
         formData.append("timeline", formTask.timeline);
         formData.append("status", formTask.status);
         formData.append("date", formTask.date);
-
-        // Append files properly
         if (formTask.attachments) {
           Array.from(formTask.attachments).forEach((file) => {
-            formData.append("attachments", file); // Append files one by one
+            formData.append("attachments", file); 
           });
         } else {
-          formData.append("attachments", ""); // Ensure backend gets at least an empty string
+          formData.append("attachments", ""); 
         }
 
         const response = await createTask(formData);
@@ -189,8 +185,6 @@ function TaskForm() {
                   ))}
                 </select>
               </div>
-
-              {/* Task */}
               <div>
                 <label className="block text-sm font-medium pb-2 text-gray-600">Task:</label>
                 <input
@@ -202,8 +196,6 @@ function TaskForm() {
                   className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-
-              {/* EmpID */}
               <div>
 
                 <label className="block text-sm font-medium pb-2 text-gray-600">Employee:</label>
@@ -222,8 +214,6 @@ function TaskForm() {
                   ))}
                 </select>
               </div>
-
-              {/* Description */}
               <div>
                 <label className="block text-sm font-medium pb-2 text-gray-600">Description:</label>
                 <textarea
@@ -236,10 +226,7 @@ function TaskForm() {
                 />
               </div>
             </div>
-
-            {/* Second Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Timeline */}
               <div>
                 <label className="block text-sm font-medium pb-2 text-gray-600">Timeline:</label>
                 <input
@@ -250,8 +237,6 @@ function TaskForm() {
                   className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-
-              {/* Status */}
               <div>
                 <label className="block text-sm font-medium pb-2 text-gray-600">Status:</label>
                 <select
@@ -266,8 +251,6 @@ function TaskForm() {
                   <option value="Completed">Completed</option>
                 </select>
               </div>
-
-              {/* Date */}
               <div>
                 <label className="block text-sm font-medium pb-2 text-gray-600">Date:</label>
                 <input
@@ -279,8 +262,6 @@ function TaskForm() {
                   className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-
-              {/* Attachments */}
               <div>
                 <label className="block text-sm font-medium pb-2 text-gray-600">Attachments:</label>
                 <input
@@ -292,8 +273,6 @@ function TaskForm() {
                 />
               </div>
             </div>
-
-            {/* Remove Button */}
             {tasks.length > 1 && (
               <div className="flex justify-end mt-4">
                 <button
@@ -307,8 +286,6 @@ function TaskForm() {
             )}
           </div>
         ))}
-
-        {/* Add Button */}
         <div className="flex justify-center mt-8">
           <button
             type="button"
@@ -318,8 +295,6 @@ function TaskForm() {
             Add More
           </button>
         </div>
-
-        {/* Submit Button */}
         <div className="flex justify-center mt-8">
           <button
             type="submit"

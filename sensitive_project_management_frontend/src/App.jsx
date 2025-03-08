@@ -24,7 +24,7 @@ import TaskEdit from "./components/Task/TaskEdit";
 import ProjectEdit from "./components/Project/ProjectEdit";
 import LeadForm from "./components/Leads/Leads";
 import LeadTable from "./components/Leads/LeadTable";
-import Preloader from "./components/preloader/Preloader"; // Import Preloader
+import Preloader from "./components/preloader/Preloader";
 import LeadEdit from "./components/Leads/LeadEdit";
 import Payments from "./components/Payments/Payments";
 import PaymentTable from "./components/Payments/PaymentTable";
@@ -43,19 +43,17 @@ import PayrollForm from "./components/PayrollEmployee/PayrollForm";
 import QuotationForm from "./components/Quotations/Quotations";
 import QuotationTable from "./components/Quotations/Quotationstable";
 import QuotationEdit from "./components/Quotations/QuotationsEdit";
-// import DispositionForm from "./components/UpdateLog/UpdateLog";
+import SearchResults from "./components/SearchResults/SearchResults";
 
-// Route Transition Component
 const RouteTransition = ({ children }) => {
   return <>{children}</>;
 };
 
-// Layout Component for Admin Pages
 const AdminLayout = ({ children, loading }) => {
   return (
     <div className="app">
-      {loading && <Preloader />} {/* Show Preloader over the whole layout */}
-      {!loading && <Topbar />}  {/* Show Topbar only after loading is complete */}
+      {loading && <Preloader />} 
+      {!loading && <Topbar />}  
       <div className="main-content">
         {children}
       </div>
@@ -68,14 +66,14 @@ function App() {
 
   return (
     <Router>
-      <RoutesWithPreloader role={role} /> {/* Move the logic into a child component */}
+      <RoutesWithPreloader role={role} />
     </Router>
   );
 }
 
 const RoutesWithPreloader = ({ role }) => {
   const location = useLocation();
-  const [loading, setLoading] = useState(true); // Set initial loading state to true
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
     const loadingRoutes = [
@@ -96,94 +94,168 @@ const RoutesWithPreloader = ({ role }) => {
     ];
 
     if (loadingRoutes.includes(location.pathname)) {
-      setLoading(true);  // Set loading to true when the route matches
+      setLoading(true); 
       setTimeout(() => {
-        setLoading(false);  // Hide preloader after 2 seconds
+        setLoading(false);  
       }, 2000);
     } else {
-      setLoading(false); // Hide preloader for non-matching routes
+      setLoading(false); 
     }
   }, [location]);
+  const employeeRoutes = [
+    '/dashboard', 
+    '/attendance-table', 
+    '/attendance-form', 
+    '/leave-table', 
+    '/leave', 
+    '/leave-edit', 
+    '/task', 
+    '/task-form', 
+    '/task-edit', 
+    '/project', 
+    '/add-project', 
+    '/edit-project', 
+    '/mom', 
+    '/momdetails', 
+    '/mom-edit', 
+    '/search-results'
+  ];
+  const adminRoutes = [
+    '/admin',
+    '/dashboard',
+    '/employee-table',
+    '/employee-form',
+    '/employee-edit',
+    '/task',
+    '/project',
+    '/add-project',
+    '/edit-project',
+    '/client-table',
+    '/client-edit',
+    '/client-form',
+    '/attendance-table',
+    '/attendance-form',
+    '/leave',
+    '/leave-table',
+    '/leave-edit',
+    '/task-form',
+    '/task-edit',
+    '/lead-form',
+    '/lead-table',
+    '/lead-edit',
+    '/adjustment-form',
+    '/adjustment-table',
+    '/adjustment-edit',
+    '/payments-form',
+    '/payments-table',
+    '/payments-edit',
+    '/expense-form',
+    '/expense-table',
+    '/expense-edit',
+    '/mom',
+    '/momdetails',
+    '/mom-edit',
+    '/payroll-table',
+    '/payroll-form',
+    '/quotation-form',
+    '/quotation-table',
+    '/quotation-edit',
+    '/search-results'
+  ];
+  const isValidPath = (path) => {
+    if (role === "employee") {
+      return employeeRoutes.some(route => path.startsWith(route));
+    } else {
+      return adminRoutes.some(route => path.startsWith(route));
+    }
+  };
 
   return (
     <>
       <Routes>
-        {/* Public Routes */}
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignUp />} />
-
-        {/* Protected Routes */}
         <Route
           path="/*"
           element={
             role === "employee" ? (
-              <AdminLayout loading={loading}> {/* Pass loading as prop */}
-                <Routes>
-                  {/* Employee-Specific Routes */}
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/attendance-table" element={<AttendanceTable />} />
-                  <Route path="/attendance-form" element={<EmployeeAttendance />} />
-                  <Route path="/leave-table" element={<LeaveTable />} />
-                  <Route path="/leave" element={<Leave />} />
-                  <Route path="/leave-edit/:id" element={<LeaveEdit />} />
-                  <Route path="/task" element={<TaskList />} />
-                  <Route path="/task-form" element={<TaskForm />} />
-                  <Route path="/task-edit/:taskId" element={<TaskEdit />} />
-                  <Route path="/project" element={<ProjectManager />} />
-                  <Route path="/add-project" element={<ProjectForm />} />
-                  <Route path="/edit-project/:projectId" element={<ProjectEdit />} />
-                  <Route path="/mom" element={<MoM />} />
-                  <Route path="/momdetails" element={<BlogPage />} />
-                  <Route path="/mom-edit/:id" element={<MoMEdit />} />
-                </Routes>
-              </AdminLayout>
+              !isValidPath(location.pathname) ? (
+                <Navigate to="/login" replace />
+              ) : (
+                <AdminLayout loading={loading}>
+                  <Routes>
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/attendance-table" element={<AttendanceTable />} />
+                    <Route path="/attendance-form" element={<EmployeeAttendance />} />
+                    <Route path="/leave-table" element={<LeaveTable />} />
+                    <Route path="/leave" element={<Leave />} />
+                    <Route path="/leave-edit/:id" element={<LeaveEdit />} />
+                    <Route path="/task" element={<TaskList />} />
+                    <Route path="/task-form" element={<TaskForm />} />
+                    <Route path="/task-edit/:taskId" element={<TaskEdit />} />
+                    <Route path="/project" element={<ProjectManager />} />
+                    <Route path="/add-project" element={<ProjectForm />} />
+                    <Route path="/edit-project/:projectId" element={<ProjectEdit />} />
+                    <Route path="/mom" element={<MoM />} />
+                    <Route path="/momdetails" element={<BlogPage />} />
+                    <Route path="/mom-edit/:id" element={<MoMEdit />} />
+                    <Route path="/search-results" element={<SearchResults />} />
+                    <Route path="*" element={<Navigate to="/login" replace />} />
+                  </Routes>
+                </AdminLayout>
+              )
             ) : (
-              <AdminLayout loading={loading}> {/* Pass loading as prop */}
-                <Routes>
-                  {/* Admin-Specific Routes */}
-                  <Route path="/admin" element={<AdminForm />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/employee-table" element={<EmployeeTable />} />
-                  <Route path="/employee-form" element={<Employee />} />
-                  <Route path="/employee-edit/:id" element={<EmployeeEdit />} />
-                  <Route path="/task" element={<TaskList />} />
-                  <Route path="/project" element={<ProjectManager />} />
-                  <Route path="/add-project" element={<ProjectForm />} />
-                  <Route path="/edit-project/:projectId" element={<ProjectEdit />} />
-                  <Route path="/client-table" element={<ClientTable />} />
-                  <Route path="/client-edit/:id" element={<ClientEdit />} />
-                  <Route path="/client-form" element={<Client />} />
-                  <Route path="/attendance-table" element={<AttendanceTable />} />
-                  <Route path="/attendance-form" element={<EmployeeAttendance />} />
-                  <Route path="/leave" element={<Leave />} />
-                  <Route path="/leave-table" element={<LeaveTable />} />
-                  <Route path="/leave-edit/:id" element={<LeaveEdit />} />
-                  <Route path="/task-form" element={<TaskForm />} />
-                  <Route path="/task-edit/:taskId" element={<TaskEdit />} />
-                  <Route path="/lead-form" element={<LeadForm />} />
-                  <Route path="/lead-table" element={<LeadTable />} />
-                  <Route path="/lead-edit/:id" element={<LeadEdit />} />
-                  <Route path="/adjustment-form" element={<Adjustment />} />
-                  <Route path="/adjustment-table" element={<AdjustmentTable />} />
-                  <Route path="/adjustment-edit/:id" element={<AdjustmentEdit />} />
-                  <Route path="/payments-form" element={<Payments />} />
-                  <Route path="/payments-table" element={<PaymentTable />} />
-                  <Route path="/payments-edit/:id" element={<PaymentEdit />} />
-                  <Route path="/expense-form" element={<Expenses />} />
-                  <Route path="/expense-table" element={<ExpenseTable />} />
-                  <Route path="/expense-edit/:id" element={<ExpensesEdit />} />
-                  <Route path="/mom" element={<MoM />} />
-                  <Route path="/momdetails" element={<BlogPage />} />
-                  <Route path="/mom-edit/:id" element={<MoMEdit />} />
-                  {/* <Route path="/updatelog" element={<DispositionForm />} /> */}
-                  <Route path="/payroll-table" element={<PayrollEmployee />} />
-                  <Route path="/payroll-form/:id" element={<PayrollForm />} />
-                  <Route path="/quotation-form" element={<QuotationForm />} />
-                  <Route path="/quotation-table" element={<QuotationTable />} />
-                  <Route path="/quotation-edit/:id" element={<QuotationEdit />} />
-                </Routes>
-              </AdminLayout>
+              !isValidPath(location.pathname) ? (
+                <Navigate to="/login" replace />
+              ) : (
+                <AdminLayout loading={loading}>
+                  <Routes>
+                    <Route path="/admin" element={<AdminForm />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/employee-table" element={<EmployeeTable />} />
+                    <Route path="/employee-form" element={<Employee />} />
+                    <Route path="/employee-edit/:id" element={<EmployeeEdit />} />
+                    <Route path="/task" element={<TaskList />} />
+                    <Route path="/project" element={<ProjectManager />} />
+                    <Route path="/add-project" element={<ProjectForm />} />
+                    <Route path="/edit-project/:projectId" element={<ProjectEdit />} />
+                    <Route path="/client-table" element={<ClientTable />} />
+                    <Route path="/client-edit/:id" element={<ClientEdit />} />
+                    <Route path="/client-form" element={<Client />} />
+                    <Route path="/attendance-table" element={<AttendanceTable />} />
+                    <Route path="/attendance-form" element={<EmployeeAttendance />} />
+                    <Route path="/leave" element={<Leave />} />
+                    <Route path="/leave-table" element={<LeaveTable />} />
+                    <Route path="/leave-edit/:id" element={<LeaveEdit />} />
+                    <Route path="/task-form" element={<TaskForm />} />
+                    <Route path="/task-edit/:taskId" element={<TaskEdit />} />
+                    <Route path="/lead-form" element={<LeadForm />} />
+                    <Route path="/lead-table" element={<LeadTable />} />
+                    <Route path="/lead-edit/:id" element={<LeadEdit />} />
+                    <Route path="/adjustment-form" element={<Adjustment />} />
+                    <Route path="/adjustment-table" element={<AdjustmentTable />} />
+                    <Route path="/adjustment-edit/:id" element={<AdjustmentEdit />} />
+                    <Route path="/payments-form" element={<Payments />} />
+                    <Route path="/payments-table" element={<PaymentTable />} />
+                    <Route path="/payments-edit/:id" element={<PaymentEdit />} />
+                    <Route path="/expense-form" element={<Expenses />} />
+                    <Route path="/expense-table" element={<ExpenseTable />} />
+                    <Route path="/expense-edit/:id" element={<ExpensesEdit />} />
+                    <Route path="/mom" element={<MoM />} />
+                    <Route path="/momdetails" element={<BlogPage />} />
+                    <Route path="/mom-edit/:id" element={<MoMEdit />} />
+                    {/* <Route path="/updatelog" element={<DispositionForm />} /> */}
+                    <Route path="/payroll-table" element={<PayrollEmployee />} />
+                    <Route path="/payroll-form/:id" element={<PayrollForm />} />
+                    <Route path="/quotation-form" element={<QuotationForm />} />
+                    <Route path="/quotation-table" element={<QuotationTable />} />
+                    <Route path="/quotation-edit/:id" element={<QuotationEdit />} />
+                    <Route path="/search-results" element={<SearchResults />} />
+                    <Route path="*" element={<Navigate to="/login" replace />} />
+                  </Routes>
+                </AdminLayout>
+              )
             )
           }
         />
@@ -193,5 +265,3 @@ const RoutesWithPreloader = ({ role }) => {
 };
 
 export default App;
-
-

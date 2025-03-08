@@ -35,7 +35,7 @@ const QuotationEdit = () => {
                         ...data,
                         quotationDate: data.quotationDate ? data.quotationDate.split('T')[0] : ''
                     });
-                    setQuotationUrl(data.quotation); // Store the URL
+                    setQuotationUrl(data.quotation);
                     setFileName(data.quotation ? data.quotation.split('/').pop() : '');
                 } else {
                     alert('Failed to fetch quotation details.');
@@ -48,10 +48,6 @@ const QuotationEdit = () => {
         };
         fetchQuotation();
     }, [id]);
-
-
-
-    // Handle form input changes
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
@@ -60,51 +56,20 @@ const QuotationEdit = () => {
     const handleFileChange = (e) => {
         setFormData({
             ...formData,
-            quotation: e.target.files[0] // Store the selected file
+            quotation: e.target.files[0] 
         });
-        setFileName(e.target.files[0].name); // Update the file name state
+        setFileName(e.target.files[0].name);
     };
-
-    // const handleSubmit = async (e) => {
-    //     e.preventDefault();
-    //     setLoading(true);
-
-    //     try {
-    //         const updatedData = {
-    //             ...formData,
-    //             quotationDate: new Date(formData.quotationDate).toISOString() // Convert back to ISO format before saving
-    //         };
-
-    //         const response = await updateQuotation(id, updatedData);
-
-    //         if (response.status === 200) {
-    //             alert('Quotation updated successfully!');
-    //             navigate('/quotation-table');
-    //         } else {
-    //             alert('Failed to update quotation. Please try again.');
-    //         }
-    //     } catch (error) {
-    //         console.error('Error updating quotation:', error);
-    //         alert('An error occurred while updating the quotation.');
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-
-        // Create a FormData object
         const formDataToSubmit = new FormData();
-
-        // Append all form fields to the FormData object
         for (const key in formData) {
             formDataToSubmit.append(key, formData[key]);
         }
 
         try {
-            const response = await updateQuotation(id, formDataToSubmit); // Use formDataToSubmit here
+            const response = await updateQuotation(id, formDataToSubmit); 
 
             if (response.status === 200) {
                 alert('Quotation updated successfully!');
@@ -125,7 +90,6 @@ const QuotationEdit = () => {
 
             <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {/* Client Information */}
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
                             Name
@@ -157,8 +121,6 @@ const QuotationEdit = () => {
                             placeholder="Email or phone number"
                         />
                     </div>
-
-                    {/* Project Requirements */}
                     <div className="mb-4 md:col-span-2">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="requirement">
                             Requirements
@@ -316,7 +278,7 @@ const QuotationEdit = () => {
                         disabled={loading}
                         className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                        {loading ? 'Submitting...' : 'Create Quotation'}
+                        {loading ? 'Submitting...' : 'Update Quotation'}
                     </button>
                 </div>
             </form>

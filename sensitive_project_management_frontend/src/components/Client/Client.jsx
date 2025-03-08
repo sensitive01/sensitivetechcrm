@@ -51,13 +51,11 @@ function Client() {
   const handleCheckboxChange = () => {
     setIsAddressSame((prev) => {
       if (!prev) {
-        // If checked, copy Office Location to Registered Address
         setClient((prevClient) => ({
           ...prevClient,
           registeredAddress: { ...prevClient.officeLocation },
         }));
       } else {
-        // If unchecked, reset Registered Address fields
         setClient((prevClient) => ({
           ...prevClient,
           registeredAddress: {
@@ -80,8 +78,8 @@ function Client() {
   
     try {
       const response = await axios.post('https://sensitivetechcrm.onrender.com/clients/create', client);
-      console.log('Response Status:', response.status); // Log the response status
-      console.log('Response Data:', response.data);     // Log the response data
+      console.log('Response Status:', response.status); 
+      console.log('Response Data:', response.data);
   
       if (response.status === 201) {
         alert('Client data submitted successfully!');
@@ -110,14 +108,14 @@ function Client() {
             landmark: "",
           },
           status: "",
-        }); // Reset form after submission
+        });
         navigate("/client-table");
       } else {
         console.error('Unexpected response status:', response.status);
         alert('There was an issue with the submission.');
       }
     } catch (error) {
-      console.error('Error submitting data:', error); // Log the error
+      console.error('Error submitting data:', error);
       alert('There was an error submitting the data');
     }
   };
@@ -126,7 +124,6 @@ function Client() {
     <div className="container mx-auto p-6 mt-12">
       <h2 className="text-4xl font-bold mb-10 text-center mt-20">Client Form</h2>
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
-        {/* First Column */}
         <div className="border border-blue-500 p-6 rounded-lg">
           <div className="space-y-8 pb-4">
             <div>
@@ -208,11 +205,8 @@ function Client() {
             </div>
           </div>
         </div>
-
-        {/* Second Column */}
         <div className="border border-blue-500 p-6 rounded-lg">
           <div className="space-y-8 pb-4">
-            {/* Office Location */}
             <div>
               <label className="block text-sm font-medium pb-4">Office Location:</label>
               <input
@@ -270,8 +264,6 @@ function Client() {
                 placeholder="Landmark"
               />
             </div>
-
-            {/* Registered Address */}
             <div>
             <label className="block text-sm font-medium pb-4">Registered Address:</label>
               <input

@@ -23,9 +23,6 @@ const LeadEdit = () => {
     "Invalid Number", "Taken outside", "Requirement on hold", "Escalated",
     "Schedule Meeting", "Deal Closed", "Others"
   ];
-
-  // Fetch lead data
-  // Fetch lead data
   useEffect(() => {
     const fetchLeadData = async () => {
       try {
@@ -36,7 +33,7 @@ const LeadEdit = () => {
           let data = response.data;
 
           if (role === "Lead") {
-            const today = new Date().toISOString().split("T")[0]; // Get today's date (YYYY-MM-DD)
+            const today = new Date().toISOString().split("T")[0];
             data = data.filter(lead => lead.createdAt.split("T")[0] === today);
           }
 
@@ -53,10 +50,7 @@ const LeadEdit = () => {
     };
 
     fetchLeadData();
-  }, [role]); // Depend on role to refetch if it changes
-
-
-  // Handle input changes
+  }, [role]);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setLead((prev) => ({
@@ -64,12 +58,10 @@ const LeadEdit = () => {
       [name]: value,
     }));
   };
-
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const leadWithDateTime = { ...lead }; // Let the server handle the date and time.
+    const leadWithDateTime = { ...lead };
 
     try {
       const response = await axios.post(
@@ -89,15 +81,11 @@ const LeadEdit = () => {
       alert(`Submission failed: ${error.message}`);
     }
   };
-
-
-
-  // Download table as Excel file
   const downloadExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(leads); // Convert data to sheet
-    const workbook = XLSX.utils.book_new(); // Create new workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Leads"); // Add sheet to workbook
-    XLSX.writeFile(workbook, "leads.xlsx"); // Download Excel file
+    const worksheet = XLSX.utils.json_to_sheet(leads); 
+    const workbook = XLSX.utils.book_new(); 
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Leads"); 
+    XLSX.writeFile(workbook, "leads.xlsx"); 
   };
 
   const applyDateFilter = () => {
@@ -125,11 +113,6 @@ const LeadEdit = () => {
 
     setFilteredLeads(filteredData);
   };
-
-
-
-
-  // Define columns for react-table
   const columns = useMemo(() => [
     { Header: 'S.No', accessor: (row, index) => index + 1 },
     { Header: 'Disposition', accessor: 'disposition' },
@@ -137,14 +120,14 @@ const LeadEdit = () => {
     {
       Header: 'Date',
       accessor: 'createdAt',
-      Cell: ({ value }) => new Date(value).toLocaleDateString('en-GB'), // Use 'en-GB' locale
+      Cell: ({ value }) => new Date(value).toLocaleDateString('en-GB'),
       id: 'date'
     },
     {
       Header: 'Time',
       accessor: 'createdAt',
       Cell: ({ value }) => new Date(value).toLocaleTimeString(),
-      id: 'time' // Unique identifier for the time column
+      id: 'time' 
     }
   ], [leads]);
 
@@ -168,7 +151,7 @@ const LeadEdit = () => {
   } = useTable(
     {
       columns,
-      data: tableData,  // Use filteredLeads if available
+      data: tableData, 
       initialState: { pageSize: 10 },
     },
     useGlobalFilter,
@@ -186,8 +169,6 @@ const LeadEdit = () => {
       <h2 className="text-4xl font-bold mb-10 text-center mt-24">
         Call Logs
       </h2>
-
-      {/* Form Section */}
       <form
         onSubmit={handleSubmit}
         className="flex items-center space-x-6 p-4 rounded bg-[#eff6ff] shadow-lg border border-gray-300 hover:border-gray-500 transition-all"
@@ -229,8 +210,6 @@ const LeadEdit = () => {
           </button>
         </div>
       </form>
-
-      {/* Data Table Section */}
       <div className="mt-12">
         <div className="flex justify-between items-center mb-6">
           <div className="relative">

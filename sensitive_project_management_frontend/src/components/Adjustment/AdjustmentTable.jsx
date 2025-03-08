@@ -92,8 +92,6 @@ const AdjustmentTable = () => {
             alert('Please select both start and end dates.');
             return;
         }
-
-        // Convert dates to Date objects for comparison
         const start = new Date(startDate);
         const end = new Date(endDate);
 
@@ -167,8 +165,6 @@ const AdjustmentTable = () => {
             )
         }
     ], [payroll]);
-
-    // Custom global filter function to support text and date (dd/mm/yyyy)
     const customGlobalFilter = (rows, id, filterValue) => {
         const formattedFilterValue = formatDateForComparison(filterValue);
 
@@ -189,8 +185,6 @@ const AdjustmentTable = () => {
             });
         });
     };
-
-    // Helper function to format date as dd/mm/yyyy
     const formatDateForComparison = (dateInput) => {
         if (!dateInput) return '';
 
@@ -228,7 +222,7 @@ const AdjustmentTable = () => {
             columns,
             data: payroll,
             initialState: { pageSize: 10 },
-            globalFilter: customGlobalFilter, // Apply custom global filter
+            globalFilter: customGlobalFilter,
         },
         useGlobalFilter,
         useSortBy,
@@ -399,8 +393,6 @@ const AdjustmentTable = () => {
                     </>
                 )}
             </div>
-
-            {/* Modal for Viewing Payroll */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center">
                     <div className="bg-white rounded-lg p-8 w-1/2">

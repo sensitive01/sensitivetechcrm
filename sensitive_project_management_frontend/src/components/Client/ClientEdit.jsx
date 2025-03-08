@@ -32,16 +32,15 @@ function ClientEdit() {
     status: "",
   });
   const navigate = useNavigate();
-  // Fetch user details when the component mounts or the ID changes.
   useEffect(() => {
-    if (!id) return; // Skip if ID is not provided.
+    if (!id) return;
 
     const fetchClientDetails = async () => {
       try {
         const response = await axios.get(`https://sensitivetechcrm.onrender.com/clients/get/${id}`);
         console.log(response)
         if (response.status === 200) {
-          setClient(response.data); // Update the state with fetched data.
+          setClient(response.data);
         } else {
           console.error("Failed to fetch client details:", response.status);
         }
@@ -74,8 +73,8 @@ function ClientEdit() {
 
     try {
       const response = id
-        ? await axios.put(`https://sensitivetechcrm.onrender.com/clients/update/${id}`, client) // Update client
-        : await axios.post(`https://sensitivetechcrm.onrender.com/clients/create`, client); // Create client
+        ? await axios.put(`https://sensitivetechcrm.onrender.com/clients/update/${id}`, client) 
+        : await axios.post(`https://sensitivetechcrm.onrender.com/clients/create`, client);
         
 
       if (response.status === 200 || response.status === 201) {
@@ -120,7 +119,6 @@ function ClientEdit() {
     <div className="container mx-auto p-6 mt-12">
       <h2 className="text-4xl font-bold mb-10 text-center mt-20">Client Form</h2>
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
-        {/* First Column */}
         <div className="border border-blue-500 p-6 rounded-lg">
           <div className="space-y-8 pb-4">
             <div>
@@ -202,11 +200,8 @@ function ClientEdit() {
             </div>
           </div>
         </div>
-
-        {/* Second Column */}
         <div className="border border-blue-500 p-6 rounded-lg">
           <div className="space-y-8 pb-4">
-            {/* Office Location */}
             <div>
               <label className="block text-sm font-medium pb-4">Office Location:</label>
               <input
@@ -264,8 +259,6 @@ function ClientEdit() {
                 placeholder="Landmark"
               />
             </div>
-
-            {/* Registered Address */}
             <div>
               <label className="block text-sm font-medium pb-4">Registered Address:</label>
               <input

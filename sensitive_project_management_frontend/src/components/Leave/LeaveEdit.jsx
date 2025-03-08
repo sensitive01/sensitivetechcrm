@@ -30,8 +30,6 @@ function LeaveEdit() {
 
   const { id } = useParams();
   const navigate = useNavigate();
-
-  // Define the leave types here
   const leaveTypes = ["Sick Leave", "Casual Leave", "Emergency Leave", "Others"];
 
   const formatDateForInput = (date) => {
@@ -132,21 +130,17 @@ function LeaveEdit() {
     e.preventDefault();
 
     const formData = new FormData();
-
-    // Determine the correct leaveType value
     const finalLeaveType =
       leave.leaveType === "Others" ? leave.customLeaveType : leave.leaveType;
 
     const finalPermissionType =
       leave.leaveType === "Others" ? leave.customPermissionType : leave.leaveType;
-
-    // Append other fields to formData
     Object.keys(leave).forEach((key) => {
       if (key !== "attachment") {
         if (key === "leaveType") {
           formData.append("leaveType", leave.leaveCategory === "Leave" ? finalLeaveType : finalPermissionType);
         } else if (leave[key]) {
-          formData.append(key, leave[key]); // Only append non-empty values
+          formData.append(key, leave[key]); 
         }
       }
     });
@@ -159,10 +153,10 @@ function LeaveEdit() {
       const response = id
         ? await axios.put(`https://sensitivetechcrm.onrender.com/leaves/update/${id}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
-        }) // Update leave
+        })
         : await axios.post("https://sensitivetechcrm.onrender.com/leaves/create", formData, {
           headers: { "Content-Type": "multipart/form-data" },
-        }); // Create leave
+        });
 
       if (response.status === 200 || response.status === 201) {
         alert("Leave data submitted successfully!");
@@ -171,7 +165,7 @@ function LeaveEdit() {
           leaveCategory: "",
           leaveType: "",
           customLeaveType: "",
-          customPermissonType: "", // Fixed typo
+          customPermissonType: "", 
           permissionDate: "",
           startDate: "",
           endDate: "",
@@ -214,7 +208,6 @@ function LeaveEdit() {
     <div className="container mx-auto p-6 mt-12">
       <h2 className="text-4xl font-bold mb-10 text-center mt-20">Leave Application Form</h2>
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
-        {/* Form Fields */}
         <div className="border border-blue-500 p-6 rounded-lg">
           <div className="space-y-8 pb-4">
             {role === "Superadmin" ? (
@@ -246,9 +239,6 @@ function LeaveEdit() {
                 />
               </div>
             )}
-
-
-            {/* Leave or Permission Radio Buttons */}
             <div className="pb-4">
               <label className="block text-sm font-medium pb-4">Leave or Permission:</label>
               <div className="flex space-x-4">
@@ -278,7 +268,6 @@ function LeaveEdit() {
                 </div>
               </div>
             </div>
-
             {leave.leaveCategory === "Leave" && (
               <div>
                 <label className="block text-sm font-medium pb-4">Leave Type:</label>
@@ -298,7 +287,6 @@ function LeaveEdit() {
                 </select>
               </div>
             )}
-
             {leave.leaveType === "Others" && leave.leaveCategory === "Leave" && (
               <div>
                 <label className="block text-sm font-medium pb-4">Specify Leave Type:</label>
@@ -311,9 +299,6 @@ function LeaveEdit() {
                 />
               </div>
             )}
-
-
-
             {leave.leaveCategory === "Leave" && (
               <div>
                 <label className="block text-sm font-medium pb-4">Leave Dates:</label>
@@ -340,7 +325,6 @@ function LeaveEdit() {
                 </div>
               </div>
             )}
-
             {leave.leaveCategory === "Permission" && (
               <div>
                 <label className="block text-sm font-medium pb-4">Permission Type:</label>
@@ -353,7 +337,7 @@ function LeaveEdit() {
                 >
                   <option value="">Select Permission Type</option>
                   {leaveTypes
-                    .filter(type => type.includes("Permission") || type === "Others") // Show only "Permission" types
+                    .filter(type => type.includes("Permission") || type === "Others")
                     .map((type, index) => (
                       <option key={index} value={type}>
                         {type}
@@ -362,8 +346,6 @@ function LeaveEdit() {
                 </select>
               </div>
             )}
-
-            {/* Show Custom Permission Type Field if "Others" is selected */}
             {leave.leaveType === "Others" && leave.leaveCategory === "Permission" && (
               <div>
                 <label className="block text-sm font-medium pb-4">Specify Permission Type:</label>
@@ -376,9 +358,6 @@ function LeaveEdit() {
                 />
               </div>
             )}
-
-
-            {/* Permission Date Input (only shown if "Permission" is selected) */}
             {leave.leaveCategory === "Permission" && (
               <div>
                 <label className="block text-sm font-medium pb-4">Permission Date:</label>
@@ -393,8 +372,6 @@ function LeaveEdit() {
                 />
               </div>
             )}
-
-            {/* Time Range Input (only shown if "Permission" is selected) */}
             {leave.leaveCategory === "Permission" && (
               <div>
                 <label className="block text-sm font-medium pb-4">Time Range:</label>
@@ -421,8 +398,6 @@ function LeaveEdit() {
             )}
           </div>
         </div>
-
-        {/* Second Column */}
         <div className="border border-blue-500 p-6 rounded-lg">
           <div className="space-y-8 pb-4">
             <div>
@@ -450,7 +425,7 @@ function LeaveEdit() {
               <input
                 type="file"
                 name="attachment"
-                onChange={handleFileChange}  // Using handleFileChange here
+                onChange={handleFileChange}
                 className="border border-blue-300 p-2 w-full rounded"
               />
             </div>
@@ -471,8 +446,6 @@ function LeaveEdit() {
             </div> */}
           </div>
         </div>
-
-        {/* Submit Button */}
         <div className="col-span-2 flex justify-center mt-6">
           <button
             type="submit"
