@@ -42,7 +42,6 @@ const EmployeeSchema = new mongoose.Schema({
   status: { type: String, default: "Active" },
   shiftStartTime: { type: String, required: true }, 
   shiftEndTime: { type: String, required: true }, 
-  shiftDate: { type: Date, required: true },   
 }, { timestamps: true });                     
 
 
