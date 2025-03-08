@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 const PayrollForm = ({ onSubmit }) => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -50,7 +51,7 @@ const PayrollForm = ({ onSubmit }) => {
               deductions: data.currentMonth.totalDeductions || 0,
               advance: data.currentMonth.totalAdvances || 0,
             });
-            setIsUpdate(true); // ✅ Set edit mode ON
+            setIsUpdate(true);
           } else {
             setError("Invalid employee data");
           }
@@ -88,13 +89,12 @@ const PayrollForm = ({ onSubmit }) => {
     }
 
     setLoading(true);
-
-    // ✅ Update existing payroll record
     axios
       .put(`https://sensitivetechcrm.onrender.com/employeedataupdateid/${id}`, updatedData)
       .then((response) => {
         console.log("Payroll updated successfully:", response.data);
         alert("Payroll updated successfully!");
+        navigate("/payroll-table"); 
       })
       .catch((error) => {
         console.error("Error updating payroll:", error);
@@ -112,7 +112,7 @@ const PayrollForm = ({ onSubmit }) => {
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
           {Object.keys(formData).map((key) => {
-            if (key === "lateMins") return null; // Skip "lateMins" here, as we add it separately below
+            if (key === "lateMins") return null;
             return (
               <div key={key}>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -129,8 +129,6 @@ const PayrollForm = ({ onSubmit }) => {
               </div>
             );
           })}
-
-          {/* Late Mins Field (Manually Added) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Late Minutes
