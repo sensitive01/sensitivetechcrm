@@ -78,9 +78,8 @@ const RoutesWithPreloader = ({ role }) => {
   const [loading, setLoading] = useState(true); // Set initial loading state to true
 
   useEffect(() => {
-    // Trigger preloader for specific routes
     const loadingRoutes = [
-      '/dashboard', // Add this to include dashboard in preloading
+      '/dashboard',
       '/employee-table',
       '/attendance-table',
       '/leave-table',
@@ -92,6 +91,8 @@ const RoutesWithPreloader = ({ role }) => {
       '/payments-table',
       '/payroll-table',
       '/expense-table',
+      '/momdetails',
+      '/quotation-table',
     ];
 
     if (loadingRoutes.includes(location.pathname)) {

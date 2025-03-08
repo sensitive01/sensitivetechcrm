@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { createPayment, projectname } from "../../api/services/projectServices";
-
+import { useNavigate } from "react-router-dom";
 function Payments() {
     const [payment, setPayment] = useState({
         project: "",
@@ -10,6 +10,7 @@ function Payments() {
         tdsApplicable: "",
         taxApplicable: "",
     });
+    const navigate = useNavigate(); 
     const [projects, setprojects] = useState([]);
     const [loading, setLoading] = useState([]);
     const [error, setError] = useState(null);
@@ -75,6 +76,7 @@ function Payments() {
                     tdsApplicable: "",
                     taxApplicable: "",
                 });
+                navigate("/payments-table");
             } else {
                 alert("There was an issue with the submission.");
             }

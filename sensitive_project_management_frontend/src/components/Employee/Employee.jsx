@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Eye, EyeOff } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const EmployeeForm = () => {
+  const navigate = useNavigate(); 
   const [isLoading, setIsLoading] = useState(false);
   const [isPermanentAddressSame, setIsPermanentAddressSame] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -53,7 +55,6 @@ const EmployeeForm = () => {
     profileImage: null,
     shiftStartTime: '',
     shiftEndTime: '',
-    shiftDate: '',
     status: 'Active'
   });
 
@@ -241,6 +242,7 @@ const EmployeeForm = () => {
 
       console.log("Response:", response.data);
       alert("Form submitted successfully!");
+      navigate("/employee-table");
 
       // Store user details in localStorage
       localStorage.setItem("empName", formData.name);
@@ -592,17 +594,6 @@ const EmployeeForm = () => {
               <label className="block font-semibold ">Shift Date and Time</label>
               <div className="border border-gray-300 p-4 rounded-md mt-2 w-1/2">
                 <div className="flex items-center space-x-4">
-                  {/* <div className="flex-1">
-                    <label className="block">Shift Date</label>
-                    <input
-                      type="date"
-                      name="shiftDate"
-                      value={formData.shiftDate}
-                      onChange={handleChange}
-                      className="w-full px-4 py-2 border rounded-md"
-                      required
-                    />
-                  </div> */}
                   <div className="flex-1">
                     <label className="block">Shift Time</label>
                     <div className="flex space-x-2">

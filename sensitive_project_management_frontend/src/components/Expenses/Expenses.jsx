@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { createExpense, projectname } from "../../api/services/projectServices";
+import { useNavigate } from "react-router-dom";
 
 function Expenses() {
     const [expenses, setExpenses] = useState({
@@ -9,6 +10,7 @@ function Expenses() {
         attachments: null,
         notes: "",
     });
+    const navigate = useNavigate();
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -64,6 +66,7 @@ function Expenses() {
             const response = await createExpense(formData);
             if (response.status === 201) {
                 alert("Expense data submitted successfully!");
+                navigate("/expense-table");
                 setExpenses({
                     type: "",
                     project: "",

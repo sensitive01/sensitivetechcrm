@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-
+import { useNavigate } from "react-router-dom";
 const LeadForm = () => {
   const [lead, setLead] = useState({
     name: '',
@@ -13,7 +13,7 @@ const LeadForm = () => {
     comments: '',
     status: ''
   });
-
+  const navigate = useNavigate(); 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setLead(prev => ({
@@ -45,6 +45,7 @@ const LeadForm = () => {
           comments: '',
           status: ''
         });
+        navigate("/lead-table");
       } else {
         alert('There was an issue with the submission.');
       }

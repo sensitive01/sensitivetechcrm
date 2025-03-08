@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { createExpense, projectname, updateExpenseById, getExpenseById } from "../../api/services/projectServices";
-import { useParams } from "react-router-dom"; // Just for the expenseId in the URL
+import { useParams,useNavigate } from "react-router-dom"; // Just for the expenseId in the URL
 
 function ExpensesEdit() {
     const { id } = useParams(); // Get expenseId from the URL
@@ -13,6 +13,7 @@ function ExpensesEdit() {
         attachments: null,
         notes: "",
     });
+    const navigate = useNavigate(); 
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -91,6 +92,7 @@ function ExpensesEdit() {
 
             if (response.status === 200 || response.status === 201) {
                 alert("Expense data submitted successfully!");
+                navigate("/expense-table");
                 setExpenses({
                     type: "",
                     project: "",

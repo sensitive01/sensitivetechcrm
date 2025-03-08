@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { employeename, getTheTask, projectname } from "../../api/services/projectServices";
 import axios from "axios";
 
@@ -15,8 +15,8 @@ function TaskEdit() {
     date: "",
     attachments: "", // Store as a single string (URL or filename)
   });
-  
- const id = localStorage.getItem("empId");
+  const navigate = useNavigate();
+  const id = localStorage.getItem("empId");
   const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
   const [projects, setProjects] = useState([]);
   const [employees, setEmployees] = useState([]);
@@ -30,8 +30,8 @@ function TaskEdit() {
 
         // Fetch employees and project names concurrently
         const [employeesResponse, projectsResponse] = await Promise.all([
-        employeename(`${id}`),
-          projectname(), 
+          employeename(`${id}`),
+          projectname(),
         ]);
 
         if (employeesResponse && projectsResponse) {
@@ -64,20 +64,20 @@ function TaskEdit() {
         const response = await getTheTask(taskId);
         if (response.status === 200) {
           let fetchedTask = response.data.task;
-  
-          console.log("Fetched Task Data:", fetchedTask); 
-  
+
+          console.log("Fetched Task Data:", fetchedTask);
+
           if (fetchedTask.date) {
             // Convert ISO date format to DD/MM/YY
             let dateObj = new Date(fetchedTask.date);
             let day = String(dateObj.getDate()).padStart(2, "0");
             let month = String(dateObj.getMonth() + 1).padStart(2, "0"); // Months are 0-based
             let year = String(dateObj.getFullYear()).slice(-2); // Get last two digits of year
-  
+
             fetchedTask.dateFormatted = `${day}/${month}/${year}`; // Store DD/MM/YY for display
             fetchedTask.date = dateObj.toISOString().split("T")[0]; // Store YYYY-MM-DD for input field
           }
-  
+
           setTask(fetchedTask);
         } else {
           console.error("Failed to fetch task data. Response status:", response.status);
@@ -88,22 +88,22 @@ function TaskEdit() {
         alert("An error occurred while fetching task data.");
       }
     };
-  
+
     if (taskId) {
       fetchTaskData();
     }
   }, [taskId]);
-  
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-  
+
     if (name === "date") {
       let dateObj = new Date(value);
       let day = String(dateObj.getDate()).padStart(2, "0");
       let month = String(dateObj.getMonth() + 1).padStart(2, "0");
       let year = String(dateObj.getFullYear()).slice(-2);
-  
+
       setTask((prev) => ({
         ...prev,
         date: value, // Store YYYY-MM-DD for input field
@@ -116,7 +116,7 @@ function TaskEdit() {
       }));
     }
   };
-  
+
 
   const handleFileChange = (e) => {
     const file = e.target.files[0]; // Only store one file
@@ -141,6 +141,7 @@ function TaskEdit() {
       const result = await getTheTask(taskId, task);
       console.log("Task updated:", result);
       alert("Task updated successfully!");
+      navigate("/task");
     } catch (error) {
       console.error("Error:", error);
       alert("An error occurred while updating the task.");
@@ -174,7 +175,7 @@ function TaskEdit() {
           {/* Task */}
           <div>
             <label className="block text-sm font-medium pb-2 text-gray-600">Task:</label>
-            <input type="text" name="task" value={task.task} onChange={handleChange} required className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"/>
+            <input type="text" name="task" value={task.task} onChange={handleChange} required className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500" />
           </div>
 
           {/* Employee */}
@@ -191,7 +192,7 @@ function TaskEdit() {
           {/* Description */}
           <div>
             <label className="block text-sm font-medium pb-2 text-gray-600">Description:</label>
-            <textarea name="description" value={task.description} onChange={handleChange} required className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500" rows="4"/>
+            <textarea name="description" value={task.description} onChange={handleChange} required className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500" rows="4" />
           </div>
         </div>
 
@@ -199,7 +200,7 @@ function TaskEdit() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
             <label className="block text-sm font-medium pb-2 text-gray-600">Timeline:</label>
-            <input type="text" name="timeline" value={task.timeline} onChange={handleChange} className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"/>
+            <input type="text" name="timeline" value={task.timeline} onChange={handleChange} className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500" />
           </div>
 
           <div>
@@ -213,7 +214,7 @@ function TaskEdit() {
 
           <div>
             <label className="block text-sm font-medium pb-2 text-gray-600">Date:</label>
-            <input type="date" name="date" value={task.date} onChange={handleChange} required className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"/>
+            <input type="date" name="date" value={task.date} onChange={handleChange} required className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500" />
           </div>
 
           {/* Attachments */}
@@ -225,7 +226,7 @@ function TaskEdit() {
                 <Link to={task.attachments} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">View Attachment</Link>
               </div>
             )}
-            <input type="file" name="attachments" onChange={handleFileChange} className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"/>
+            <input type="file" name="attachments" onChange={handleFileChange} className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500" />
           </div>
         </div>
 

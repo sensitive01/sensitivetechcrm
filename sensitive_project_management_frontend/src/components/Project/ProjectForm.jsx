@@ -104,6 +104,7 @@ const ProjectForm = () => {
 
         setProjects((prevProjects) => [...prevProjects, newProject]);
         alert("Project added successfully!");
+        navigate("/project"); 
       } else {
         console.error("Error creating project:", response);
         alert("Failed to create project. Please try again.");

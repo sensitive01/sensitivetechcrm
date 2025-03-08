@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Paperclip, Calendar, Clock, Users, X } from 'lucide-react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -15,6 +15,7 @@ const toolbarOptions = [
 
 const MoMEdit = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -143,6 +144,7 @@ const MoMEdit = () => {
       const response = await updateMoM(id, formData);
       if (response.status === 200) {
         alert('Meeting updated successfully!');
+        navigate("/momdetails");
       }
     } catch (error) {
       console.error('Error updating meeting:', error);

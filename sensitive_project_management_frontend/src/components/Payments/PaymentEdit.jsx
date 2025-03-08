@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { createPayment, getPaymentById, projectname, updatePaymentById } from "../../api/services/projectServices";
-import { useParams, Link } from "react-router-dom"; // Just for the expenseId in the URL
+import { useParams, Link,useNavigate } from "react-router-dom"; // Just for the expenseId in the URL
 
 function PaymentEdit() {
     const { id } = useParams(); // Get expenseId from the URL
     console.log("Payment ID from URL:", id);
+    const navigate = useNavigate(); 
 
     const [payment, setPayment] = useState({
         project: "",
@@ -119,39 +120,25 @@ function PaymentEdit() {
         e.preventDefault();
         const formData = new FormData();
         Object.keys(payment).forEach((key) => {
+            console.log(`${key}:`, payment[key]); // Debugging line
             formData.append(key, payment[key]);
         });
-
+    
         try {
-            let response;
-            if (id) {
-                response = await updatePaymentById(id, formData);
+            const response = await updatePaymentById(id, formData);
+            if (response.status === 200 || response.status === 201) {
+                alert("Payment updated successfully!"); // Alert message
+                navigate("/payments-table");
             } else {
-                response = await createPayment(formData);
-            }
-            if (response.status === 201) {
-                alert("Payment data submitted successfully!");
-                setPayment({
-                    project: "",
-                    amount: "",
-                    mode: "",
-                    date: "",
-                    tdsApplicable: "",
-                    taxApplicable: "",
-                    paymentType: "",
-                    paymentReferenceNumber: "",
-                    paymentQuotation: "",
-                    paymentProof: "",
-                    notes: "",
-                });
-            } else {
-                alert("There was an issue with the submission.");
+                console.error("Failed to update payment", response);
+                alert("Failed to update payment. Please try again.");
             }
         } catch (error) {
-            console.error("Error submitting data:", error);
-            alert("There was an error submitting the data.");
+            console.error("Error updating payment:", error);
+            alert("An error occurred while updating. Please try again.");
         }
     };
+    
 
     if (loading) {
         return (

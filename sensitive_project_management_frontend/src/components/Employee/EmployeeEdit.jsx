@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useParams } from "react-router-dom";
+import { useParams,useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 
 
 const EmployeeEdit = () => {
+  const navigate = useNavigate(); 
   const [isPermanentAddressSame, setIsPermanentAddressSame] = useState(false);
   const { id } = useParams();
   console.log(id)
@@ -62,7 +63,6 @@ const EmployeeEdit = () => {
     profileImage: null, 
     shiftStartTime: '',
     shiftEndTime: '',
-    shiftDate: '',
     status: 'Active'
   });
   const [loading, setLoading] = useState(true);
@@ -165,7 +165,7 @@ const EmployeeEdit = () => {
         const employeeData = response.data;
         const { formatted: dobFormatted, isoDate: dobIso } = formatDate(employeeData.dob);
         const { formatted: dojFormatted, isoDate: dojIso } = formatDate(employeeData.doj);
-        const { formatted: shiftDateFormatted, isoDate: shiftDateIso } = formatDate(employeeData.shiftDate); 
+        // const { formatted: shiftDateFormatted, isoDate: shiftDateIso } = formatDate(employeeData.shiftDate); 
 
         // Ensure ID Proof Type and Address Proof Type are included in response data
         setFormData((prevData) => ({
@@ -175,8 +175,8 @@ const EmployeeEdit = () => {
           dobFormatted,
           doj: dojIso,
           dojFormatted,
-          shiftDate: shiftDateIso,
-          shiftDateFormatted,
+          // shiftDate: shiftDateIso,
+          // shiftDateFormatted,
         }));
       } catch (err) {
         setError(err.message);
@@ -264,6 +264,7 @@ const EmployeeEdit = () => {
 
     console.log("Response:", response.data);
     alert("Form submitted successfully!");
+    navigate("/employee-table");
 
     // Store user details in localStorage
     localStorage.setItem("empName", formData.name);

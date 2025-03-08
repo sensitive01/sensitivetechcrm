@@ -3,6 +3,7 @@ import { Paperclip, Calendar, Clock, Users } from 'lucide-react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { createMoM } from '../../api/services/projectServices';
+import { useNavigate } from "react-router-dom";
 
 const toolbarOptions = [
   [{ 'header': [1, 2, 3, false] }],
@@ -27,6 +28,7 @@ const MoM = () => {
     discussionFile: null,
     actionFile: null
   });
+  const navigate = useNavigate();
 
   const handleChange = (value, field) => {
     setMeetingDetails({ ...meetingDetails, [field]: value });
@@ -58,6 +60,7 @@ const MoM = () => {
       const response = await createMoM(formData);  // Update the API to accept FormData
       console.log('Meeting saved:', response.data);
       alert('Meeting saved successfully!');
+      navigate("/momdetails");
     } catch (error) {
       console.error('Error saving meeting:', error);
       alert('Failed to save meeting.');

@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { createTask, employeename, projectname } from "../../api/services/projectServices";
+import { useNavigate } from "react-router-dom";
 
 function TaskForm() {
   const [tasks, setTasks] = useState([
@@ -16,7 +17,7 @@ function TaskForm() {
     },
 
   ]);
-
+  const navigate = useNavigate();
   const id = localStorage.getItem("empId");
   const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
   const [projects, setprojects] = useState([]);
@@ -130,6 +131,7 @@ function TaskForm() {
 
         if (response.status === 201) {
           alert("Task created successfully!");
+          navigate("/task");
         } else {
           alert("Failed to create task.");
         }
