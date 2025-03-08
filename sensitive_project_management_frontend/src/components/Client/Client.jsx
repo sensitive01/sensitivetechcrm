@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Client() {
   const [client, setClient] = useState({
@@ -28,7 +29,7 @@ function Client() {
     },
     status: "",
   });
-
+  const navigate = useNavigate();
   const [isAddressSame, setIsAddressSame] = useState(false);
 
   const handleChange = (e) => {
@@ -110,6 +111,7 @@ function Client() {
           },
           status: "",
         }); // Reset form after submission
+        navigate("/client-table");
       } else {
         console.error('Unexpected response status:', response.status);
         alert('There was an issue with the submission.');

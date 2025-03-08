@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams,useNavigate } from "react-router-dom";
 
 function ClientEdit() {
   const { id } = useParams(); 
@@ -31,7 +31,7 @@ function ClientEdit() {
     },
     status: "",
   });
-
+  const navigate = useNavigate();
   // Fetch user details when the component mounts or the ID changes.
   useEffect(() => {
     if (!id) return; // Skip if ID is not provided.
@@ -106,6 +106,7 @@ function ClientEdit() {
           },
           status: "",
         });
+        navigate("/client-table");
         } else {
       alert(`Error: ${response.statusText}`);
     }
