@@ -442,33 +442,48 @@ const getEmployeeDataById = async (req, res) => {
     };
 
     const fetchPayrollData = async (firstDay, lastDay) => {
-      // Filter payroll records by createdAt timestamp
-      const allowances = await Payroll.find({ 
-        empId: employee.name, 
-        type: "Allowance",
-        createdAt: { $gte: firstDay, $lte: lastDay }
-      });
-      
-      const deductions = await Payroll.find({ 
-        empId: employee.name, 
-        type: "Deductions",
-        createdAt: { $gte: firstDay, $lte: lastDay }
-      });
-      
-      const advances = await Payroll.find({ 
-        empId: employee.name, 
-        type: "Advance",
-        createdAt: { $gte: firstDay, $lte: lastDay }
-      });
-
-      const totalAllowances = allowances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-      const totalDeductions = deductions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-      const totalAdvances = advances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-
-      const payable = parseFloat(employee.salary || 0) + totalAllowances - totalDeductions - totalAdvances;
-
-      return { totalAllowances, totalDeductions, totalAdvances, payable };
+      try {
+        const allowances = await Payroll.find({ 
+          empId: employee.name,  // FIXED: Use correct empId
+          type: "Allowances",
+          createdAt: { $gte: firstDay, $lte: lastDay }
+        });
+    
+        const deductions = await Payroll.find({ 
+          empId: employee.name,  // FIXED: Use correct empId
+          type: "Deductions",
+          createdAt: { $gte: firstDay, $lte: lastDay }
+        });
+    
+        const advances = await Payroll.find({ 
+          empId: employee.name,  // FIXED: Use correct empId
+          type: "Advance",
+          createdAt: { $gte: firstDay, $lte: lastDay }
+        });
+    
+        // Convert amounts to numbers for calculations
+        const totalAllowances = allowances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+        const totalDeductions = deductions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+        const totalAdvances = advances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+    
+        let payable = parseFloat(employee.salary || 0);
+    
+        // Apply deduction first
+        payable -= totalDeductions;
+    
+        // Then apply advances (which should be added to salary)
+        payable += totalAdvances;
+    
+        // Finally, add allowances (bonuses, incentives, etc.)
+        payable += totalAllowances;
+    
+        return { totalAllowances, totalDeductions, totalAdvances, payable };
+      } catch (error) {
+        console.error("Error fetching payroll data:", error);
+        return { totalAllowances: 0, totalDeductions: 0, totalAdvances: 0, payable: parseFloat(employee.salary || 0) };
+      }
     };
+    
 
     const fetchLeaveData = async (firstDay, lastDay) => {
       const leaves = await LeaveModel.find({ 
@@ -526,285 +541,93 @@ const getEmployeeDataById = async (req, res) => {
   }
 };
 
-// const updateEmployeeDataById = async (req, res) => {
-//   try {
-//     const { empId } = req.params; // Get empId from URL parameters
-//     const updateData = req.body; // Get data to update from request body
-
-//     if (!empId) {
-//       return res.status(400).json({ success: false, error: 'Employee ID is required' });
-//     }
-
-//     let updatedResponse = {};
-
-//     // Update Employee Basic Info
-//     if (updateData.name || updateData.department || updateData.salary) {
-//       const updatedEmployee = await Employee.findOneAndUpdate(
-//         { empId },
-//         { $set: updateData },
-//         { new: true, runValidators: true }
-//       );
-//       updatedResponse.employee = updatedEmployee;
-//     }
-
-//     // Update Attendance Data
-//     if (updateData.attendance) {
-//       await AttendanceModel.updateMany(
-//         { employeeId: empId, date: { $gte: updateData.startDate, $lte: updateData.endDate } },
-//         { $set: updateData.attendance }
-//       );
-//       updatedResponse.attendance = 'Updated successfully';
-//     }
-
-//     // Update Payroll Data
-//     if (updateData.payroll) {
-//       await Payroll.updateMany(
-//         { empId },
-//         { $set: updateData.payroll }
-//       );
-//       updatedResponse.payroll = 'Updated successfully';
-//     }
-
-//     // Update Leave Data
-//     if (updateData.leave) {
-//       await LeaveModel.updateMany(
-//         { employee: empId },
-//         { $set: updateData.leave }
-//       );
-//       updatedResponse.leave = 'Updated successfully';
-//     }
-
-//     res.status(200).json({
-//       success: true,
-//       message: 'Employee data updated successfully',
-//       data: updatedResponse
-//     });
-
-//   } catch (error) {
-//     console.error('Error updating employee data:', error);
-//     res.status(500).json({ success: false, error: 'Server Error' });
-//   }
-// };
-
 const updateEmployeeDataById = async (req, res) => {
   try {
     const { empId } = req.params;
     const { 
-      name,
-      department,
-      salary,
-      allowances,
-      deductions,
-      advance,
-      attendanceDate,
-      attendanceStatus,
-      logintime,
-      logouttime,
-      leaveData,
-
-      shiftStartTime = "09:30"
+      name, department, salary, shiftStartTime,
+      allowances, deductions, advance,
+      attendanceDate, attendanceStatus, logintime, logouttime,
+      leaveData
     } = req.body;
 
     if (!empId) {
-      return res.status(400).json({ 
-        success: false, 
-        error: 'Employee ID is required' 
-      });
+      return res.status(400).json({ success: false, error: 'Employee ID is required' });
     }
+
     const employee = await Employee.findOne({ empId });
-    
     if (!employee) {
-      return res.status(404).json({ 
-        success: false, 
-        error: 'Employee not found' 
-      });
+      return res.status(404).json({ success: false, error: 'Employee not found' });
     }
+
+    // Update basic employee info
     const employeeUpdateData = {};
-    
     if (name !== undefined) employeeUpdateData.name = name;
     if (department !== undefined) employeeUpdateData.department = department;
     if (salary !== undefined) employeeUpdateData.salary = salary;
     if (shiftStartTime !== undefined) employeeUpdateData.shiftStartTime = shiftStartTime;
-    
+
     if (Object.keys(employeeUpdateData).length > 0) {
-      await Employee.findOneAndUpdate(
-        { empId }, 
-        employeeUpdateData,
-        { new: true, runValidators: true }
-      );
+      await Employee.findOneAndUpdate({ empId }, employeeUpdateData, { new: true });
     }
-    const currentDate = new Date();
-    const payrollDate = currentDate.toISOString().split('T')[0]; 
-    let payrollUpdates = {};
 
-    if (allowances !== undefined) {
-      const existingAllowance = await Payroll.findOne({ 
-        empId: employee.name, 
-        type: 'Allowance'
-      });
+    const payrollDate = new Date().toISOString().split('T')[0];
 
-      if (existingAllowance) {
-        existingAllowance.amount = allowances;
-        await existingAllowance.save();
-      } else if (parseFloat(allowances) > 0) {
-        await Payroll.create({
-          empId: employee.name,
-          type: 'Allowance',
-          amount: allowances,
-          date: payrollDate,
-          description: 'Updated via API'
-        });
+    // Update payroll records (allowances, deductions, advances)
+    const updatePayroll = async (type, amount) => {
+      if (amount !== undefined) {
+        const existingRecord = await Payroll.findOne({ empId: employee.name, type });
+        if (existingRecord) {
+          existingRecord.amount = amount;
+          await existingRecord.save();
+        } else if (parseFloat(amount) > 0) {
+          await Payroll.create({ empId: employee.name, type, amount, date: payrollDate, description: 'Updated via API' });
+        }
       }
-      payrollUpdates.totalAllowances = allowances;
-    }
+    };
 
-    if (deductions !== undefined) {
-      const existingDeduction = await Payroll.findOne({ 
-        empId: employee.name, 
-        type: 'Deductions'
-      });
+    await Promise.all([
+      updatePayroll("Allowance", allowances),
+      updatePayroll("Deductions", deductions),
+      updatePayroll("Advance", advance),
+    ]);
 
-      if (existingDeduction) {
-        existingDeduction.amount = deductions;
-        await existingDeduction.save();
-      } else if (parseFloat(deductions) > 0) {
-        await Payroll.create({
-          empId: employee.name,
-          type: 'Deductions',
-          amount: deductions,
-          date: payrollDate,
-          description: 'Updated via API'
-        });
-      }
-      payrollUpdates.totalDeductions = deductions;
-    }
-
-    if (advance !== undefined) {
-      const existingAdvance = await Payroll.findOne({ 
-        empId: employee.name, 
-        type: 'Advance'
-      });
-
-      if (existingAdvance) {
-        existingAdvance.amount = advance;
-        await existingAdvance.save();
-      } else if (parseFloat(advance) > 0) {
-        await Payroll.create({
-          empId: employee.name,
-          type: 'Advance',
-          amount: advance,
-          date: payrollDate,
-          description: 'Updated via API'
-        });
-      }
-      payrollUpdates.totalAdvances = advance;
-    }
-
-    // Update attendance if provided
-    let attendanceUpdates = {};
+    // Update attendance
     if (attendanceDate && attendanceStatus) {
-      const existingAttendance = await AttendanceModel.findOne({
-        employeeId: empId,
-        date: new Date(attendanceDate)
-      });
+      const attendanceQuery = { employeeId: empId, date: new Date(attendanceDate) };
+      const attendanceData = { status: attendanceStatus, logintime, logouttime };
 
-      const attendanceData = {
-        employeeId: empId,
-        status: attendanceStatus,
-        date: new Date(attendanceDate)
-      };
-      
-      if (logintime) attendanceData.logintime = logintime;
-      if (logouttime) attendanceData.logouttime = logouttime;
-
-      if (existingAttendance) {
-        await AttendanceModel.findByIdAndUpdate(
-          existingAttendance._id,
-          attendanceData,
-          { new: true, runValidators: true }
-        );
-      } else {
-        await AttendanceModel.create(attendanceData);
-      }
-      
-      attendanceUpdates = {
-        date: attendanceDate,
-        status: attendanceStatus,
-        logintime: logintime || null,
-        logouttime: logouttime || null
-      };
+      await AttendanceModel.findOneAndUpdate(attendanceQuery, attendanceData, { upsert: true, new: true });
     }
 
-    // Update leave data if provided
-    let leaveUpdates = {};
+    // Update leave data
     if (leaveData) {
       if (leaveData._id) {
-        // Update existing leave
-        await LeaveModel.findByIdAndUpdate(
-          leaveData._id,
-          leaveData,
-          { new: true, runValidators: true }
-        );
+        await LeaveModel.findByIdAndUpdate(leaveData._id, leaveData, { new: true });
       } else {
-        // Create new leave
-        const newLeave = await LeaveModel.create({
-          ...leaveData,
-          employee: empId
-        });
-        leaveUpdates = newLeave;
+        await LeaveModel.create({ ...leaveData, employee: empId });
       }
     }
 
-    // Calculate current payable amount if salary or any payroll component was updated
-    let payable;
-    if (salary !== undefined || allowances !== undefined || deductions !== undefined || advance !== undefined) {
-      const currentSalary = salary !== undefined ? parseFloat(salary) : parseFloat(employee.salary || 0);
-      const currentAllowances = allowances !== undefined ? parseFloat(allowances) : 0;
-      const currentDeductions = deductions !== undefined ? parseFloat(deductions) : 0;
-      const currentAdvances = advance !== undefined ? parseFloat(advance) : 0;
-      
-      payable = currentSalary + currentAllowances - currentDeductions - currentAdvances;
-      payrollUpdates.payable = payable;
+    // Fetch updated employee details (like in `getEmployeeDataById`)
+    const updatedEmployeeData = await getEmployeeDataById({ params: { empId } }, res, true); // Pass `true` to return data instead of sending response
+
+    if (!updatedEmployeeData) {
+      return res.status(500).json({ success: false, error: 'Failed to retrieve updated employee data' });
     }
 
-    // Prepare the response data
-    const responseData = {
-      empId,
-      name: employee.name
-    };
-    
-    if (Object.keys(employeeUpdateData).length > 0) {
-      responseData.basicInfo = employeeUpdateData;
-    }
-    
-    if (Object.keys(payrollUpdates).length > 0) {
-      responseData.payroll = payrollUpdates;
-    }
-    
-    if (Object.keys(attendanceUpdates).length > 0) {
-      responseData.attendance = attendanceUpdates;
-    }
-    
-    if (Object.keys(leaveUpdates).length > 0) {
-      responseData.leave = leaveUpdates;
-    }
-
-    // Return success response with updated data
     res.status(200).json({
       success: true,
       message: 'Employee data updated successfully',
-      data: responseData
+      data: updatedEmployeeData.data
     });
 
   } catch (error) {
     console.error('Error updating employee data:', error);
-    res.status(500).json({ 
-      success: false, 
-      error: 'Server Error',
-      message: error.message 
-    });
+    res.status(500).json({ success: false, error: 'Server Error', message: error.message });
   }
 };
+
 
 
 

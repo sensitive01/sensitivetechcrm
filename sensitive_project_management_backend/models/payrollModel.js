@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 
 const PayrollSchema = new mongoose.Schema({
     empId: { 
-      type: String, required: true
+      type: String,
     },
-    type: { type: String, required: true },
-    amount: { type: String, required: true },
+    type: { type: String,  },
+    amount: { type: String, },
     note: { type: String },
  }, { timestamps: true });
 

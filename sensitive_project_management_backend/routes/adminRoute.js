@@ -72,6 +72,4 @@ employeeRouter.get('/allemployeesdata', Employee.getAllEmployeesWithData);
 employeeRouter.get('/employeedatabyid/:empId', Employee.getEmployeeDataById);
 employeeRouter.put('/employeedataupdateid/:empId', Employee.updateEmployeeDataById);
 
-
-
 module.exports = employeeRouter;
