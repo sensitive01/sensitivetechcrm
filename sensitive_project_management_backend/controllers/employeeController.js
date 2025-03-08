@@ -312,17 +312,9 @@ const getAllEmployeesWithData = async (req, res) => {
           const totalAllowances = allowances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
           const totalDeductions = deductions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
           const totalAdvances = advances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-      
+          
           let payable = parseFloat(employee.salary || 0);
-      
-          // Apply deduction first
-          payable -= totalDeductions;
-      
-          // Then apply advances (which should be added to salary)
-          payable += totalAdvances;
-      
-          // Finally, add allowances (bonuses, incentives, etc.)
-          payable += totalAllowances;
+          payable = payable + totalAllowances - totalAdvances - totalDeductions;
       
           return { totalAllowances, totalDeductions, totalAdvances, payable };
         } catch (error) {
@@ -481,15 +473,7 @@ const getEmployeeDataById = async (req, res) => {
         const totalAdvances = advances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
     
         let payable = parseFloat(employee.salary || 0);
-    
-        // Apply deduction first
-        payable -= totalDeductions;
-    
-        // Then apply advances (which should be added to salary)
-        payable += totalAdvances;
-    
-        // Finally, add allowances (bonuses, incentives, etc.)
-        payable += totalAllowances;
+        payable = payable + totalAllowances - totalAdvances - totalDeductions;
     
         return { totalAllowances, totalDeductions, totalAdvances, payable };
       } catch (error) {
