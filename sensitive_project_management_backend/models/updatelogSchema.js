@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-
-// Define the disposition schema
 const dispositionSchema = new mongoose.Schema({
     disposition: {
         type: String,
@@ -28,10 +26,8 @@ const dispositionSchema = new mongoose.Schema({
         type: String,
     }
 }, {
-    timestamps: true, // Automatically add createdAt and updatedAt fields
+    timestamps: true, 
 });
-
-// Create a model based on the schema
 const Disposition = mongoose.model('Disposition', dispositionSchema);
 
 module.exports = Disposition;

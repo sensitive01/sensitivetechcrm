@@ -15,7 +15,7 @@ const leadSchema = new mongoose.Schema(
     status: { type: String, default: 'Pending' },
   },
   {
-    timestamps: true, // Automatically add createdAt and updatedAt fields
+    timestamps: true, 
   }
 );
 

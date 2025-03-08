@@ -1,18 +1,11 @@
 const express = require("express");
 const multer = require("multer");
 const employeeRouter = express.Router();
-// const { login } = require("../controllers/LoginController");
 const Employee = require("../controllers/employeeController")
 
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
-
-// employeeRouter.post("/login", login);
-
-
-// employeeRouter.post("/createemployee", Employee.createEmployee)
 employeeRouter.post(
   "/createemployee",
   upload.fields([
@@ -26,7 +19,6 @@ employeeRouter.post(
 
 employeeRouter.get("/getallemployees", Employee.getAllEmployees)
 employeeRouter.get("/getemployeesbyid/:id", Employee.getEmployeeById)
-// employeeRouter.patch("/updateemployee/:id", Employee.updateEmployee)
 employeeRouter.patch(
   "/updateemployee/:id",
   upload.fields([

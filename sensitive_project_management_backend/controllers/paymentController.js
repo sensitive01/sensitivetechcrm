@@ -1,12 +1,8 @@
 const Payment = require('../models/paymentSchema');
 const { uploadImage } = require("../config/cloudinary");
-
-// Create a new payment
 exports.createPayment = async (req, res) => {
     try {
         const paymentData = req.body;
-
-        // Handle file uploads if needed
         if (req.files) {
             if (req.files.paymentQuotation) {
                 paymentData.paymentQuotation = await uploadImage(req.files.paymentQuotation[0].buffer);
@@ -24,8 +20,6 @@ exports.createPayment = async (req, res) => {
         res.status(500).json({ error: 'Failed to create payment' });
     }
 };
-
-// Get all payments
 exports.getAllPayments = async (req, res) => {
     try {
         const payments = await Payment.find();
@@ -35,8 +29,6 @@ exports.getAllPayments = async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch payments' });
     }
 };
-
-// Get payment by ID
 exports.getPaymentById = async (req, res) => {
     try {
         const paymentId = req.params.id;
@@ -52,14 +44,10 @@ exports.getPaymentById = async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch payment by ID' });
     }
 };
-
-// Update payment by ID
 exports.updatePaymentById = async (req, res) => {
     try {
         const paymentId = req.params.id;
         const updatedData = req.body;
-
-        // Handle file uploads if needed
         if (req.files) {
             if (req.files.paymentQuotation) {
                 updatedData.paymentQuotation = await uploadImage(req.files.paymentQuotation[0].buffer);

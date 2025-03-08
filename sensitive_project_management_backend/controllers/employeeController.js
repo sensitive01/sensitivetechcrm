@@ -103,18 +103,6 @@ const deleteEmployee = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-// Get employee names with role "employee"
-// const getEmployeeNames = async (req, res) => {
-//   try {
-//     const employees = await Employee.find({ role: "employee" }).select("name");
-//     res.json(employees);
-//   } catch (error) {
-//     res.status(500).json({ message: "Error fetching employees" });
-//   }
-// };
-
-
 const getEmployeeNames = async (req, res) => {
   try {
     const { id } = req.params;
@@ -213,8 +201,6 @@ const getAllEmployeesWithData = async (req, res) => {
     const prevMonthData = getMonthDateRange(-1);
 
     const employees = await Employee.find({}, 'name empId department salary shiftStartTime shiftEndTime');
-
-    // Debug logging to check date ranges
     console.log("Current Month Date Range:", {
       first: currentMonthData.firstDay.toISOString(),
       last: currentMonthData.lastDay.toISOString()
@@ -226,8 +212,6 @@ const getAllEmployeesWithData = async (req, res) => {
 
     const convertTo24HourFormat = (timeStr) => {
       if (!timeStr) return null;
-      
-      // Check if already in 24-hour format
       if (!timeStr.includes(" ")) return timeStr;
       
       const [time, modifier] = timeStr.split(" ");
@@ -291,22 +275,16 @@ const getAllEmployeesWithData = async (req, res) => {
       const fetchPayrollData = async (firstDay, lastDay) => {
         try {
             const payrollEntries = await Payroll.find({ 
-                empId: employee.name,  // Ensure empId is correct
+                empId: employee.name,
                 createdAt: { $gte: firstDay, $lte: lastDay }
             });
-    
-            // Initialize totals
             let totalAllowances = 0, totalDeductions = 0, totalAdvances = 0;
-    
-            // Sum up all relevant payroll amounts
             payrollEntries.forEach(entry => {
                 const amount = parseFloat(entry.amount || 0);
                 if (entry.type === "Allowances") totalAllowances += amount;
                 if (entry.type === "Deductions") totalDeductions += amount;
                 if (entry.type === "Advance") totalAdvances += amount;
             });
-    
-            // Calculate the final payable salary
             let payable = parseFloat(employee.salary || 0);
             payable = payable + totalAllowances - totalAdvances - totalDeductions;
     
@@ -325,8 +303,6 @@ const getAllEmployeesWithData = async (req, res) => {
         });
         return leaves.length;
       };
-
-      // Execute all data fetching in parallel for better performance
       const [currentAttendance, prevAttendance, currentPayroll, prevPayroll, currentLeaves, prevLeaves] = 
         await Promise.all([
           fetchAttendanceData(currentMonthData),
@@ -387,8 +363,6 @@ const getEmployeeDataById = async (req, res) => {
 
     const convertTo24HourFormat = (timeStr) => {
       if (!timeStr) return null;
-      
-      // Check if already in 24-hour format
       if (!timeStr.includes(" ")) return timeStr;
       
       const [time, modifier] = timeStr.split(" ");
@@ -445,24 +419,22 @@ const getEmployeeDataById = async (req, res) => {
     const fetchPayrollData = async (firstDay, lastDay) => {
       try {
         const allowances = await Payroll.find({ 
-          empId: employee.name,  // FIXED: Use correct empId
+          empId: employee.name,
           type: "Allowances",
           createdAt: { $gte: firstDay, $lte: lastDay }
         });
     
         const deductions = await Payroll.find({ 
-          empId: employee.name,  // FIXED: Use correct empId
+          empId: employee.name,
           type: "Deductions",
           createdAt: { $gte: firstDay, $lte: lastDay }
         });
     
         const advances = await Payroll.find({ 
-          empId: employee.name,  // FIXED: Use correct empId
+          empId: employee.name,
           type: "Advance",
           createdAt: { $gte: firstDay, $lte: lastDay }
         });
-    
-        // Convert amounts to numbers for calculations
         const totalAllowances = allowances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
         const totalDeductions = deductions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
         const totalAdvances = advances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
@@ -485,8 +457,6 @@ const getEmployeeDataById = async (req, res) => {
       });
       return leaves.length;
     };
-
-    // Execute all data fetching in parallel for better performance
     const [currentAttendance, prevAttendance, currentPayroll, prevPayroll, currentLeaves, prevLeaves] = 
       await Promise.all([
         fetchAttendanceData(currentMonthData, employee),
@@ -496,8 +466,6 @@ const getEmployeeDataById = async (req, res) => {
         fetchLeaveData(currentMonthData.firstDay, currentMonthData.lastDay),
         fetchLeaveData(prevMonthData.firstDay, prevMonthData.lastDay)
       ]);
-
-    // Debug logging to check what data is being fetched
     console.log("Current Month Date Range:", {
       first: currentMonthData.firstDay.toISOString(),
       last: currentMonthData.lastDay.toISOString()
@@ -547,19 +515,13 @@ const updateEmployeeDataById = async (req, res) => {
     if (!empId) {
       return res.status(400).json({ success: false, error: 'Employee ID is required' });
     }
-
-    // Find the employee first
     const employee = await Employee.findOne({ empId });
     if (!employee) {
       return res.status(404).json({ success: false, error: 'Employee not found' });
     }
 
     console.log(`Updating employee ${empId} with data:`, req.body);
-
-    // Create an array to track all update operations
     const updateOperations = [];
-
-    // Update basic employee info
     if (name !== undefined || department !== undefined || salary !== undefined || shiftStartTime !== undefined) {
       const employeeUpdateData = {};
       if (name !== undefined) employeeUpdateData.name = name;
@@ -577,8 +539,6 @@ const updateEmployeeDataById = async (req, res) => {
         updateOperations.push(updatePromise);
       }
     }
-
-    // Update payroll records
     const payrollDate = new Date().toISOString().split('T')[0];
 
     const updatePayroll = async (type, amount) => {
@@ -587,7 +547,6 @@ const updateEmployeeDataById = async (req, res) => {
         const existingRecord = await Payroll.findOne({ 
           empId: employee.name, 
           type,
-          // Add date condition if needed
         });
         
         if (existingRecord) {
@@ -605,15 +564,11 @@ const updateEmployeeDataById = async (req, res) => {
           });
         }
       }
-      return Promise.resolve(); // Return resolved promise if no operation
+      return Promise.resolve();
     };
-
-    // Add payroll updates to operations
     updateOperations.push(updatePayroll("Allowances", allowances));
     updateOperations.push(updatePayroll("Deductions", deductions));
     updateOperations.push(updatePayroll("Advance", advance));
-
-    // Update attendance if provided
     if (attendanceDate && attendanceStatus) {
       console.log(`Updating attendance for date: ${attendanceDate}, status: ${attendanceStatus}`);
       const attendanceQuery = { employeeId: empId, date: new Date(attendanceDate) };
@@ -631,8 +586,6 @@ const updateEmployeeDataById = async (req, res) => {
       
       updateOperations.push(updateAttendancePromise);
     }
-
-    // Update leave data if provided
     if (leaveData) {
       console.log(`Updating leave data:`, leaveData);
       if (leaveData._id) {
@@ -647,29 +600,17 @@ const updateEmployeeDataById = async (req, res) => {
         updateOperations.push(createLeavePromise);
       }
     }
-
-    // Wait for all update operations to complete
     await Promise.all(updateOperations);
     console.log('All update operations completed successfully');
-
-    // Force a small delay to ensure database consistency
     await new Promise(resolve => setTimeout(resolve, 100));
-
-    // Fetch the updated employee data with consistent date ranges
     const currentMonthData = getMonthDateRange(0);
     const prevMonthData = getMonthDateRange(-1);
-
-    // Re-fetch the employee to get the latest data
     const updatedEmployee = await Employee.findOne(
       { empId },
       "name empId department salary shiftStartTime shiftEndTime"
     );
-
-    // Helper functions for fetching employee data
     const convertTo24HourFormat = (timeStr) => {
       if (!timeStr) return null;
-      
-      // Check if already in 24-hour format
       if (!timeStr.includes(" ")) return timeStr;
       
       const [time, modifier] = timeStr.split(" ");
@@ -695,7 +636,7 @@ const updateEmployeeDataById = async (req, res) => {
       attendanceRecords.forEach((record) => {
         if (record.status === "Present" && record.logintime) {
           const loginTime = convertTo24HourFormat(record.logintime);
-          const shiftStartTime = employee.shiftStartTime || "09:30"; // Default if not set
+          const shiftStartTime = employee.shiftStartTime || "09:30";
 
           if (loginTime && loginTime > shiftStartTime) {
             lateDays++;
@@ -742,8 +683,6 @@ const updateEmployeeDataById = async (req, res) => {
           type: "Advance",
           createdAt: { $gte: firstDay, $lte: lastDay }
         });
-    
-        // Convert amounts to numbers for calculations
         const totalAllowances = allowances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
         const totalDeductions = deductions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
         const totalAdvances = advances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
@@ -765,8 +704,6 @@ const updateEmployeeDataById = async (req, res) => {
       });
       return leaves.length;
     };
-
-    // Execute all data fetching in parallel for better performance
     const [currentAttendance, prevAttendance, currentPayroll, prevPayroll, currentLeaves, prevLeaves] = 
       await Promise.all([
         fetchAttendanceData(currentMonthData, updatedEmployee),
@@ -795,8 +732,6 @@ const updateEmployeeDataById = async (req, res) => {
     };
 
     console.log(`Successfully prepared response data for employee ${empId}`);
-
-    // Send the single response with updated data
     return res.status(200).json({
       success: true,
       message: 'Employee data updated successfully',

@@ -18,18 +18,6 @@ const createProject = async (req, res) => {
     res.status(500).json({ message: "Error creating project" });
   }
 };
-
-// const getAllProjects = async (req, res) => {
-//   try {
-//     const projects = await Project.find();
-//     res.status(200).json(projects);
-//   } catch (error) {
-//     console.error("Error fetching projects:", error);
-//     res.status(500).json({ message: "Error fetching projects" });
-//   }
-// };
-
-
 const getAllProjects = async (req, res) => {
   try {
     const { id } = req.params; 
@@ -42,7 +30,6 @@ const getAllProjects = async (req, res) => {
     console.log("Employee Data:", empdata);
 
     let projects;
-    // if (id === "6779360b3fb6809073b96ef4") {
       if (empdata.role === "Superadmin") {
       projects = await Project.find();
     } else {

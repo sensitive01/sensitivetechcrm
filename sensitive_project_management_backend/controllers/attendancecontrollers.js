@@ -20,7 +20,6 @@ exports.createAttendance = async (req, res) => {
   }
 };
 
-// Get all attendance records
 exports.getAllAttendance = async (req, res) => {
   try {
     const { id } = req.params
@@ -42,23 +41,17 @@ exports.getAllAttendance = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-// Update logout time for a specific attendance record
 exports.logoutAttendance = async (req, res) => {
   try {
-    const { id } = req.params;  // Get the record ID from the URL params
-    const { logouttime } = req.body;  // Get the logout time from the request body
-
-    // Validate the logout time
+    const { id } = req.params;  
+    const { logouttime } = req.body;
     if (!logouttime) {
       return res.status(400).json({ message: "Logout time is required" });
     }
-
-    // Find and update the attendance record with the given ID
     const updatedAttendance = await attendanceModel.findByIdAndUpdate(
       id,
       { logouttime: logouttime },
-      { new: true } // Return the updated document
+      { new: true }
     );
 
     if (!updatedAttendance) {
@@ -72,16 +65,11 @@ exports.logoutAttendance = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-// Get total attendance count
 exports.getTotalAttendance = async (req, res) => {
   try {
-    // Count the total number of attendance records
     const totalAttendance = await attendanceModel.countDocuments();
 
     console.log("Total attendance count:", totalAttendance);
-
-    // Return the total attendance count as a response
     res.status(200).json({ TotalAttendance: totalAttendance });
   } catch (error) {
     console.error("Error fetching total attendance:", error);

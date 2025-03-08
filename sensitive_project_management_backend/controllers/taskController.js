@@ -25,25 +25,6 @@ const createTask = async (req, res) => {
       });
   }
 };
-
-
-// Get all tasks
-// const getAllTasks = async (req, res) => {
-//   try {
-//     const tasks = await Task.find(); 
-//     return res.status(200).json({
-//       message: "Tasks retrieved successfully",
-//       tasks,
-//     });
-//   } catch (error) {
-//     return res.status(500).json({
-//       message: "Error retrieving tasks",
-//       error: error.message,
-//     });
-//   }
-// };
-
-
 const getAllTasks = async (req, res) => {
   try{
     const {id} = req.params;

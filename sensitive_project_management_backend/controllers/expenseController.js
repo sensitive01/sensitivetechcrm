@@ -1,19 +1,12 @@
-// controllers/expenseController.js
 const Expense = require("../models/expenseSchema");
 const { uploadImage } = require("../config/cloudinary");
-
-// Create Expense
 exports.createExpense = async (req, res) => {
     try {
         const expenseData = req.body;
-
-        // Check if there are files and process attachments
         if (req.file) {
-            expenseData.attachments = await uploadImage(req.file.buffer); // Correct file handling for a single file
+            expenseData.attachments = await uploadImage(req.file.buffer);
         }
-
-        // Create a new Expense
-        const newExpense = new Expense(expenseData); // Pass `expenseData` directly
+        const newExpense = new Expense(expenseData); 
         await newExpense.save();
 
         res.status(201).json({ message: "Expense created successfully.", expense: newExpense });
@@ -22,9 +15,6 @@ exports.createExpense = async (req, res) => {
         res.status(500).json({ error: "Failed to create expense." });
     }
 };
-
-
-// Fetch All Expenses
 exports.getAllExpenses = async (req, res) => {
     try {
         const expenses = await Expense.find();
@@ -34,19 +24,13 @@ exports.getAllExpenses = async (req, res) => {
         res.status(500).json({ error: "Failed to fetch expenses." });
     }
 };
-
-// Update Expense By ID
 exports.updateExpenseById = async (req, res) => {
     try {
         const { id } = req.params;
         const updateData = req.body;
-
-        // Check if there are files and process attachments
         if (req.file) {
-            updateData.attachments = await uploadImage(req.file.buffer); // Process file upload
+            updateData.attachments = await uploadImage(req.file.buffer);
         }
-
-        // Find and update the expense
         const updatedExpense = await Expense.findByIdAndUpdate(id, updateData, { new: true });
 
         if (!updatedExpense) {
@@ -59,13 +43,9 @@ exports.updateExpenseById = async (req, res) => {
         res.status(500).json({ error: "Failed to update expense." });
     }
 };
-
-// Get Expense By ID
 exports.getExpenseById = async (req, res) => {
     try {
         const { id } = req.params;
-
-        // Find expense by ID
         const expense = await Expense.findById(id);
 
         if (!expense) {

@@ -1,13 +1,11 @@
 const Quotation = require('../models/quotationmodel');
 const { uploadImage } = require("../config/cloudinary");
-
-// Create a new quotation
 exports.createQuotation = async (req, res) => {
     try {
         const quotationData = req.body;
         console.log("CREATE LEAVE REQUEST", quotationData);
         if (req.file) {
-            quotationData.quotation = await uploadImage(req.file.buffer); // Correct file handling for a single file
+            quotationData.quotation = await uploadImage(req.file.buffer);
         }
         const quotation = new Quotation(quotationData);
         await quotation.save();
@@ -16,8 +14,6 @@ exports.createQuotation = async (req, res) => {
         res.status(500).json({ error: 'Error creating quotation', details: error.message });
     }
 };
-
-// Get all quotations
 exports.getAllQuotations = async (req, res) => {
     try {
         const quotations = await Quotation.find();
@@ -26,8 +22,6 @@ exports.getAllQuotations = async (req, res) => {
         res.status(500).json({ error: 'Error fetching quotations', details: error.message });
     }
 };
-
-// Get a single quotation by ID
 exports.getQuotationById = async (req, res) => {
     try {
         const quotation = await Quotation.findById(req.params.id);
@@ -37,15 +31,13 @@ exports.getQuotationById = async (req, res) => {
         res.status(500).json({ error: 'Error fetching quotation', details: error.message });
     }
 };
-
-// Update a quotation
 exports.updateQuotation = async (req, res) => {
     try {
         const { id } = req.params;
         const quotationData = req.body;
         console.log("Update LEAVE REQUEST", quotationData);
         if (req.file) {
-            quotationData.quotation = await uploadImage(req.file.buffer); // Correct file handling for a single file
+            quotationData.quotation = await uploadImage(req.file.buffer);
         }
         const quotation = await Quotation.findByIdAndUpdate(id, quotationData, { new: true });
         if (!quotation) return res.status(404).json({ error: 'Quotation not found' });
@@ -55,8 +47,6 @@ exports.updateQuotation = async (req, res) => {
         res.status(500).json({ error: "Failed to update Quotation." });
       }
 };
-
-// Delete a quotation
 exports.deleteQuotation = async (req, res) => {
     try {
         const quotation = await Quotation.findByIdAndDelete(req.params.id);

@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-
-// Define the schema for the client model
 const clientSchema = new mongoose.Schema({
   organization: { type: String },
   contactPerson: { type: String },
@@ -26,6 +24,6 @@ const clientSchema = new mongoose.Schema({
     landmark: { type: String },
   },
   status: { type: String, default: 'Pending' },
-}, { timestamps: true }); // Automatically adds `createdAt` and `updatedAt` fields
+}, { timestamps: true });
 
 module.exports = mongoose.model('Clientmodel', clientSchema);

@@ -8,12 +8,6 @@ const login = async (req, res) => {
     const { username, password } = req.body;
     const testUsername = "Rakesh"
     const testPassword = "123"
-
-    // if(username==testUsername && password==testPassword){
-    //     res.status(200).json({ message: "Login successful" });
-
-    // }
-
     const user = await Login.findOne({ username });
     if (!user) {
       return res.status(404).json({ error: "User not found" });

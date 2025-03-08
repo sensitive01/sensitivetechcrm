@@ -6,8 +6,6 @@ const {
     getTotalAttendance,
 } = require('../controllers/attendancecontrollers')
 const router = express.Router();
-
-// Routes
 router.post('/create',createAttendance);
 router.get('/attendance-all/:id',getAllAttendance);
 router.put('/logout/:id',logoutAttendance)

@@ -1,8 +1,5 @@
-// controllers/meetingController.js
 const Meeting = require('../models/momSchema');
 const { uploadImage } = require("../config/cloudinary");
-
-// Create a new meeting
 exports.createMeeting = async (req, res) => {
   try {
     const MeetingData = req.body;
@@ -24,9 +21,6 @@ exports.createMeeting = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-
-// Get all meetings
 exports.getAllMeetings = async (req, res) => {
   try {
     const meetings = await Meeting.find();
@@ -35,8 +29,6 @@ exports.getAllMeetings = async (req, res) => {
     res.status(500).json({ message: 'Error fetching meetings', error: err });
   }
 };
-
-// Get meeting by ID
 exports.getMeetingById = async (req, res) => {
   try {
     const meeting = await Meeting.findById(req.params.id);
@@ -48,8 +40,6 @@ exports.getMeetingById = async (req, res) => {
     res.status(500).json({ message: 'Error fetching meeting', error: err });
   }
 };
-
-// Update meeting by ID
 exports.updateMeetingById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -74,8 +64,6 @@ exports.updateMeetingById = async (req, res) => {
     res.status(500).json({ message: 'Error updating meeting', error: err });
   }
 };
-
-// Delete meeting by ID
 exports.deleteMeetingById = async (req, res) => {
   try {
     const deletedMeeting = await Meeting.findByIdAndDelete(req.params.id);
