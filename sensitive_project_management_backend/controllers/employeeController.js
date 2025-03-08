@@ -290,37 +290,33 @@ const getAllEmployeesWithData = async (req, res) => {
 
       const fetchPayrollData = async (firstDay, lastDay) => {
         try {
-          const allowances = await Payroll.find({ 
-            empId: employee.name,  // FIXED: Use correct empId
-            type: "Allowances",
-            createdAt: { $gte: firstDay, $lte: lastDay }
-          });
-      
-          const deductions = await Payroll.find({ 
-            empId: employee.name,  // FIXED: Use correct empId
-            type: "Deductions",
-            createdAt: { $gte: firstDay, $lte: lastDay }
-          });
-      
-          const advances = await Payroll.find({ 
-            empId: employee.name,  // FIXED: Use correct empId
-            type: "Advance",
-            createdAt: { $gte: firstDay, $lte: lastDay }
-          });
-      
-          // Convert amounts to numbers for calculations
-          const totalAllowances = allowances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-          const totalDeductions = deductions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-          const totalAdvances = advances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-          let payable = parseFloat(employee.salary || 0);
-          payable = payable + totalAllowances - totalAdvances - totalDeductions;
-      
-          return { totalAllowances, totalDeductions, totalAdvances, payable };
+            const payrollEntries = await Payroll.find({ 
+                empId: employee.name,  // Ensure empId is correct
+                createdAt: { $gte: firstDay, $lte: lastDay }
+            });
+    
+            // Initialize totals
+            let totalAllowances = 0, totalDeductions = 0, totalAdvances = 0;
+    
+            // Sum up all relevant payroll amounts
+            payrollEntries.forEach(entry => {
+                const amount = parseFloat(entry.amount || 0);
+                if (entry.type === "Allowances") totalAllowances += amount;
+                if (entry.type === "Deductions") totalDeductions += amount;
+                if (entry.type === "Advance") totalAdvances += amount;
+            });
+    
+            // Calculate the final payable salary
+            let payable = parseFloat(employee.salary || 0);
+            payable = payable + totalAllowances - totalAdvances - totalDeductions;
+    
+            return { totalAllowances, totalDeductions, totalAdvances, payable };
         } catch (error) {
-          console.error("Error fetching payroll data:", error);
-          return { totalAllowances: 0, totalDeductions: 0, totalAdvances: 0, payable: parseFloat(employee.salary || 0) };
+            console.error("Error fetching payroll data:", error);
+            return { totalAllowances: 0, totalDeductions: 0, totalAdvances: 0, payable: parseFloat(employee.salary || 0) };
         }
-      };
+    };
+    
 
       const fetchLeaveData = async (firstDay, lastDay) => {
         const leaves = await LeaveModel.find({ 
