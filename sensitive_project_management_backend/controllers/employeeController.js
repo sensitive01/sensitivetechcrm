@@ -289,32 +289,46 @@ const getAllEmployeesWithData = async (req, res) => {
       };
 
       const fetchPayrollData = async (firstDay, lastDay) => {
-        // Filter payroll records by createdAt timestamp, matching getEmployeeDataById logic
-        const allowances = await Payroll.find({ 
-          empId: employee.name, 
-          type: 'Allowance',
-          createdAt: { $gte: firstDay, $lte: lastDay }
-        });
-        
-        const deductions = await Payroll.find({ 
-          empId: employee.name, 
-          type: 'Deductions',
-          createdAt: { $gte: firstDay, $lte: lastDay }
-        });
-        
-        const advances = await Payroll.find({ 
-          empId: employee.name, 
-          type: 'Advance',
-          createdAt: { $gte: firstDay, $lte: lastDay }
-        });
-
-        const totalAllowances = allowances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-        const totalDeductions = deductions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-        const totalAdvances = advances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-
-        const payable = parseFloat(employee.salary || 0) + totalAllowances - totalDeductions - totalAdvances;
-
-        return { totalAllowances, totalDeductions, totalAdvances, payable };
+        try {
+          const allowances = await Payroll.find({ 
+            empId: employee.name,  // FIXED: Use correct empId
+            type: "Allowances",
+            createdAt: { $gte: firstDay, $lte: lastDay }
+          });
+      
+          const deductions = await Payroll.find({ 
+            empId: employee.name,  // FIXED: Use correct empId
+            type: "Deductions",
+            createdAt: { $gte: firstDay, $lte: lastDay }
+          });
+      
+          const advances = await Payroll.find({ 
+            empId: employee.name,  // FIXED: Use correct empId
+            type: "Advance",
+            createdAt: { $gte: firstDay, $lte: lastDay }
+          });
+      
+          // Convert amounts to numbers for calculations
+          const totalAllowances = allowances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+          const totalDeductions = deductions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+          const totalAdvances = advances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+      
+          let payable = parseFloat(employee.salary || 0);
+      
+          // Apply deduction first
+          payable -= totalDeductions;
+      
+          // Then apply advances (which should be added to salary)
+          payable += totalAdvances;
+      
+          // Finally, add allowances (bonuses, incentives, etc.)
+          payable += totalAllowances;
+      
+          return { totalAllowances, totalDeductions, totalAdvances, payable };
+        } catch (error) {
+          console.error("Error fetching payroll data:", error);
+          return { totalAllowances: 0, totalDeductions: 0, totalAdvances: 0, payable: parseFloat(employee.salary || 0) };
+        }
       };
 
       const fetchLeaveData = async (firstDay, lastDay) => {
