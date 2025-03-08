@@ -312,7 +312,6 @@ const getAllEmployeesWithData = async (req, res) => {
           const totalAllowances = allowances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
           const totalDeductions = deductions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
           const totalAdvances = advances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-          
           let payable = parseFloat(employee.salary || 0);
           payable = payable + totalAllowances - totalAdvances - totalDeductions;
       
@@ -553,80 +552,270 @@ const updateEmployeeDataById = async (req, res) => {
       return res.status(400).json({ success: false, error: 'Employee ID is required' });
     }
 
+    // Find the employee first
     const employee = await Employee.findOne({ empId });
     if (!employee) {
       return res.status(404).json({ success: false, error: 'Employee not found' });
     }
 
-    // Update basic employee info
-    const employeeUpdateData = {};
-    if (name !== undefined) employeeUpdateData.name = name;
-    if (department !== undefined) employeeUpdateData.department = department;
-    if (salary !== undefined) employeeUpdateData.salary = salary;
-    if (shiftStartTime !== undefined) employeeUpdateData.shiftStartTime = shiftStartTime;
+    console.log(`Updating employee ${empId} with data:`, req.body);
 
-    if (Object.keys(employeeUpdateData).length > 0) {
-      await Employee.findOneAndUpdate({ empId }, employeeUpdateData, { new: true });
+    // Create an array to track all update operations
+    const updateOperations = [];
+
+    // Update basic employee info
+    if (name !== undefined || department !== undefined || salary !== undefined || shiftStartTime !== undefined) {
+      const employeeUpdateData = {};
+      if (name !== undefined) employeeUpdateData.name = name;
+      if (department !== undefined) employeeUpdateData.department = department;
+      if (salary !== undefined) employeeUpdateData.salary = salary;
+      if (shiftStartTime !== undefined) employeeUpdateData.shiftStartTime = shiftStartTime;
+
+      if (Object.keys(employeeUpdateData).length > 0) {
+        console.log(`Updating employee basic info:`, employeeUpdateData);
+        const updatePromise = Employee.findOneAndUpdate(
+          { empId }, 
+          employeeUpdateData, 
+          { new: true }
+        ).exec();
+        updateOperations.push(updatePromise);
+      }
     }
 
+    // Update payroll records
     const payrollDate = new Date().toISOString().split('T')[0];
 
-    // Update payroll records (allowances, deductions, advances)
     const updatePayroll = async (type, amount) => {
       if (amount !== undefined) {
-        const existingRecord = await Payroll.findOne({ empId: employee.name, type });
+        console.log(`Updating ${type} with amount: ${amount}`);
+        const existingRecord = await Payroll.findOne({ 
+          empId: employee.name, 
+          type,
+          // Add date condition if needed
+        });
+        
         if (existingRecord) {
+          console.log(`Found existing ${type} record, updating`);
           existingRecord.amount = amount;
-          await existingRecord.save();
+          return existingRecord.save();
         } else if (parseFloat(amount) > 0) {
-          await Payroll.create({ empId: employee.name, type, amount, date: payrollDate, description: 'Updated via API' });
+          console.log(`Creating new ${type} record`);
+          return Payroll.create({ 
+            empId: employee.name, 
+            type, 
+            amount, 
+            date: payrollDate, 
+            description: 'Updated via API' 
+          });
         }
+      }
+      return Promise.resolve(); // Return resolved promise if no operation
+    };
+
+    // Add payroll updates to operations
+    updateOperations.push(updatePayroll("Allowances", allowances));
+    updateOperations.push(updatePayroll("Deductions", deductions));
+    updateOperations.push(updatePayroll("Advance", advance));
+
+    // Update attendance if provided
+    if (attendanceDate && attendanceStatus) {
+      console.log(`Updating attendance for date: ${attendanceDate}, status: ${attendanceStatus}`);
+      const attendanceQuery = { employeeId: empId, date: new Date(attendanceDate) };
+      const attendanceData = { 
+        status: attendanceStatus,
+        logintime: logintime || undefined,
+        logouttime: logouttime || undefined
+      };
+
+      const updateAttendancePromise = AttendanceModel.findOneAndUpdate(
+        attendanceQuery,
+        attendanceData,
+        { upsert: true, new: true }
+      ).exec();
+      
+      updateOperations.push(updateAttendancePromise);
+    }
+
+    // Update leave data if provided
+    if (leaveData) {
+      console.log(`Updating leave data:`, leaveData);
+      if (leaveData._id) {
+        const updateLeavePromise = LeaveModel.findByIdAndUpdate(
+          leaveData._id, 
+          leaveData, 
+          { new: true }
+        ).exec();
+        updateOperations.push(updateLeavePromise);
+      } else {
+        const createLeavePromise = LeaveModel.create({ ...leaveData, employee: empId });
+        updateOperations.push(createLeavePromise);
+      }
+    }
+
+    // Wait for all update operations to complete
+    await Promise.all(updateOperations);
+    console.log('All update operations completed successfully');
+
+    // Force a small delay to ensure database consistency
+    await new Promise(resolve => setTimeout(resolve, 100));
+
+    // Fetch the updated employee data with consistent date ranges
+    const currentMonthData = getMonthDateRange(0);
+    const prevMonthData = getMonthDateRange(-1);
+
+    // Re-fetch the employee to get the latest data
+    const updatedEmployee = await Employee.findOne(
+      { empId },
+      "name empId department salary shiftStartTime shiftEndTime"
+    );
+
+    // Helper functions for fetching employee data
+    const convertTo24HourFormat = (timeStr) => {
+      if (!timeStr) return null;
+      
+      // Check if already in 24-hour format
+      if (!timeStr.includes(" ")) return timeStr;
+      
+      const [time, modifier] = timeStr.split(" ");
+      let [hours, minutes, seconds] = time.split(":").map(Number);
+
+      if (modifier === "PM" && hours !== 12) hours += 12;
+      if (modifier === "AM" && hours === 12) hours = 0;
+
+      return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+    };
+
+    const fetchAttendanceData = async ({ firstDay, lastDay, totalDays }, employee) => {
+      const attendanceRecords = await AttendanceModel.find({
+        employeeId: employee.empId,
+        date: { $gte: firstDay, $lte: lastDay },
+      });
+
+      const present = attendanceRecords.filter((record) => record.status === "Present").length;
+      const absent = totalDays - present;
+
+      let lateDays = 0, lateMins = 0;
+
+      attendanceRecords.forEach((record) => {
+        if (record.status === "Present" && record.logintime) {
+          const loginTime = convertTo24HourFormat(record.logintime);
+          const shiftStartTime = employee.shiftStartTime || "09:30"; // Default if not set
+
+          if (loginTime && loginTime > shiftStartTime) {
+            lateDays++;
+
+            const [loginHour, loginMin] = loginTime.split(":").map(Number);
+            const [startHour, startMin] = shiftStartTime.split(":").map(Number);
+            let minutesLate = (loginHour * 60 + loginMin) - (startHour * 60 + startMin);
+
+            lateMins += Math.abs(minutesLate);
+          }
+        }
+      });
+
+      const lateHours = Math.floor(lateMins / 60);
+      const remainingMins = lateMins % 60;
+      const formattedLateTime = lateMins > 0 ? `${lateHours}h ${remainingMins}m` : "0h 0m";
+
+      return {
+        totalDays,
+        present,
+        absent,
+        lateDays,
+        lateTime: formattedLateTime,
+        workingDays: present + absent,
+      };
+    };
+
+    const fetchPayrollData = async (firstDay, lastDay) => {
+      try {
+        const allowances = await Payroll.find({ 
+          empId: updatedEmployee.name,
+          type: "Allowances",
+          createdAt: { $gte: firstDay, $lte: lastDay }
+        });
+    
+        const deductions = await Payroll.find({ 
+          empId: updatedEmployee.name,
+          type: "Deductions",
+          createdAt: { $gte: firstDay, $lte: lastDay }
+        });
+    
+        const advances = await Payroll.find({ 
+          empId: updatedEmployee.name,
+          type: "Advance",
+          createdAt: { $gte: firstDay, $lte: lastDay }
+        });
+    
+        // Convert amounts to numbers for calculations
+        const totalAllowances = allowances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+        const totalDeductions = deductions.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+        const totalAdvances = advances.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+    
+        let payable = parseFloat(updatedEmployee.salary || 0);
+        payable = payable + totalAllowances - totalAdvances - totalDeductions;
+    
+        return { totalAllowances, totalDeductions, totalAdvances, payable };
+      } catch (error) {
+        console.error("Error fetching payroll data:", error);
+        return { totalAllowances: 0, totalDeductions: 0, totalAdvances: 0, payable: parseFloat(updatedEmployee.salary || 0) };
       }
     };
 
-    await Promise.all([
-      updatePayroll("Allowance", allowances),
-      updatePayroll("Deductions", deductions),
-      updatePayroll("Advance", advance),
-    ]);
+    const fetchLeaveData = async (firstDay, lastDay) => {
+      const leaves = await LeaveModel.find({ 
+        employee: empId, 
+        startDate: { $gte: firstDay, $lte: lastDay } 
+      });
+      return leaves.length;
+    };
 
-    // Update attendance
-    if (attendanceDate && attendanceStatus) {
-      const attendanceQuery = { employeeId: empId, date: new Date(attendanceDate) };
-      const attendanceData = { status: attendanceStatus, logintime, logouttime };
+    // Execute all data fetching in parallel for better performance
+    const [currentAttendance, prevAttendance, currentPayroll, prevPayroll, currentLeaves, prevLeaves] = 
+      await Promise.all([
+        fetchAttendanceData(currentMonthData, updatedEmployee),
+        fetchAttendanceData(prevMonthData, updatedEmployee),
+        fetchPayrollData(currentMonthData.firstDay, currentMonthData.lastDay),
+        fetchPayrollData(prevMonthData.firstDay, prevMonthData.lastDay),
+        fetchLeaveData(currentMonthData.firstDay, currentMonthData.lastDay),
+        fetchLeaveData(prevMonthData.firstDay, prevMonthData.lastDay)
+      ]);
 
-      await AttendanceModel.findOneAndUpdate(attendanceQuery, attendanceData, { upsert: true, new: true });
-    }
+    const responseData = {
+      name: updatedEmployee.name,
+      empId: updatedEmployee.empId,
+      department: updatedEmployee.department,
+      salary: updatedEmployee.salary,
+      currentMonth: {
+        ...currentAttendance,
+        ...currentPayroll,
+        leaves: currentLeaves,
+      },
+      previousMonth: {
+        ...prevAttendance,
+        ...prevPayroll,
+        leaves: prevLeaves,
+      },
+    };
 
-    // Update leave data
-    if (leaveData) {
-      if (leaveData._id) {
-        await LeaveModel.findByIdAndUpdate(leaveData._id, leaveData, { new: true });
-      } else {
-        await LeaveModel.create({ ...leaveData, employee: empId });
-      }
-    }
+    console.log(`Successfully prepared response data for employee ${empId}`);
 
-    // Fetch updated employee details (like in `getEmployeeDataById`)
-    const updatedEmployeeData = await getEmployeeDataById({ params: { empId } }, res, true); // Pass `true` to return data instead of sending response
-
-    if (!updatedEmployeeData) {
-      return res.status(500).json({ success: false, error: 'Failed to retrieve updated employee data' });
-    }
-
-    res.status(200).json({
+    // Send the single response with updated data
+    return res.status(200).json({
       success: true,
       message: 'Employee data updated successfully',
-      data: updatedEmployeeData.data
+      data: responseData
     });
 
   } catch (error) {
     console.error('Error updating employee data:', error);
-    res.status(500).json({ success: false, error: 'Server Error', message: error.message });
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Server Error', 
+      message: error.message 
+    });
   }
 };
-
-
 
 
 module.exports = {
