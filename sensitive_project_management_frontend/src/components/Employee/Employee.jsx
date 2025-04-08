@@ -11,6 +11,9 @@ const EmployeeForm = () => {
   const [profileImagePreview, setProfileImagePreview] = useState(null);
   const [formData, setFormData] = useState({
     role: '',
+    empType: '',
+    workMode: '',
+    shiftType: '',
     salary: '',
     empId: '',
     name: '',
@@ -384,6 +387,53 @@ const EmployeeForm = () => {
                 className="w-full px-4 py-2 border rounded-md"
                 required
               />
+            </div>
+
+            <div>
+              <label className="block font-semibold">Employee Type</label>
+              <select
+                name="empType"
+                value={formData.empType}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-md"
+                required
+              >
+                <option value="">Select Employee Type</option>
+                <option value="Permanent">Permanent</option>
+                <option value="Contract">Contract</option>
+                <option value="Internship">Internship</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block font-semibold">Work Mode</label>
+              <select
+                name="workMode"
+                value={formData.workMode}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-md"
+                required
+              >
+                <option value="">Select Work Mode</option>
+                <option value="Office">Office</option>
+                <option value="Work From Home">Work From Home</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block font-semibold">Shift Type</label>
+              <select
+                name="shiftType"
+                value={formData.shiftType}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-md"
+                required
+              >
+                <option value="">Select Shift Type</option>
+                <option value="FullTime">Full Time</option>
+                <option value="PartTime">Part Time</option>
+                <option value="HourlyBasis">Hourly Basis</option>
+              </select>
             </div>
 
             <div>
