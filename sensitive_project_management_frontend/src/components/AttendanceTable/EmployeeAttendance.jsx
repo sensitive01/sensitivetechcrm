@@ -1,71 +1,337 @@
+// import React, { useState, useRef, useEffect } from 'react';
+// import { Camera } from 'lucide-react';
+
+// const EmployeeAttendance = () => {
+//   const employeeId = localStorage.getItem("empId")
+//   const [photo, setPhoto] = useState(null);
+//   const [attendanceDetails, setAttendanceDetails] = useState({
+//     employeeId: "",
+//     employeeName: "",
+//     date: new Date().toLocaleDateString('en-GB'), 
+//     status: "Present", 
+//     logintime: "",
+//   });
+//   const [submittedData, setSubmittedData] = useState(null);
+//   const [isCameraActive, setIsCameraActive] = useState(false);
+//   const [isInitializingCamera, setIsInitializingCamera] = useState(false);
+//   const videoRef = useRef(null);
+//   const canvasRef = useRef(null);
+//   const [cameraStream, setCameraStream] = useState(null);
+
+//   const stopCamera = () => {
+//     if (cameraStream) {
+//       cameraStream.getTracks().forEach(track => track.stop());
+//       setCameraStream(null);
+//       setIsCameraActive(false);
+//     }
+//   };
+
+//   const initializeCamera = async () => {
+//     setIsInitializingCamera(true);
+//     stopCamera();
+//     try {
+//       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+//       if (videoRef.current) {
+//         videoRef.current.srcObject = stream;
+//       }
+//       setCameraStream(stream);
+//       setIsCameraActive(true);
+//     } catch (error) {
+//       alert("Unable to access the camera. Please check permissions.");
+//     } finally {
+//       setIsInitializingCamera(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     const handleVisibilityChange = () => {
+//       if (document.hidden) {
+//         stopCamera();
+//       } else if (!photo && !submittedData) {
+//         initializeCamera();
+//       }
+//     };
+
+//     document.addEventListener("visibilitychange", handleVisibilityChange);
+//     initializeCamera();
+
+//     return () => {
+//       document.removeEventListener("visibilitychange", handleVisibilityChange);
+//       stopCamera();
+//     };
+//   }, [photo, submittedData]);
+
+//   const capturePhoto = () => {
+//     if (videoRef.current && canvasRef.current) {
+//       const context = canvasRef.current.getContext("2d");
+//       context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
+//       const dataURL = canvasRef.current.toDataURL("image/jpeg");
+//       setPhoto(dataURL);
+//       stopCamera();
+//     }
+//   };
+
+//   const recapturePhoto = () => {
+//     setPhoto(null);
+//     initializeCamera();
+//   };
+
+//   const handleSubmit = async () => {
+//     if (!photo) {
+//       alert("Please capture a photo before submitting.");
+//       return;
+//     }
+  
+//     const currentDate = new Date();
+//     const formattedDate = currentDate.toISOString().split('T')[0];
+//     const formattedTime = currentDate.toLocaleTimeString();
+  
+//     const submissionData = {
+//       photo,
+//       employeeId: employeeId,
+//       employeeName: attendanceDetails.employeeName,
+//       date: formattedDate, 
+//       status: "Present", 
+//       logintime: formattedTime,
+//     };
+  
+//     try {
+//       const response = await fetch("https://sensitivetechcrm.onrender.com/attendance/create", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(submissionData),
+//       });
+  
+//       if (response.ok) {
+//         const result = await response.json();
+//         alert("Attendance submitted successfully!");
+//         setSubmittedData(result.attendance);
+//         setAttendanceDetails({
+//           employeeId: "",
+//           employeeName: "",
+//           date: formattedDate,
+//           status: "Present",
+//           logintime: "",
+//         });
+//         setPhoto(null);
+//       } else {
+//         const error = await response.json();
+//         alert(`Failed to submit attendance: ${error.message || "Unknown error"}`);
+//       }
+//     } catch (error) {
+//       console.error("Error submitting attendance:", error);
+//       alert("Error submitting attendance. Please try again.");
+//     }
+//   };
+
+//   return (
+//     <div className="container mx-auto p-6 mt-20">
+//       <h2 className="text-4xl font-bold mb-6">Employee Attendance</h2>
+
+//       {!submittedData && (
+//         <div>
+//           <div className="flex justify-center mb-6 space-x-4">
+//             {!photo && isCameraActive && (
+//               <button
+//                 onClick={capturePhoto}
+//                 className="bg-blue-500 text-white p-4 rounded-full flex items-center justify-center"
+//               >
+//                 <Camera className="mr-2" size={20} />
+//                 Capture Photo
+//               </button>
+//             )}
+//             {photo && (
+//               <button
+//                 onClick={recapturePhoto}
+//                 className="bg-yellow-500 text-white p-4 rounded-full flex items-center justify-center"
+//               >
+//                 <Camera className="mr-2" size={20} />
+//                 Recapture
+//               </button>
+//             )}
+//           </div>
+
+//           {!photo && isCameraActive && !isInitializingCamera && (
+//             <div className="flex justify-center">
+//               <video ref={videoRef} autoPlay className="fullscreen-video"></video>
+//             </div>
+//           )}
+//           {isInitializingCamera && <div className="text-center">Initializing camera...</div>}
+//           <canvas ref={canvasRef} width="300" height="200" className="hidden"></canvas>
+//           {photo && (
+//             <div className="flex justify-center mt-6">
+//               <img src={photo} alt="Captured" className="w-64 h-64 rounded-full object-cover shadow-lg" />
+//             </div>
+//           )}
+//           {photo && (
+//             <div className="flex justify-center mt-6">
+//               <button onClick={handleSubmit} className="bg-green-500 text-white p-4 rounded-md">
+//                 Submit Details
+//               </button>
+//             </div>
+//           )}
+//         </div>
+//       )}
+
+//       {submittedData && (
+//         <div className="mt-6 p-6 border rounded-md">
+//           <h3 className="text-2xl font-semibold">Submitted Attendance Details</h3>
+//           <div className="flex justify-center mt-6">
+//             <img
+//               src={submittedData.photo}
+//               alt="Captured"
+//               className="w-64 h-64 rounded-full object-cover shadow-lg"
+//             />
+//           </div>
+//           <ul className="mt-4">
+//             <li><strong>Employee ID:</strong> {submittedData.employeeId}</li>
+//             <li><strong>Name:</strong> {submittedData.employeeName}</li>
+//             <li><strong>Date:</strong> {submittedData.date}</li>
+//             <li><strong>Status:</strong> {submittedData.status}</li>
+//             <li><strong>Login Time:</strong> {submittedData.logintime}</li>
+//           </ul>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default EmployeeAttendance;
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Camera } from 'lucide-react';
+import { useNavigate } from 'react-router-dom'; 
 
 const EmployeeAttendance = () => {
-  const employeeId = localStorage.getItem("empId")
+  const navigate = useNavigate();
+  const employeeId = localStorage.getItem("empId");
   const [photo, setPhoto] = useState(null);
-  const [attendanceDetails, setAttendanceDetails] = useState({
+  const [attendanceDetails] = useState({
     employeeId: "",
     employeeName: "",
-    date: new Date().toLocaleDateString('en-GB'), 
-    status: "Present", 
+    date: new Date().toLocaleDateString('en-GB'),
+    status: "Present",
     logintime: "",
   });
   const [submittedData, setSubmittedData] = useState(null);
-  const [isCameraActive, setIsCameraActive] = useState(false);
-  const [isInitializingCamera, setIsInitializingCamera] = useState(false);
+  const [cameraState, setCameraState] = useState({
+    isActive: false,
+    isLoading: false,
+    error: null
+  });
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const [cameraStream, setCameraStream] = useState(null);
+  const streamRef = useRef(null);
+  const [isMounted, setIsMounted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+    return () => {
+      setIsMounted(false);
+      stopCamera();
+    };
+  }, []);
 
   const stopCamera = () => {
-    if (cameraStream) {
-      cameraStream.getTracks().forEach(track => track.stop());
-      setCameraStream(null);
-      setIsCameraActive(false);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => {
+        track.stop();
+      });
+      streamRef.current = null;
     }
+    
+    if (videoRef.current && videoRef.current.srcObject) {
+      videoRef.current.srcObject = null;
+    }
+    
+    setCameraState(prev => ({
+      ...prev,
+      isActive: false,
+      isLoading: false
+    }));
   };
 
   const initializeCamera = async () => {
-    setIsInitializingCamera(true);
-    stopCamera();
+    if (cameraState.isLoading || cameraState.isActive || !isMounted) return;
+    if (!videoRef.current) {
+      console.error("Video element not available");
+      setCameraState({
+        isActive: false,
+        isLoading: false,
+        error: "Camera not ready. Please try again."
+      });
+      return;
+    }
+    
+    setCameraState({
+      isActive: false,
+      isLoading: true,
+      error: null
+    });
+    
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: 'user',
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        } 
+      });
+      
+      streamRef.current = stream;
+      
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        await new Promise((resolve) => {
+          videoRef.current.onloadedmetadata = resolve;
+        });
+        
+        setCameraState({
+          isActive: true,
+          isLoading: false,
+          error: null
+        });
       }
-      setCameraStream(stream);
-      setIsCameraActive(true);
     } catch (error) {
-      alert("Unable to access the camera. Please check permissions.");
-    } finally {
-      setIsInitializingCamera(false);
+      console.error("Camera initialization error:", error);
+      stopCamera();
+      setCameraState({
+        isActive: false,
+        isLoading: false,
+        error: error.message || "Failed to access camera"
+      });
     }
   };
-
+  useEffect(() => {
+    if (isMounted && !photo && !submittedData) {
+      initializeCamera();
+    }
+  }, [isMounted, photo, submittedData]);
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
         stopCamera();
-      } else if (!photo && !submittedData) {
+      } else if (isMounted && !photo && !submittedData && !cameraState.isActive && !cameraState.isLoading) {
         initializeCamera();
       }
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    initializeCamera();
-
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      stopCamera();
     };
-  }, [photo, submittedData]);
-
+  }, [isMounted, photo, submittedData, cameraState.isActive, cameraState.isLoading]);
   const capturePhoto = () => {
-    if (videoRef.current && canvasRef.current) {
-      const context = canvasRef.current.getContext("2d");
-      context.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
-      const dataURL = canvasRef.current.toDataURL("image/jpeg");
+    if (videoRef.current && canvasRef.current && cameraState.isActive) {
+      const canvas = canvasRef.current;
+      const context = canvas.getContext("2d");
+      const width = 320;
+      const height = 240;
+      
+      canvas.width = width;
+      canvas.height = height;
+      context.drawImage(videoRef.current, 0, 0, width, height);
+      const dataURL = canvas.toDataURL("image/jpeg", 0.7); 
       setPhoto(dataURL);
       stopCamera();
     }
@@ -81,6 +347,8 @@ const EmployeeAttendance = () => {
       alert("Please capture a photo before submitting.");
       return;
     }
+    
+    setIsSubmitting(true);
   
     const currentDate = new Date();
     const formattedDate = currentDate.toISOString().split('T')[0];
@@ -88,8 +356,8 @@ const EmployeeAttendance = () => {
   
     const submissionData = {
       photo,
-      employeeId: employeeId,
-      employeeName: attendanceDetails.employeeName,
+      employeeId: employeeId || "Unknown", 
+      employeeName: attendanceDetails.employeeName || "Unknown", 
       date: formattedDate, 
       status: "Present", 
       logintime: formattedTime,
@@ -98,7 +366,11 @@ const EmployeeAttendance = () => {
     try {
       const response = await fetch("https://sensitivetechcrm.onrender.com/attendance/create", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+        },
+        mode: 'cors', 
+        credentials: 'same-origin', 
         body: JSON.stringify(submissionData),
       });
   
@@ -106,21 +378,25 @@ const EmployeeAttendance = () => {
         const result = await response.json();
         alert("Attendance submitted successfully!");
         setSubmittedData(result.attendance);
-        setAttendanceDetails({
-          employeeId: "",
-          employeeName: "",
-          date: formattedDate,
-          status: "Present",
-          logintime: "",
-        });
-        setPhoto(null);
+        setTimeout(() => {
+          navigate('/attendance-table');
+        }, 1500);
       } else {
-        const error = await response.json();
-        alert(`Failed to submit attendance: ${error.message || "Unknown error"}`);
+        const errorText = await response.text();
+        let errorMessage;
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.message || "Unknown server error";
+        } catch (e) {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        }
+        alert(`Failed to submit attendance: ${errorMessage}`);
       }
     } catch (error) {
       console.error("Error submitting attendance:", error);
-      alert("Error submitting attendance. Please try again.");
+      alert("Error submitting attendance. Please try again or contact support.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -131,7 +407,7 @@ const EmployeeAttendance = () => {
       {!submittedData && (
         <div>
           <div className="flex justify-center mb-6 space-x-4">
-            {!photo && isCameraActive && (
+            {!photo && cameraState.isActive && (
               <button
                 onClick={capturePhoto}
                 className="bg-blue-500 text-white p-4 rounded-full flex items-center justify-center"
@@ -149,24 +425,55 @@ const EmployeeAttendance = () => {
                 Recapture
               </button>
             )}
+            
+            {(cameraState.error || cameraState.isLoading) && (
+              <button
+                onClick={initializeCamera}
+                className="bg-red-500 text-white p-4 rounded-full flex items-center justify-center"
+              >
+                {cameraState.error ? "Retry Camera" : "Initializing..."}
+              </button>
+            )}
           </div>
 
-          {!photo && isCameraActive && !isInitializingCamera && (
-            <div className="flex justify-center">
-              <video ref={videoRef} autoPlay className="fullscreen-video"></video>
+          {cameraState.error && (
+            <div className="text-center p-4 text-red-500">
+              <p>Camera Error: {cameraState.error}</p>
             </div>
           )}
-          {isInitializingCamera && <div className="text-center">Initializing camera...</div>}
-          <canvas ref={canvasRef} width="300" height="200" className="hidden"></canvas>
+
+          <div className="flex justify-center">
+            <video 
+              ref={videoRef} 
+              autoPlay 
+              playsInline
+              muted
+              className={`fullscreen-video ${!cameraState.isActive ? 'hidden' : ''}`}
+            ></video>
+          </div>
+          
+          {cameraState.isLoading && (
+            <div className="text-center p-4">
+              <p>Initializing camera...</p>
+            </div>
+          )}
+          
+          <canvas ref={canvasRef} className="hidden"></canvas>
+          
           {photo && (
             <div className="flex justify-center mt-6">
               <img src={photo} alt="Captured" className="w-64 h-64 rounded-full object-cover shadow-lg" />
             </div>
           )}
+          
           {photo && (
             <div className="flex justify-center mt-6">
-              <button onClick={handleSubmit} className="bg-green-500 text-white p-4 rounded-md">
-                Submit Details
+              <button 
+                onClick={handleSubmit} 
+                disabled={isSubmitting}
+                className={`${isSubmitting ? 'bg-gray-400' : 'bg-green-500'} text-white p-4 rounded-md`}
+              >
+                {isSubmitting ? 'Submitting...' : 'Submit Details'}
               </button>
             </div>
           )}
@@ -190,6 +497,14 @@ const EmployeeAttendance = () => {
             <li><strong>Status:</strong> {submittedData.status}</li>
             <li><strong>Login Time:</strong> {submittedData.logintime}</li>
           </ul>
+          <div className="flex justify-center mt-6">
+            {/* <button 
+              onClick={() => navigate('/attendance-table')}
+              className="bg-blue-500 text-white p-4 rounded-md"
+            >
+              View Attendance Table
+            </button> */}
+          </div>
         </div>
       )}
     </div>
