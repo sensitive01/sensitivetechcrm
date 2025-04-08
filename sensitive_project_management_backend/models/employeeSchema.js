@@ -12,6 +12,9 @@ const AddressSchema = new mongoose.Schema({
 const EmployeeSchema = new mongoose.Schema({
   empId: { type: String, },
   role: {type: String,},
+  empType: {type: String,},
+  workMode: {type: String,},
+  shiftType: {type: String,},
   salary: {type: String,},
   name: { type: String,  },
   gender: { type: String,  },
