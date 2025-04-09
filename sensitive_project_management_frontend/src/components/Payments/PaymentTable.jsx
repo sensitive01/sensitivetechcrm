@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
+import { useNavigate } from 'react-router-dom';
 import * as XLSX from 'xlsx';
 import { Eye } from 'lucide-react';
 import { FaFileDownload, FaFilter } from 'react-icons/fa';
@@ -15,18 +15,14 @@ const PaymentTable = () => {
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
 
-    const navigate = useNavigate(); // Initialize useNavigate hook
-
-    // Fetch payment data
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchPaymentData = async () => {
             try {
-                // Replace with your actual API call
                 const response = await getTotalPayments();
                 console.log("total payment fetched:", response);
 
                 if (response.status === 200) {
-                    // Ensure payments is an array
                     const paymentData = Array.isArray(response.data) ? response.data : response.data.payments || [];
                     setPayments(paymentData);
                 } else {
@@ -55,13 +51,11 @@ const PaymentTable = () => {
         setIsModalOpen(false);
         setSelectedPayment(null);
     };
-
-    // Download table as Excel file
     const downloadExcel = () => {
-        const worksheet = XLSX.utils.json_to_sheet(payments); // Convert data to sheet
-        const workbook = XLSX.utils.book_new(); // Create new workbook
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Payments"); // Add sheet to workbook
-        XLSX.writeFile(workbook, "payments.xlsx"); // Download Excel file
+        const worksheet = XLSX.utils.json_to_sheet(payments); 
+        const workbook = XLSX.utils.book_new(); 
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Payments");
+        XLSX.writeFile(workbook, "payments.xlsx"); 
     };
 
     const applyDateFilter = () => {
@@ -69,8 +63,6 @@ const PaymentTable = () => {
             alert('Please select both start and end dates.');
             return;
         }
-    
-        // Convert dates to Date objects for comparison
         const start = new Date(startDate);
         const end = new Date(endDate);
     
@@ -82,8 +74,6 @@ const PaymentTable = () => {
         setPayments(filteredPayments);
     };
     
-
-    // Define columns for react-table
     const columns = useMemo(() => [
         { Header: 'S.No', accessor: (row, index) => index + 1 },
         { Header: 'Project', accessor: 'project' },
@@ -97,7 +87,7 @@ const PaymentTable = () => {
         },
         { Header: 'TDS Applicable', accessor: 'tdsApplicable' },
         { Header: 'Tax Applicable', accessor: 'taxApplicable' },
-        { Header: 'Payment Reference Number', accessor: 'paymentReferenceNumber' },
+        { Header: 'Payment Ref. No.', accessor: 'paymentReferenceNumber' },
         {
             Header: 'Payment Quotation',
             accessor: 'paymentQuotation',
@@ -107,7 +97,7 @@ const PaymentTable = () => {
                         <img
                             src={value}
                             alt="Payment Quotation"
-                            className="w-20 h-20 object-cover rounded"
+                            className="w-10 h-10 object-cover rounded"
                         />
                     ) : (
                         <span>No Quotation</span>
@@ -124,7 +114,7 @@ const PaymentTable = () => {
                         <img
                             src={value}
                             alt="Payment Proof"
-                            className="w-20 h-20 object-cover rounded"
+                            className="w-10 h-10 object-cover rounded"
                         />
                     ) : (
                         <span>No Proof</span>
@@ -137,46 +127,42 @@ const PaymentTable = () => {
             accessor: 'createdAt',
             Cell: ({ value }) =>
                 value ? (
-                    <>
-                        {new Date(value).toLocaleDateString('en-GB', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: '2-digit',
-                        })}
-                        <br />
-                        {new Date(value).toLocaleTimeString('en-GB', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit',
-                            hour12: true
-                        })}
-                    </>
+                    new Date(value).toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: '2-digit',
+                    }) +
+                    ' ' +
+                    new Date(value).toLocaleTimeString('en-GB', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true
+                    })
                 ) : 'N/A',
             id: 'created_date_time',
         },
-        
         {
             Header: 'Updated Date & Time',
             accessor: 'updatedAt',
             Cell: ({ value }) =>
                 value ? (
-                    <>
-                        {new Date(value).toLocaleDateString('en-GB', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: '2-digit',
-                        })}
-                        <br />
-                        {new Date(value).toLocaleTimeString('en-GB', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit',
-                            hour12: true
-                        })}
-                    </>
+                    new Date(value).toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: '2-digit',
+                    }) +
+                    ' ' +
+                    new Date(value).toLocaleTimeString('en-GB', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: true
+                    })
                 ) : 'N/A',
             id: 'updated_date_time',
         },
+        
         
         { Header: 'Notes', accessor: 'notes' },
         {
@@ -196,8 +182,6 @@ const PaymentTable = () => {
         }
     ], [payments]);
 
-
-    // Initialize react-table
     const {
         getTableProps,
         getTableBodyProps,
@@ -223,8 +207,6 @@ const PaymentTable = () => {
     );
 
     const { globalFilter, pageIndex } = state;
-
-    // Ensure payments are loaded correctly
     console.log("Payments before rendering:", payments);
 
     if (loading) return <div>Loading...</div>;
@@ -235,8 +217,6 @@ const PaymentTable = () => {
             <h2 className="text-4xl font-bold mb-10 text-center mt-24">
              Payment Details
             </h2>
-
-            {/* Data Table Section */}
             <div className="mt-12">
                 <div className="flex justify-between items-center mb-6">
                     <div className="relative">
@@ -281,7 +261,7 @@ const PaymentTable = () => {
                     </div>
                     <div className="flex space-x-4">
                         <button
-                            onClick={() => navigate('/payments-form')} // Navigate to /payments-form on click
+                            onClick={() => navigate('/payments-form')}
                             className="bg-blue-500 text-white px-6 py-2 rounded flex items-center hover:bg-blue-600"
                         >
                             Add Payment
@@ -321,7 +301,7 @@ const PaymentTable = () => {
                                         return (
                                             <tr {...row.getRowProps()} className="border-b hover:bg-gray-50 transition-colors">
                                                 {row.cells.map(cell => (
-                                                    <td {...cell.getCellProps()} className="p-4">{cell.render('Cell')}</td>
+                                                    <td {...cell.getCellProps()} className="p-4 whitespace-nowrap">{cell.render('Cell')}</td>
                                                 ))}
                                             </tr>
                                         );
@@ -359,10 +339,8 @@ const PaymentTable = () => {
                 {isModalOpen && (
                     <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center mt-20">
                         <div className="bg-white rounded-lg p-4 w-full sm:w-2/3 md:w-1/2 lg:w-1/3 max-h-[500px] overflow-auto flex flex-col"> {/* Adjust width for mobile */}
-                            {/* Title and Main Content Section */}
                             <h2 className="text-2xl font-semibold mb-4">Payment Details</h2>
                             <div className="flex flex-row justify-between">
-                                {/* Left Side - Text Data */}
                                 <div className="w-1/2 pr-4">
                                     {selectedPayment && (
                                         <div className="space-y-2">
@@ -373,15 +351,13 @@ const PaymentTable = () => {
                                             <p><strong>Date:</strong> {new Date(selectedPayment.date).toLocaleDateString('en-GB')}</p>
                                             <p><strong>TDS Applicable:</strong> {selectedPayment.tdsApplicable ? 'Yes' : 'No'}</p>
                                             <p><strong>Tax Applicable:</strong> {selectedPayment.taxApplicable ? 'Yes' : 'No'}</p>
-                                            <p><strong>Payment Reference Number:</strong> {selectedPayment.paymentReferenceNumber}</p>
+                                            <p><strong>Payment Ref. No:</strong> {selectedPayment.paymentReferenceNumber}</p>
                                             <p><strong>Notes:</strong> {selectedPayment.notes}</p>
                                             <p><strong>Created Date&Time:</strong> {new Date(selectedPayment.createdAt).toLocaleString()}</p>
                                             <p><strong>Updated Date&Time:</strong> {selectedPayment.updatedAt ? new Date(selectedPayment.updatedAt).toLocaleString() : 'N/A'}</p>
                                         </div>
                                     )}
                                 </div>
-
-                                {/* Right Side - Attachment Image Data */}
                                 <div className="w-1/2 pl-4 flex flex-col justify-start">
                                     <div className="mb-2">
                                         <strong>Payment Quotation:</strong>
@@ -409,8 +385,6 @@ const PaymentTable = () => {
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Modal Buttons Below the Images */}
                             <div className="mt-4 flex justify-between">
                                 <button
                                     onClick={() => handleEdit(selectedPayment._id)}

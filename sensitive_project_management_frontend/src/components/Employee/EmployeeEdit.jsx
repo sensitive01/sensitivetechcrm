@@ -10,7 +10,7 @@ const EmployeeEdit = () => {
   const { id } = useParams();
   console.log(id)
   const [showPassword, setShowPassword] = useState(false);
-    const [profileImagePreview, setProfileImagePreview] = useState(null);
+  const [profileImagePreview, setProfileImagePreview] = useState(null);
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -149,6 +149,11 @@ const EmployeeEdit = () => {
           doj: dojIso,
           dojFormatted,
         }));
+        
+        // Set profile image preview if it exists in the fetched data
+        if (employeeData.profileImage) {
+          setProfileImagePreview(employeeData.profileImage);
+        }
       } catch (err) {
         setError(err.message);
       } finally {
@@ -506,26 +511,27 @@ const EmployeeEdit = () => {
             </div>
 
             <div className="mb-6">
-            <label className="block font-semibold mb-2">Profile Image</label>
-            <div className="flex items-center space-x-4">
-              <input
-                type="file"
-                name="profileImage"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="w-full px-4 py-2 border rounded-md"
-              />
-              {profileImagePreview && (
-                <div className="w-24 h-24 rounded-full overflow-hidden">
-                  <img 
-                    src={profileImagePreview} 
-                    alt="Profile Preview" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
+              <label className="block font-semibold mb-2">Profile Image</label>
+              <div className="flex items-center space-x-4">
+                <input
+                  type="file"
+                  name="profileImage"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="w-full px-4 py-2 border rounded-md"
+                />
+                {/* Display existing or newly selected profile image */}
+                {(profileImagePreview || formData.profileImage) && (
+                  <div className="w-24 h-24 rounded-full overflow-hidden">
+                    <img 
+                      src={profileImagePreview || formData.profileImage} 
+                      alt="Profile" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
 
             <div>
               <label className="block font-semibold">Qualification</label>
@@ -823,7 +829,7 @@ const EmployeeEdit = () => {
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword((prev) => !prev)}
+                  onClick={togglePasswordVisibility}
                   className="absolute right-3 top-3 text-gray-500"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}

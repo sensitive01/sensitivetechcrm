@@ -320,7 +320,7 @@ const AttendanceTable = () => {
                         {headerGroups.map((headerGroup) => (
                             <tr {...headerGroup.getHeaderGroupProps()}>
                                 {headerGroup.headers.map((column) => (
-                                    <th {...column.getHeaderProps(column.getSortByToggleProps())} className="p-6">
+                                    <th {...column.getHeaderProps(column.getSortByToggleProps())} className="p-4">
                                         {column.render("Header")}
                                     </th>
                                 ))}

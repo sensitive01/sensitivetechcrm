@@ -248,7 +248,7 @@ const LeadTable = () => {
                                 {headerGroups.map(headerGroup => (
                                     <tr {...headerGroup.getHeaderGroupProps()}>
                                         {headerGroup.headers.map(column => (
-                                            <th {...column.getHeaderProps(column.getSortByToggleProps())} className="p-4 text-left cursor-pointer">
+                                            <th {...column.getHeaderProps(column.getSortByToggleProps())} className="p-4 text-left cursor-pointer whitespace-nowrap">
                                                 <div className="flex items-center">
                                                     {column.render('Header')}
                                                     <span>{column.isSorted ? (column.isSortedDesc ? ' 🔽' : ' 🔼') : ''}</span>
@@ -264,7 +264,7 @@ const LeadTable = () => {
                                     return (
                                         <tr {...row.getRowProps()} className="border-b hover:bg-gray-50 transition-colors">
                                             {row.cells.map(cell => (
-                                                <td {...cell.getCellProps()} className="p-4">{cell.render('Cell')}</td>
+                                                <td {...cell.getCellProps()} className="p-4 whitespace-nowrap">{cell.render('Cell')}</td>
                                             ))}
                                         </tr>
                                     );

@@ -81,7 +81,7 @@ const ExpenseTable = () => {
             Cell: ({ value }) => (
                 <div>
                     {value ? (
-                        <img src={value} alt="Attachment" className="w-20 h-20 object-cover rounded" />
+                        <img src={value} alt="Attachment" className="w-10 h-10 object-cover rounded" />
                     ) : (
                         <span>No attachment</span>
                     )}
@@ -95,7 +95,7 @@ const ExpenseTable = () => {
                 value ? (
                     <>
                         {new Date(value).toLocaleDateString('en-GB')}
-                        <br />
+                       
                         {new Date(value).toLocaleTimeString()}
                     </>
                 ) : (

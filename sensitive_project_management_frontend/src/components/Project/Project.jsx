@@ -426,7 +426,7 @@ const ProjectManager = () => {
                 </thead>
                 <tbody>
                   {paginatedProjects.map((project, index) => (
-                    <tr key={project._id} className="border-b hover:bg-gray-50 transition-colors">
+                    <tr key={project._id} className="border-b hover:bg-gray-50 transition-colors whitespace-nowrap">
                       <td className="p-4">{currentPage * ITEMS_PER_PAGE + index + 1}</td>
                       <td className="p-4">{project.displayData.projectName}</td>
                       <td className="p-4">{project.displayData.techStack}</td>

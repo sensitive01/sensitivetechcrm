@@ -43,7 +43,7 @@ const EmployeeDetailsModal = ({ isOpen, onClose, employee }) => {
           </div>
 
           <div className="space-y-4 col-span-2">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 ">
               <DetailItem label="Employee ID" value={employee.empId} />
               <DetailItem label="Name" value={employee.name} />
               <DetailItem label="Designation" value={employee.designation} />
@@ -128,7 +128,7 @@ const EmployeeTable = () => {
           <img
             src={value}
             alt="Profile"
-            className="w-16 h-16 rounded-full object-cover"
+            className="w-12 h-12 rounded-full object-cover"
           />
         ),
       },
@@ -397,7 +397,7 @@ const EmployeeTable = () => {
               return (
                 <tr {...row.getRowProps()} className="border-b hover:bg-gray-50">
                   {row.cells.map((cell) => (
-                    <td {...cell.getCellProps()} className="p-4">
+                    <td {...cell.getCellProps()} className="p-2 whitespace-nowrap">
                       {cell.render("Cell")}
                     </td>
                   ))}
