@@ -44,6 +44,7 @@ import QuotationForm from "./components/Quotations/Quotations";
 import QuotationTable from "./components/Quotations/Quotationstable";
 import QuotationEdit from "./components/Quotations/QuotationsEdit";
 import SearchResults from "./components/SearchResults/SearchResults";
+import SearchLeads from "./components/SearchLeads/SearchLeads";
 
 const RouteTransition = ({ children }) => {
   return <>{children}</>;
@@ -160,6 +161,7 @@ const RoutesWithPreloader = ({ role }) => {
     '/quotation-form',
     '/quotation-table',
     '/quotation-edit',
+    '/search-leads',
     '/search-results'
   ];
   const isValidPath = (path) => {
@@ -233,6 +235,7 @@ const RoutesWithPreloader = ({ role }) => {
                     <Route path="/lead-form" element={<LeadForm />} />
                     <Route path="/lead-table" element={<LeadTable />} />
                     <Route path="/lead-edit/:id" element={<LeadEdit />} />
+                    <Route path="/search-leads" element={<SearchLeads/>} />
                     <Route path="/adjustment-form" element={<Adjustment />} />
                     <Route path="/adjustment-table" element={<AdjustmentTable />} />
                     <Route path="/adjustment-edit/:id" element={<AdjustmentEdit />} />

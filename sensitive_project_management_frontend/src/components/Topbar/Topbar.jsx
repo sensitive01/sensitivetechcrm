@@ -47,6 +47,7 @@ const Topbar = () => {
         { label: "Leaves", path: "/leave-table", roles: ["Superadmin", "employee", "Lead"] },
         { label: "Adjustments", path: "/adjustment-table", roles: ["Superadmin"] },
         { label: "Payroll", path: "/payroll-table", roles: ["Superadmin"] },
+        { label: "Search Leads", path: "/search-leads", roles: ["Superadmin"] },
       ],
     },
     { label: "Tasks", path: "/task", icon: Clipboard },
