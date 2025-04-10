@@ -19,6 +19,7 @@ const paymentRoutes =  require('./routes/paymentRoute');
 const expenseRoutes =  require('./routes/expenseRoute');
 const momRoutes =  require('./routes/momRoute');
 const quotationRoutes =  require('./routes/quotationRoute');
+const placesRoutes = require('./routes/placesRoutes');
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ app.use('/payments', paymentRoutes);
 app.use('/expense', expenseRoutes);
 app.use('/mom', momRoutes);
 app.use('/quotation', quotationRoutes);
+app.use('/api', placesRoutes);
 
 // app.get('/api/places', async (req, res) => {
 //   const { location, radius, keyword, type } = req.query;
