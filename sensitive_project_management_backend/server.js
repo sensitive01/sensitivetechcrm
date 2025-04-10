@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const db = require('./config/db');
 const cors = require('cors');
+// const fetch = require('node-fetch'); 
 const adminRoute =require('./routes/adminRoute')
 const projectRouter = require('./routes/projectRoute')
 const taskRouter = require('./routes/taskRoute')
@@ -39,6 +40,32 @@ app.use('/payments', paymentRoutes);
 app.use('/expense', expenseRoutes);
 app.use('/mom', momRoutes);
 app.use('/quotation', quotationRoutes);
+
+// app.get('/api/places', async (req, res) => {
+//   const { location, radius, keyword, type } = req.query;
+//   const apiKey = process.env.GOOGLE_API_KEY;
+
+//   if (!location || !radius || (!keyword && !type)) {
+//       return res.status(400).json({ error: 'Missing required parameters.' });
+//   }
+
+//   try {
+//       const queryParam = keyword
+//           ? `keyword=${encodeURIComponent(keyword)}`
+//           : `type=${encodeURIComponent(type)}`;
+
+//       const apiUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${location}&radius=${radius}&${queryParam}&key=${apiKey}`;
+
+//       const response = await fetch(apiUrl);
+//       const data = await response.json();
+
+//       res.json(data);
+//   } catch (err) {
+//       console.error("Google API fetch error:", err);
+//       res.status(500).json({ error: 'Google Places API error' });
+//   }
+// });
+
 
 db(); 
 app.use('/', adminRoute);
