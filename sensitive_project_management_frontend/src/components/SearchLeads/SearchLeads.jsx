@@ -414,8 +414,8 @@ function SearchLeads() {
                                                 </ul>
                                                 <p className="mt-2 text-sm">
                                                     <span className={`px-2 py-1 rounded ${placeDetails.opening_hours.open_now
-                                                            ? "bg-green-100 text-green-800"
-                                                            : "bg-red-100 text-red-800"
+                                                        ? "bg-green-100 text-green-800"
+                                                        : "bg-red-100 text-red-800"
                                                         }`}>
                                                         {placeDetails.opening_hours.open_now ? "Open now" : "Closed now"}
                                                     </span>
@@ -453,39 +453,46 @@ function SearchLeads() {
                                             </div>
                                         )}
 
-                                        {placeDetails.reviews && placeDetails.reviews.length > 0 && (
+                                        {placeDetails.reviews && Array.isArray(placeDetails.reviews) && placeDetails.reviews.length > 0 && (
                                             <div>
                                                 <h4 className="font-bold text-lg mb-2">Reviews</h4>
                                                 <div className="space-y-4 max-h-80 overflow-y-auto">
-                                                    {placeDetails.reviews.map((review, index) => (
-                                                        <div key={index} className="border-b pb-4">
-                                                            <div className="flex items-center mb-2">
-                                                                <div className="mr-3 h-8 w-8 bg-gray-300 rounded-full overflow-hidden">
-                                                                    <img
-                                                                        src={review.profile_photo_url || `/api/placeholder/40/40`}
-                                                                        alt={review.author_name}
-                                                                        className="h-full w-full object-cover"
-                                                                    />
-                                                                </div>
-                                                                <div>
-                                                                    <p className="font-medium">{review.author_name}</p>
-                                                                    <div className="flex items-center">
-                                                                        <div className="flex text-yellow-500">
-                                                                            {[...Array(5)].map((_, i) => (
-                                                                                <span key={i}>
-                                                                                    {i < review.rating ? "★" : "☆"}
-                                                                                </span>
-                                                                            ))}
+                                                    {placeDetails.reviews.map((review, index) => {
+                                                        // Safety check to ensure review is an object
+                                                        if (!review || typeof review !== 'object') {
+                                                            return null;
+                                                        }
+
+                                                        return (
+                                                            <div key={index} className="border-b pb-4">
+                                                                <div className="flex items-center mb-2">
+                                                                    <div className="mr-3 h-8 w-8 bg-gray-300 rounded-full overflow-hidden">
+                                                                        <img
+                                                                            src={review.profile_photo_url || `/api/placeholder/40/40`}
+                                                                            alt={review.author_name || 'Reviewer'}
+                                                                            className="h-full w-full object-cover"
+                                                                        />
+                                                                    </div>
+                                                                    <div>
+                                                                        <p className="font-medium">{review.author_name || 'Anonymous'}</p>
+                                                                        <div className="flex items-center">
+                                                                            <div className="flex text-yellow-500">
+                                                                                {[...Array(5)].map((_, i) => (
+                                                                                    <span key={i}>
+                                                                                        {i < (review.rating || 0) ? "★" : "☆"}
+                                                                                    </span>
+                                                                                ))}
+                                                                            </div>
+                                                                            <span className="ml-2 text-sm text-gray-500">
+                                                                                {review.relative_time_description || 'No date'}
+                                                                            </span>
                                                                         </div>
-                                                                        <span className="ml-2 text-sm text-gray-500">
-                                                                            {review.relative_time_description}
-                                                                        </span>
                                                                     </div>
                                                                 </div>
+                                                                <p className="text-gray-700 text-sm">{review.text || 'No review text'}</p>
                                                             </div>
-                                                            <p className="text-gray-700 text-sm">{review.text}</p>
-                                                        </div>
-                                                    ))}
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
                                         )}
