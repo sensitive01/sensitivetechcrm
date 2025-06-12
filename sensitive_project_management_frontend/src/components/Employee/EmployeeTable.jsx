@@ -46,14 +46,14 @@ const EmployeeDetailsModal = ({ isOpen, onClose, employee }) => {
             <div className="grid grid-cols-2 gap-4 ">
               <DetailItem label="Employee ID" value={employee.empId} />
               <DetailItem label="Name" value={employee.name} />
+              {/* <DetailItem label="Email" value={(employee.email)} /> */}
               <DetailItem label="Designation" value={employee.designation} />
               <DetailItem label="Department" value={employee.department} />
               <DetailItem label="Date of Birth" value={formatDate(employee.dob)} />
               <DetailItem label="Date of Joining" value={formatDate(employee.doj)} />
-              <DetailItem label="Status" value={employee.status} />
+              {/* <DetailItem label="Status" value={employee.status} /> */}
               <DetailItem label="Created Date" value={formatDateTime(employee.createdAt)} />
-              <DetailItem label="Shift Date" value={formatDate(employee.shiftDate)} />
-              <DetailItem label="Shift Time" value={combinedShiftTime} /> 
+              <DetailItem label="Shift Time" value={combinedShiftTime} />
             </div>
           </div>
         </div>
@@ -73,6 +73,8 @@ const formatDate = (dateString) => {
   const date = new Date(dateString);
   return date.toLocaleDateString("en-GB").split('/').join('/');
 };
+
+
 const formatDateTime = (dateString) => {
   if (!dateString || isNaN(new Date(dateString).getTime())) {
     return "N/A";

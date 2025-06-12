@@ -64,7 +64,7 @@ const Topbar = () => {
       roles: ["Superadmin"],
     },
     { label: "MoM", path: "/momdetails", icon: FileText },
-    { label: "Quotations", path: "/quotation-table", icon: FileText },
+    { label: "Quotations", path: "/quotation-table", icon: FileText, roles: ["Superadmin"]},
   ];
 
   useEffect(() => {

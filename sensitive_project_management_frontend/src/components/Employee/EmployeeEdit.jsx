@@ -619,7 +619,7 @@ const EmployeeEdit = () => {
             </div>
 
             <div className="col-span-3">
-              <label className="block font-semibold ">Shift Date and Time</label>
+              <label className="block font-semibold ">Shift Time</label>
               <div className="border border-gray-300 p-4 rounded-md mt-2 w-1/2">
                 <div className="flex items-center space-x-4">
                   <div className="flex-1">

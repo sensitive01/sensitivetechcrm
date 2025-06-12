@@ -336,12 +336,14 @@ const ProjectManager = () => {
             )}
           </div>
           <div className="flex space-x-4">
+          {role === "Superadmin" && (
             <button
               onClick={handleAddProject}
               className="bg-blue-500 text-white px-6 py-2 rounded flex items-center hover:bg-blue-600"
             >
               Add Project
             </button>
+             )}
             {role === "Superadmin" && (
               <button
                 onClick={handleExportData}

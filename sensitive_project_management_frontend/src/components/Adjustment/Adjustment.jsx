@@ -3,11 +3,12 @@ import { createPayroll, employeename } from "../../api/services/projectServices"
 import { useNavigate } from "react-router-dom";
 
 function Adjustment() {
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
     const [payrolls, setPayrolls] = useState([
         {
             empId: "",
             type: "",
+            month: "",
             amount: "",
             note: "",
         },
@@ -46,7 +47,7 @@ function Adjustment() {
     };
 
     const handleAddFields = () => {
-        setPayrolls((prev) => [...prev, { empId: "", type: "", amount: "", note: "" }]);
+        setPayrolls((prev) => [...prev, { empId: "", type: "", month: "", amount: "", note: "" }]);
     };
 
     const handleRemoveFields = (index) => {
@@ -63,7 +64,7 @@ function Adjustment() {
 
                 if (response.status === 201) {
                     alert("Payroll entry created successfully!");
-                    navigate("/adjustment-table"); 
+                    navigate("/adjustment-table");
                 } else {
                     alert("Failed to create payroll entry.");
                 }
@@ -120,6 +121,25 @@ function Adjustment() {
                                 <option value="Advance">Advance</option>
                             </select>
                         </div>
+                        <div>
+                            <label className="block text-sm font-medium pb-2 text-gray-600">Month:</label>
+                            <select
+                                name="month"
+                                value={payroll.month}
+                                onChange={(e) => handleChange(index, e)}
+                                required
+                                className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="">Select Month</option>
+                                {[
+                                    "January", "February", "March", "April", "May", "June",
+                                    "July", "August", "September", "October", "November", "December"
+                                ].map((month) => (
+                                    <option key={month} value={month}>{month}</option>
+                                ))}
+                            </select>
+                        </div>
+
                         <div>
                             <label className="block text-sm font-medium pb-2 text-gray-600">Amount:</label>
                             <input

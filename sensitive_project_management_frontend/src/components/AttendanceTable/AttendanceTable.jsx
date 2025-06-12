@@ -5,7 +5,7 @@ import {
     useSortBy,
     usePagination,
 } from "react-table";
-import { FaPlus, FaFileDownload, FaFilter } from "react-icons/fa";
+import { FaPlus, FaFileDownload, FaFilter, FaEye, FaExclamationTriangle  } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import * as XLSX from "xlsx";
 
@@ -18,6 +18,14 @@ const AttendanceTable = () => {
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
+    
+    // Work report popup states
+    const [showWorkReportModal, setShowWorkReportModal] = useState(false);
+    const [workReport, setWorkReport] = useState("");
+    const [attachment, setAttachment] = useState(null);
+    const [currentRecordId, setCurrentRecordId] = useState(null);
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
+const [currentRecordDetails, setCurrentRecordDetails] = useState(null);
 
     useEffect(() => {
         const fetchAttendance = async () => {
@@ -52,29 +60,51 @@ const AttendanceTable = () => {
         fetchAttendance();
     }, [role, employeeId]);
 
+const openDetailsModal = (record) => {
+    setCurrentRecordDetails(record);
+    setShowDetailsModal(true);
+};
 
-    const handleLogoutTimeUpdate = async (recordId) => {
-        const record = attendanceRecords.find((rec) => String(rec._id) === String(recordId));
+const closeDetailsModal = () => {
+    setShowDetailsModal(false);
+    setCurrentRecordDetails(null);
+};
 
-        if (!record) {
-            alert("Unable to find the record. Please refresh the page and try again.");
-            return;
-        }
+    const openWorkReportModal = (recordId) => {
+        setCurrentRecordId(recordId);
+        setShowWorkReportModal(true);
+    };
 
-        if (record.logouttime) {
-            alert("Logout time has already been set.");
+    const closeWorkReportModal = () => {
+        setShowWorkReportModal(false);
+        setWorkReport("");
+        setAttachment(null);
+        setCurrentRecordId(null);
+    };
+
+    const handleAttachmentChange = (e) => {
+        setAttachment(e.target.files[0]);
+    };
+
+    const submitWorkReport = async () => {
+        if (!workReport.trim()) {
+            alert("Please fill in the work report before submitting.");
             return;
         }
 
         const logoutTime = new Date().toLocaleTimeString();
+        const formData = new FormData();
+        formData.append("logouttime", logoutTime);
+        formData.append("workReport", workReport);
+        
+        if (attachment) {
+            formData.append("attachment", attachment);
+        }
 
         try {
-            const response = await fetch(`https://sensitivetechcrm.onrender.com/attendance/logout/${recordId}`, {
+            const response = await fetch(`https://sensitivetechcrm.onrender.com/attendance/logout/${currentRecordId}`, {
                 method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ logouttime: logoutTime }),
+                body: formData,
             });
 
             if (!response.ok) {
@@ -82,15 +112,26 @@ const AttendanceTable = () => {
                 throw new Error(`Failed to update logout time: ${message}`);
             }
 
+            const result = await response.json();
+
             setAttendanceRecords((prevRecords) =>
                 prevRecords.map((rec) =>
-                    rec._id === recordId ? { ...rec, logouttime: logoutTime } : rec
+                    rec._id === currentRecordId 
+                        ? { 
+                            ...rec, 
+                            logouttime: logoutTime,
+                            workReport: workReport,
+                            attachment: result.updatedAttendance.attachment
+                          } 
+                        : rec
                 )
             );
 
-            alert("Logout time updated successfully.");
+            alert("Logout time and work report submitted successfully.");
+            closeWorkReportModal();
         } catch (err) {
-            alert("Failed to update logout time. Please try again.");
+            alert("Failed to submit work report. Please try again.");
+            console.error(err);
         }
     };
 
@@ -110,6 +151,8 @@ const AttendanceTable = () => {
                 minute: "2-digit",
             }),
             "Logout Time": record.logouttime || "Not Set",
+            "Work Report": record.workReport || "Not Available",
+            "Attachment": record.attachment ? "Yes" : "No",
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(exportData);
@@ -117,6 +160,7 @@ const AttendanceTable = () => {
         XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance Records");
         XLSX.writeFile(workbook, `Attendance_Records_${new Date().toISOString().split("T")[0]}.xlsx`);
     };
+
     const handleDateFilterChange = () => {
         if (role !== "Superadmin") return;
     
@@ -134,13 +178,17 @@ const AttendanceTable = () => {
         setAttendanceRecords(filteredData);
     };
     
-    
     const handleSearch = (searchValue) => {
         if (role !== "Superadmin") return; 
 
         setGlobalFilter(searchValue);
     };
 
+    const getFileNameFromUrl = (url) => {
+        if (!url) return "Attachment";
+        const parts = url.split('/');
+        return parts[parts.length - 1].split('?')[0];
+    };
 
     const columns = useMemo(
         () => [
@@ -149,13 +197,15 @@ const AttendanceTable = () => {
                 accessor: (row, index) => index + 1,
             },
             {
-                Header: "Employee ID",
-                accessor: "employeeId",
-            },
-            {
-                Header: "Name",
-                accessor: "employeeName",
-            },
+            Header: "Employee",
+            accessor: "employeeId",
+            Cell: ({ row }) => (
+                <div className="flex flex-col">
+                    <span className="font-semibold">{row.original.employeeId}</span>
+                    <span className="text-blue-600 font-semibold">{row.original.employeeName}</span>
+                </div>
+            ),
+        },
             {
                 Header: "Photo",
                 accessor: "photo",
@@ -167,10 +217,10 @@ const AttendanceTable = () => {
                     />
                 ),
             },
-            {
-                Header: "Status",
-                accessor: (row) => (row.createdAt ? "Present" : "Absent"),
-            },
+            // {
+            //     Header: "Status",
+            //     accessor: (row) => (row.createdAt ? "Present" : "Absent"),
+            // },
             {
                 Header: "Date",
                 accessor: (row) =>
@@ -188,28 +238,61 @@ const AttendanceTable = () => {
                         minute: "2-digit",
                     }),
             },
-            {
+            {   
                 Header: "Logout Time",
                 accessor: "logouttime",
-                Cell: ({ value }) => value || "Not Set",
+                Cell: ({ value }) => value ? (
+        value
+    ) : (
+        <span className="text-red-600 font-bold flex items-center">
+            <FaExclamationTriangle className="mr-1" />
+            Not Set
+        </span>
+    ),
             },
-            {
-                Header: "Actions",
-                accessor: "_id",
-                Cell: ({ row }) =>
+           {
+    Header: "Work Report",
+    accessor: "workReport",
+    Cell: ({ value }) => value ? 
+        (value.length > 20 ? `${value.substring(0, 20)}...` : value) : 
+        <span className="text-orange-600 font-bold flex items-center">
+            <FaExclamationTriangle className="mr-1" />
+            Not Available
+        </span>,
+},
+          {
+    Header: "Actions",
+    accessor: "_id",
+    Cell: ({ row }) => {
+        return (
+            <div className="flex space-x-2">
+                <button
+                    onClick={() => openDetailsModal(row.original)}
+                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 flex items-center text-sm"
+                    title="View Details"
+                >
+                    <FaEye className="mr-1" />
+                    View
+                </button>
+                
+                {role !== "Superadmin" && (
                     !row.original.logouttime ? (
                         <button
-                            onClick={() => handleLogoutTimeUpdate(row.original._id)}
-                            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                            onClick={() => openWorkReportModal(row.original._id)}
+                            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 text-sm"
                         >
                             Set Logout
                         </button>
                     ) : (
-                        <span className="text-gray-500">Logout Time Set</span>
-                    ),
-            },
+                        <span className="text-gray-500 text-sm">Logout Set</span>
+                    )
+                )}
+            </div>
+        );
+    },
+},
         ],
-        [attendanceRecords]
+        []
     );
 
     const {
@@ -225,24 +308,27 @@ const AttendanceTable = () => {
         canNextPage,
         canPreviousPage,
         pageOptions,
+        setPageSize,
     } = useTable(
         {
             columns,
             data: attendanceRecords,
-            initialState: { pageSize: 10 },
+            initialState: { pageSize: 10,pageIndex: 0  },
+            manualPagination: false,
+             pageCount: -1,
         },
         useGlobalFilter,
         useSortBy,
         usePagination
     );
 
-    const { globalFilter, pageIndex } = state;
+    const { globalFilter, pageIndex, pageSize  } = state;
 
     if (loading) return <p className="text-center p-6">Loading attendance records...</p>;
     if (error) return <p className="text-center text-red-500 p-6">Error: {error}</p>;
 
     return (
-        <div className=" mx-auto p-6">
+        <div className="mx-auto p-6">
             <h2 className="text-4xl font-bold mb-10 text-center mt-24">Attendance Records</h2>
 
             <div className="flex justify-between items-center mb-4">
@@ -267,7 +353,6 @@ const AttendanceTable = () => {
                                     id="startDate"
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
-
                                     className="border border-blue-500 p-2 rounded w-32"
                                 />
                             </div>
@@ -278,7 +363,6 @@ const AttendanceTable = () => {
                                     id="endDate"
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
-
                                     className="border border-blue-500 p-2 rounded w-32"
                                 />
                             </div>
@@ -291,7 +375,6 @@ const AttendanceTable = () => {
                         </>
                     )}
                 </div>
-
 
                 <div className="flex space-x-4">
                     {role === "Superadmin" && (
@@ -343,20 +426,234 @@ const AttendanceTable = () => {
                     </tbody>
                 </table>
 
-                <div className="flex justify-between p-4">
-                    <span>
-                        Page {pageIndex + 1} of {pageOptions.length}
-                    </span>
-                    <div>
-                        <button onClick={previousPage} disabled={!canPreviousPage} className="px-4 py-2">
-                            Previous
-                        </button>
-                        <button onClick={nextPage} disabled={!canNextPage} className="px-4 py-2">
-                            Next
-                        </button>
+ <div className="flex justify-between items-center p-4">
+    <div className="flex items-center space-x-4">
+        <span className="text-gray-700">
+            Page {pageIndex + 1} of {pageOptions.length}
+        </span>
+        
+        <select
+            value={state.pageSize}
+            onChange={e => {
+                setPageSize(Number(e.target.value));
+            }}
+            className="border border-gray-300 rounded px-3 py-1 text-sm"
+        >
+            {[10, 25, 50, 100].map(pageSize => (
+                <option key={pageSize} value={pageSize}>
+                    Show {pageSize}
+                </option>
+            ))}
+        </select>
+    </div>
+
+    <div className="flex space-x-2">
+        <button 
+            onClick={previousPage} 
+            disabled={!canPreviousPage} 
+            className={`px-4 py-2 rounded-md ${!canPreviousPage ? 
+                'bg-gray-300 cursor-not-allowed' : 
+                'bg-red-500 hover:bg-red-600 text-white'}`}
+        >
+            Previous
+        </button>
+        <button 
+            onClick={nextPage} 
+            disabled={!canNextPage} 
+            className={`px-4 py-2 rounded-md ${!canNextPage ? 
+                'bg-gray-300 cursor-not-allowed' : 
+                'bg-green-500 hover:bg-green-600 text-white'}`}
+        >
+            Next
+        </button>
+    </div>
+</div>
+            </div>
+
+            {/* Work Report Modal */}
+            {showWorkReportModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+                        <h3 className="text-xl font-bold mb-4">Submit Work Report</h3>
+                        <div className="mb-4">
+                            <label htmlFor="workReport" className="block text-sm font-medium text-gray-700 mb-1">
+                                Work Report <span className="text-red-500">*</span>
+                            </label>
+                            <textarea
+                                id="workReport"
+                                value={workReport}
+                                onChange={(e) => setWorkReport(e.target.value)}
+                                className="w-full border border-gray-300 rounded p-2 min-h-[150px]"
+                                placeholder="Please provide details of your work today..."
+                                required
+                            />
+                        </div>
+                        <div className="mb-6">
+                            <label htmlFor="attachment" className="block text-sm font-medium text-gray-700 mb-1">
+                                Attachment (Optional)
+                            </label>
+                            <input
+                                type="file"
+                                id="attachment"
+                                onChange={handleAttachmentChange}
+                                className="w-full border border-gray-300 rounded p-2"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Upload any supporting documents (max size: 5MB)</p>
+                        </div>
+                        <div className="flex justify-end space-x-3">
+                            <button
+                                onClick={closeWorkReportModal}
+                                className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={submitWorkReport}
+                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                            >
+                                Submit
+                            </button>
+                        </div>
                     </div>
                 </div>
+            )}
+
+            {/* View Details Modal */}
+{showDetailsModal && currentRecordDetails && (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-2xl">
+            <div className="flex justify-between items-center mb-4">
+                <h3 className="text-green-600 font-bold text-xl">Attendance Details</h3>
+                <button
+                    onClick={closeDetailsModal}
+                    className="text-gray-500 hover:text-gray-700"
+                >
+                    ✕
+                </button>
             </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="flex items-center space-x-4">
+                    <img
+                        src={currentRecordDetails.photo || "https://via.placeholder.com/150"}
+                        alt="Employee"
+                        className="w-16 h-16 rounded-full object-cover"
+                    />
+                    <div>
+                        <h4 className="text-blue-600 font-semibold">{currentRecordDetails.employeeName}</h4>
+                        <p className="text-sm text-gray-600">ID: {currentRecordDetails.employeeId}</p>
+                    </div>
+                </div>
+                
+                <div className="space-y-2">
+                    <div className="flex justify-between">
+                        <span className="text-gray-600">Status:</span>
+                        <span className="font-medium">
+                            {currentRecordDetails.createdAt ? "Present" : "Absent"}
+                        </span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="text-gray-600">Date:</span>
+                        <span className="font-medium">
+                            {new Intl.DateTimeFormat("en-GB", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "2-digit",
+                            }).format(new Date(currentRecordDetails.createdAt))}
+                        </span>
+                    </div>
+                </div>
+                
+                <div className="space-y-2">
+                    <div className="flex justify-between">
+                        <span className="text-gray-600">Login Time:</span>
+                        <span className="font-medium">
+                            {new Date(currentRecordDetails.createdAt).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            })}
+                        </span>
+                    </div>
+                    <div className="flex justify-between">
+    <span className="text-gray-600">Logout Time:</span>
+    <span className={currentRecordDetails.logouttime ? "font-medium" : "text-red-600 font-bold flex items-center"}>
+        {currentRecordDetails.logouttime ? (
+            currentRecordDetails.logouttime
+        ) : (
+            <>
+                <FaExclamationTriangle className="mr-1" />
+                Not Set
+            </>
+        )}
+    </span>
+</div>
+                </div>
+                
+                {currentRecordDetails.ipAddress && (
+                    <div className="space-y-2">
+                        <div className="flex justify-between">
+                            <span className="text-gray-600">IP Address:</span>
+                            <span className="font-medium">
+                                {currentRecordDetails.ipAddress}
+                            </span>
+                        </div>
+                        {currentRecordDetails.location && (
+                            <div className="flex justify-between">
+                                <span className="text-gray-600">Location:</span>
+                                <span className="font-medium">
+                                    {currentRecordDetails.location}
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+            
+  <div className="mb-6">
+    <h2 className="text-blue-600 font-bold text-xl mb-3 border-b border-gray-200 pb-2">
+        Work Report
+    </h2>
+    <div className="bg-gray-50 p-4 rounded-lg max-h-64 overflow-y-auto whitespace-pre-wrap break-words text-gray-700">
+        {currentRecordDetails.workReport ? (
+            currentRecordDetails.workReport
+        ) : (
+            <span className="text-orange-600 font-bold flex items-center">
+                <FaExclamationTriangle className="mr-1" />
+                No work report submitted.
+            </span>
+        )}
+    </div>
+</div>
+            
+            {currentRecordDetails.attachment && (
+                <div className="mb-6">
+                    <h4 className="font-semibold mb-2">Attachment</h4>
+                    <div className="flex items-center space-x-4">
+                        <a 
+                            href={currentRecordDetails.attachment} 
+                            download={getFileNameFromUrl(currentRecordDetails.attachment)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-green-500 hover:text-green-700 flex items-center"
+                        >
+                            <FaEye className="mr-1" />
+                            View Attachment
+                        </a>
+                    </div>
+                </div>
+            )}
+            
+            <div className="flex justify-end">
+                <button
+                    onClick={closeDetailsModal}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+)}
         </div>
     );
 };
