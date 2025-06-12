@@ -3,9 +3,9 @@ import { updatePayroll, getPayrollById, employeename } from "../../api/services/
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
-function AdjustmentEdit({payrollId}) {
-    const navigate = useNavigate(); 
-    const {id} = useParams();
+function AdjustmentEdit({ payrollId }) {
+    const navigate = useNavigate();
+    const { id } = useParams();
     console.log(id);
     const empid = localStorage.getItem("empId");
     const [role, setRole] = useState(localStorage.getItem("role") || "Superadmin");
@@ -13,6 +13,7 @@ function AdjustmentEdit({payrollId}) {
         {
             empId: "",
             type: "",
+            month: "",
             amount: "",
             note: "",
         },
@@ -64,7 +65,7 @@ function AdjustmentEdit({payrollId}) {
     };
 
     const handleAddFields = () => {
-        setPayrolls((prev) => [...prev, { empId: "", type: "", amount: "", note: "" }]);
+        setPayrolls((prev) => [...prev, { empId: "", type: "", month: "", amount: "", note: "" }]);
     };
 
     const handleRemoveFields = (index) => {
@@ -73,18 +74,18 @@ function AdjustmentEdit({payrollId}) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         if (!id) {
             alert("No payroll ID available for updating.");
             return;
         }
-    
+
         try {
             for (const formData of payrolls) {
                 const response = await updatePayroll(id, formData);
                 if (response.status === 200) {
                     alert("Adjustment updated successfully!");
-                    navigate("/adjustment-table"); 
+                    navigate("/adjustment-table");
                 }
             }
         } catch (error) {
@@ -92,7 +93,7 @@ function AdjustmentEdit({payrollId}) {
             alert("An error occurred while updating the payroll data.");
         }
     };
-    
+
 
     if (loading) {
         return <p className="text-xl text-center mt-20">Loading...</p>;
@@ -140,6 +141,24 @@ function AdjustmentEdit({payrollId}) {
                                 <option value="Allowances">Allowances</option>
                                 <option value="Deductions">Deductions</option>
                                 <option value="Advance">Advance</option>
+                            </select>
+                        </div>
+                         <div>
+                            <label className="block text-sm font-medium pb-2 text-gray-600">Month:</label>
+                            <select
+                                name="month"
+                                value={payroll.month}
+                                onChange={(e) => handleChange(index, e)}
+                                required
+                                className="border border-gray-300 p-3 w-full rounded-lg focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="">Select Month</option>
+                                {[
+                                    "January", "February", "March", "April", "May", "June",
+                                    "July", "August", "September", "October", "November", "December"
+                                ].map((month) => (
+                                    <option key={month} value={month}>{month}</option>
+                                ))}
                             </select>
                         </div>
                         <div>

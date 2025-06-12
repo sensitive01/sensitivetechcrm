@@ -1,9 +1,24 @@
 import { projectServices } from "../axios/axiosInstance";
 
 
+// export const verifyLogin = async (formData) => {
+//   try {
+//     const response = await projectServices.post(`/employee-login/login`, formData);
+//     return response;
+//   } catch (err) {
+//     throw err;
+//   }
+// };
+
+
 export const verifyLogin = async (formData) => {
   try {
     const response = await projectServices.post(`/employee-login/login`, formData);
+    
+    // Set token expiration to 1 minute (60000 milliseconds) from now
+    const expirationTime = new Date().getTime() + 60000;
+    localStorage.setItem("tokenExpiration", expirationTime.toString());
+    
     return response;
   } catch (err) {
     throw err;

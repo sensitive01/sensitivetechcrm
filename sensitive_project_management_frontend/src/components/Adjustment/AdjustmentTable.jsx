@@ -118,6 +118,10 @@ const AdjustmentTable = () => {
             accessor: 'type',
         },
         {
+            Header: 'Month',
+            accessor: 'month',
+        },
+        {
             Header: 'Amount',
             accessor: 'amount',
         },
