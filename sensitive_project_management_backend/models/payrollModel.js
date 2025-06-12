@@ -5,6 +5,7 @@ const PayrollSchema = new mongoose.Schema({
       type: String,
     },
     type: { type: String,  },
+    month: { type: String },
     amount: { type: String, },
     note: { type: String },
  }, { timestamps: true });

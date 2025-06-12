@@ -1,8 +1,8 @@
 const Payroll = require("../models/payrollModel");
 exports.createPayroll = async (req, res) => {
     try {
-        const { empId, type, amount, note } = req.body;
-        const payroll = new Payroll({ empId, type, amount, note });
+        const { empId, type, month, amount, note } = req.body;
+        const payroll = new Payroll({ empId, type, month, amount, note });
         await payroll.save();
         res.status(201).json({ message: "Payroll entry created successfully", payroll });
     } catch (error) {
