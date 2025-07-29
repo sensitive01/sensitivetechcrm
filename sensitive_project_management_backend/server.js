@@ -21,6 +21,7 @@ const momRoutes =  require('./routes/momRoute');
 const quotationRoutes =  require('./routes/quotationRoute');
 const placesRoutes = require('./routes/placesRoutes');
 const placeDetailsRoute = require("./routes/placeDetailsRoute");
+const emailOTP = require("./routes/emailotpRoute")
 
 dotenv.config();
 
@@ -78,6 +79,7 @@ app.use('/task', taskRouter)
 app.use('/employee-login',verificationRoutes);
 app.use('/super-admin', superadminRouter)
 app.use('/admin-login',verificationRoutes);
+app.use('/email',emailOTP);
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
