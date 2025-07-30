@@ -1,5 +1,5 @@
 // import React, { useState, useEffect } from "react";
-// import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+// import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 // import Dashboard from "./components/Dashboard/Dashboard";
 // import Topbar from "./components/Topbar/Topbar";
 // import EmployeeTable from "./components/Employee/EmployeeTable";
@@ -50,7 +50,44 @@
 //   return <>{children}</>;
 // };
 
+// const checkTokenExpiration = () => {
+//   const expirationTime = localStorage.getItem("tokenExpiration");
+//   if (!expirationTime) return true; // No expiration time set, consider expired
+  
+//   const currentTime = new Date().getTime();
+//   return currentTime > parseInt(expirationTime, 10);
+// };
+
 // const AdminLayout = ({ children, loading }) => {
+//   const navigate = useNavigate();
+//   const location = useLocation();
+
+//   useEffect(() => {
+//     const checkAuth = () => {
+//       const token = localStorage.getItem("empId");
+//       const isExpired = checkTokenExpiration();
+      
+//       if ((!token || isExpired) && location.pathname !== "/login") {
+//         // Clear all auth-related data
+//         localStorage.removeItem("empId");
+//         localStorage.removeItem("role");
+//         localStorage.removeItem("tokenExpiration");
+        
+//         navigate("/login", { 
+//           state: { 
+//             sessionExpired: isExpired,
+//             from: location.pathname 
+//           } 
+//         });
+//       }
+//     };
+
+//     const authInterval = setInterval(checkAuth, 120000); // Check every 5 minutes
+//     checkAuth(); // Initial check
+
+//     return () => clearInterval(authInterval);
+//   }, [navigate, location.pathname, location]);
+
 //   return (
 //     <div className="app">
 //       {loading && <Preloader />} 
@@ -103,6 +140,7 @@
 //       setLoading(false); 
 //     }
 //   }, [location]);
+
 //   const employeeRoutes = [
 //     '/dashboard', 
 //     '/attendance-table', 
@@ -121,6 +159,7 @@
 //     '/mom-edit', 
 //     '/search-results'
 //   ];
+
 //   const adminRoutes = [
 //     '/admin',
 //     '/dashboard',
@@ -164,6 +203,7 @@
 //     '/search-leads',
 //     '/search-results'
 //   ];
+
 //   const isValidPath = (path) => {
 //     if (role === "employee") {
 //       return employeeRoutes.some(route => path.startsWith(route));
@@ -248,7 +288,6 @@
 //                     <Route path="/mom" element={<MoM />} />
 //                     <Route path="/momdetails" element={<BlogPage />} />
 //                     <Route path="/mom-edit/:id" element={<MoMEdit />} />
-//                     {/* <Route path="/updatelog" element={<DispositionForm />} /> */}
 //                     <Route path="/payroll-table" element={<PayrollEmployee />} />
 //                     <Route path="/payroll-form/:id" element={<PayrollForm />} />
 //                     <Route path="/quotation-form" element={<QuotationForm />} />
@@ -268,7 +307,6 @@
 // };
 
 // export default App;
-
 
 
 import React, { useState, useEffect } from "react";
@@ -322,44 +360,69 @@ import SearchLeads from "./components/SearchLeads/SearchLeads";
 const RouteTransition = ({ children }) => {
   return <>{children}</>;
 };
+// Add these utility functions at the top of App.jsx
+const refreshSession = () => {
+  const expirationTime = new Date().getTime() + 10 * 60 * 1000;
+  localStorage.setItem("tokenExpiration", expirationTime.toString());
+};
 
 const checkTokenExpiration = () => {
   const expirationTime = localStorage.getItem("tokenExpiration");
-  if (!expirationTime) return true; // No expiration time set, consider expired
-  
-  const currentTime = new Date().getTime();
-  return currentTime > parseInt(expirationTime, 10);
+  if (!expirationTime) return true;
+  return new Date().getTime() > parseInt(expirationTime, 10);
 };
+
 
 const AdminLayout = ({ children, loading }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem("empId");
-      const isExpired = checkTokenExpiration();
+  // Check auth status
+  const checkAuth = () => {
+    const token = localStorage.getItem("empId");
+    const isExpired = checkTokenExpiration();
+    
+    if ((!token || isExpired) && location.pathname !== "/login") {
+      localStorage.removeItem("empId");
+      localStorage.removeItem("role");
+      localStorage.removeItem("tokenExpiration");
       
-      if ((!token || isExpired) && location.pathname !== "/login") {
-        // Clear all auth-related data
-        localStorage.removeItem("empId");
-        localStorage.removeItem("role");
-        localStorage.removeItem("tokenExpiration");
-        
-        navigate("/login", { 
-          state: { 
-            sessionExpired: isExpired,
-            from: location.pathname 
-          } 
-        });
-      }
+      navigate("/login", { 
+        state: { 
+          sessionExpired: isExpired,
+          from: location.pathname 
+        } 
+      });
+    }
+  };
+
+  useEffect(() => {
+    // Refresh session on initial load and route changes
+    refreshSession();
+    
+    // Set up activity listeners
+    const handleActivity = () => refreshSession();
+    const events = ['mousedown', 'keypress', 'scroll', 'touchstart'];
+    
+    events.forEach(event => {
+      window.addEventListener(event, handleActivity);
+    });
+
+    // Check auth periodically
+    const authInterval = setInterval(checkAuth, 60000);
+
+    return () => {
+      events.forEach(event => {
+        window.removeEventListener(event, handleActivity);
+      });
+      clearInterval(authInterval);
     };
+  }, [navigate, location.pathname]);
 
-    const authInterval = setInterval(checkAuth, 30000); // Check every 5 minutes
-    checkAuth(); // Initial check
-
-    return () => clearInterval(authInterval);
-  }, [navigate, location.pathname, location]);
+  // Refresh session on route changes
+  useEffect(() => {
+    refreshSession();
+  }, [location.pathname]);
 
   return (
     <div className="app">

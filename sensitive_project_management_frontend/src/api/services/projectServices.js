@@ -15,8 +15,8 @@ export const verifyLogin = async (formData) => {
   try {
     const response = await projectServices.post(`/employee-login/login`, formData);
     
-    // Set token expiration to 1 minute (60000 milliseconds) from now
-    const expirationTime = new Date().getTime() + 60000;
+    // Set expiration to 10 minutes (600,000 milliseconds)
+    const expirationTime = new Date().getTime() + 600000;
     localStorage.setItem("tokenExpiration", expirationTime.toString());
     
     return response;
@@ -24,6 +24,29 @@ export const verifyLogin = async (formData) => {
     throw err;
   }
 };
+
+export const sendOTP = async (data) => {
+  try {
+    const response = await projectServices.post(`/email/send-otp`, data);
+        const expirationTime = new Date().getTime() + 600000;
+    localStorage.setItem("tokenExpiration", expirationTime.toString());
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const verifyOTP = async (data) => {
+  try {
+    const response = await projectServices.post(`/email/verify-otp`, data);
+        const expirationTime = new Date().getTime() + 600000;
+    localStorage.setItem("tokenExpiration", expirationTime.toString());
+    return response;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
   export const getTheProject=async(projectId) => {
     try {

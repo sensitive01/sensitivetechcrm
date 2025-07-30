@@ -219,12 +219,12 @@ const Topbar = () => {
               {menuItems.map((item) => renderMenuItem(item))}
             </div>
             <div className="flex items-center space-x-4">
-              <button
+              {/* <button
                 onClick={toggleSearch}
                 className="p-2 hover:bg-blue-700 rounded-md"
               >
                 <Search className="h-5 w-5" />
-              </button>
+              </button> */}
 
               <button onClick={handleLogout} className="bg-white text-blue-600 px-4 py-2 rounded-md">
                 <FaPowerOff className="h-5 w-5" />
