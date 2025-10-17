@@ -1,12 +1,11 @@
 // otpController.js
 const employeeSchema = require("../models/employeeSchema");
 const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 require("dotenv").config();
 
 // In-memory store for OTPs (in production, use Redis or database)
 const otpStore = new Map();
-
-
 
 // Configure email transporter
 const transporter = nodemailer.createTransport({
@@ -16,13 +15,13 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS_CRM,
   },
   tls: {
-    rejectUnauthorized: false,
+    rejectUnauthorized: false, // for testing; remove in production
   },
 });
 
-// Generate random 6-digit OTP
+// Generate random 6-digit OTP securely
 const generateOTP = () => {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return crypto.randomInt(100000, 1000000).toString();
 };
 
 // Send OTP to email
@@ -32,20 +31,20 @@ const sendOTP = async (req, res) => {
 
     // Check if employee exists
     const empData = await employeeSchema.findOne({ email });
-    const userName = empData?.name || "User";
     if (!empData) {
       return res.status(404).json({ message: "Employee not found" });
     }
+    const userName = empData.name || "User";
 
-    // Generate OTP
+    // Generate OTP and expiry (5 minutes)
     const otp = generateOTP();
-    const otpExpiry = Date.now() + 5 * 60 * 1000; // OTP valid for 5 minutes
+    const otpExpiry = Date.now() + 5 * 60 * 1000;
 
     // Store OTP temporarily
     otpStore.set(email, { otp, expiry: otpExpiry });
-    console.log("Email is sending....")
+    console.log("Email is sending....");
 
-    // Send email
+    // Send email with full HTML template
     const mailOptions = {
       from: process.env.EMAIL_USER_CRM,
       to: email,
