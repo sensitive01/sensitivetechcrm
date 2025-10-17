@@ -6,6 +6,7 @@ require("dotenv").config();
 // In-memory store for OTPs (in production, use Redis or database)
 const otpStore = new Map();
 
+console.log("Email is sending....")
 
 // Configure email transporter
 const transporter = nodemailer.createTransport({
