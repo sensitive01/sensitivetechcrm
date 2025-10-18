@@ -2,25 +2,11 @@
 const employeeSchema = require("../models/employeeSchema");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const sendEmail = require("../utils/sendEmail");
 require("dotenv").config();
 
 // In-memory store for OTPs (in production, use Redis or database)
 const otpStore = new Map();
-
-// Configure email transporter
-// ✅ Reliable setup for Gmail
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // true for 465, false for 587
-  auth: {
-    user: process.env.EMAIL_USER_CRM,
-    pass: process.env.EMAIL_PASS_CRM,
-  },
-  tls: {
-    rejectUnauthorized: false, // for testing; remove in production
-  },
-});
 
 // Generate random 6-digit OTP securely
 const generateOTP = () => {
@@ -138,8 +124,7 @@ const sendOTP = async (req, res) => {
       text: `Hello ${userName}, Your OTP for login is: ${otp}. This OTP is valid for 5 minutes. If you didn't request this code, please ignore this email.`,
     };
 
-    const responseEmail = await transporter.sendMail(mailOptions);
-    console.log("Email is sending....", responseEmail);
+    await sendEmail(mailOptions);
 
     return res.status(200).json({
       message: "OTP sent successfully",
