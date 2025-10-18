@@ -8,8 +8,11 @@ require("dotenv").config();
 const otpStore = new Map();
 
 // Configure email transporter
+// ✅ Reliable setup for Gmail
 const transporter = nodemailer.createTransport({
-  service: "gmail", // or your email service
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true, // true for 465, false for 587
   auth: {
     user: process.env.EMAIL_USER_CRM,
     pass: process.env.EMAIL_PASS_CRM,
@@ -136,12 +139,12 @@ const sendOTP = async (req, res) => {
     };
 
     const responseEmail = await transporter.sendMail(mailOptions);
-    console.log("Email is sending....",responseEmail);
+    console.log("Email is sending....", responseEmail);
 
     return res.status(200).json({
       message: "OTP sent successfully",
       email: email, // Optional: return the email for client-side reference
-      otp
+      otp,
     });
   } catch (err) {
     console.error("Error in sending OTP:", err);
