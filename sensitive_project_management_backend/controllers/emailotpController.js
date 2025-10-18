@@ -42,7 +42,6 @@ const sendOTP = async (req, res) => {
 
     // Store OTP temporarily
     otpStore.set(email, { otp, expiry: otpExpiry });
-    console.log("Email is sending....");
 
     // Send email with full HTML template
     const mailOptions = {
@@ -136,11 +135,13 @@ const sendOTP = async (req, res) => {
       text: `Hello ${userName}, Your OTP for login is: ${otp}. This OTP is valid for 5 minutes. If you didn't request this code, please ignore this email.`,
     };
 
-    await transporter.sendMail(mailOptions);
+    const responseEmail = await transporter.sendMail(mailOptions);
+    console.log("Email is sending....",responseEmail);
 
     return res.status(200).json({
       message: "OTP sent successfully",
       email: email, // Optional: return the email for client-side reference
+      otp
     });
   } catch (err) {
     console.error("Error in sending OTP:", err);
