@@ -124,7 +124,7 @@ const sendOTP = async (req, res) => {
       text: `Hello ${userName}, Your OTP for login is: ${otp}. This OTP is valid for 5 minutes. If you didn't request this code, please ignore this email.`,
     };
 
-    await sendEmail(mailOptions);
+    // await sendEmail(mailOptions);
 
     return res.status(200).json({
       message: "OTP sent successfully",
